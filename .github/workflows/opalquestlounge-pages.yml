@@ -1,7 +1,7 @@
 name: Deploy Opal Quest Lounge to GitHub Pages
 
-# Manual on purpose: GitHub Pages for this repository currently serves the
-# Pixel Crown Club site from the branch root. Switch Settings → Pages →
+# Manual on purpose: the repository root holds the Pixel Crown Club site,
+# and GitHub Pages serves one site per repository. Set Settings → Pages →
 # Source to "GitHub Actions" (or move opalquestlounge/ to its own repository)
 # before running this. See opalquestlounge/README.md.
 on:

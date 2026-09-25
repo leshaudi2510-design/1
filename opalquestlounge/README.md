@@ -117,8 +117,9 @@ npm run simulate:21       # 20 млн раздач блэкджека
 
 ### Вариант 2. GitHub Pages
 
-В этом репозитории GitHub Pages уже раздаёт Pixel Crown Club из корня ветки. На один репозиторий GitHub Pages даёт один сайт,
-поэтому для GitHub Pages вынесите `opalquestlounge/` в отдельный репозиторий. Либо переключите Pages этого репозитория на GitHub Actions: тогда Pixel Crown Club перестанет публиковаться отсюда.
+Корень этого репозитория занят сайтом Pixel Crown Club (его README предлагает публиковать корень ветки через GitHub Pages).
+GitHub Pages даёт один сайт на репозиторий. Поэтому либо публикуйте отсюда Opal Quest Lounge через GitHub Actions (тогда Pixel Crown Club
+нужно будет публиковать где-то ещё), либо вынесите `opalquestlounge/` в отдельный репозиторий.
 
 1. Settings → Pages → Source: **GitHub Actions**.
 2. Actions → **Deploy Opal Quest Lounge to GitHub Pages** → Run workflow (файл `.github/workflows/opalquestlounge-pages.yml`).
