@@ -1,0 +1,32 @@
+{
+  "brand": "Opal Quest Lounge",
+  "shortName": "Opal Lounge",
+  "domain": "opalquestlounge.com",
+  "concept": "A Victorian collector's mineral cabinet: specimen labels, crystal drawings, the lapidary's wheel and the play-of-colour of opal.",
+  "currency": {
+    "singular": "Carat",
+    "plural": "Carats",
+    "abbr": "ct",
+    "startingBalance": 1000,
+    "topUpAmount": 1000,
+    "topUpBelow": 100
+  },
+  "operator": {
+    "companyName": "[Operator company name] Ltd",
+    "companyNumber": "[Companies House number]",
+    "registeredIn": "England and Wales",
+    "address": "[Registered office address], United Kingdom",
+    "email": "hello@opalquestlounge.com"
+  },
+  "purchases": false,
+  "analytics": {
+    "ga4": "",
+    "adsConversionId": ""
+  },
+  "contactEndpoint": "",
+  "lastUpdated": "2026-09-25",
+  "themeColor": {
+    "light": "#f6f2ea",
+    "dark": "#0d0f18"
+  }
+}

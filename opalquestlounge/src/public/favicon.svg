@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Opal Quest Lounge</title>
+  <defs>
+    <clipPath id="c"><ellipse cx="32" cy="32" rx="29" ry="23"/></clipPath>
+    <radialGradient id="dome" cx="36%" cy="28%" r="80%">
+      <stop offset="0" stop-color="#fff" stop-opacity=".55"/>
+      <stop offset=".3" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".8" stop-color="#000" stop-opacity=".1"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".45"/>
+    </radialGradient>
+  </defs>
+  <g clip-path="url(#c)">
+    <rect width="64" height="64" fill="#10131b"/>
+    <g stroke="#10131b" stroke-width="2.2" stroke-linejoin="round">
+    <path d="M11.3 0.0 L28.5 0.0 L31.8 16.5 L23.8 26.0 L19.0 25.9Z" fill="#1f6fd1"/>
+    <path d="M28.5 0.0 L61.2 0.0 L42.6 21.6 L31.8 16.5Z" fill="#14a6b8"/>
+    <path d="M36.4 38.1 L32.8 37.0 L23.8 26.0 L31.8 16.5 L42.6 21.6 L44.3 30.6Z" fill="#22b573"/>
+    <path d="M0.0 38.4 L0.0 23.2 L16.0 27.8 L13.4 38.3Z" fill="#3cc46a"/>
+    <path d="M26.5 64.0 L15.1 64.0 L17.6 45.4 L32.8 37.0 L36.4 38.1 L37.4 41.7Z" fill="#d7b531"/>
+    <path d="M0.0 0.0 L11.3 0.0 L19.0 25.9 L16.0 27.8 L0.0 23.2Z" fill="#e06a2a"/>
+    <path d="M64.0 63.4 L64.0 64.0 L26.5 64.0 L37.4 41.7Z" fill="#2b88e6"/>
+    <path d="M61.2 0.0 L64.0 0.0 L64.0 23.5 L49.2 31.5 L44.3 30.6 L42.6 21.6Z" fill="#19a38a"/>
+    <path d="M13.4 38.3 L16.0 27.8 L19.0 25.9 L23.8 26.0 L32.8 37.0 L17.6 45.4Z" fill="#8fce4a"/>
+    <path d="M64.0 52.7 L64.0 63.4 L37.4 41.7 L36.4 38.1 L44.3 30.6 L49.2 31.5Z" fill="#1d5fc0"/>
+    <path d="M15.1 64.0 L0.0 64.0 L0.0 38.4 L13.4 38.3 L17.6 45.4Z" fill="#e5902f"/>
+    <path d="M64.0 23.5 L64.0 52.7 L49.2 31.5Z" fill="#2fb6a0"/>
+    </g>
+    <rect width="64" height="64" fill="url(#dome)"/>
+  </g>
+  <ellipse cx="32" cy="32" rx="29" ry="23" fill="none" stroke="#f6f2ea" stroke-width="2.4"/>
+  <ellipse cx="32" cy="32" rx="30.6" ry="24.6" fill="none" stroke="#10131b" stroke-width="1.2"/>
+</svg>

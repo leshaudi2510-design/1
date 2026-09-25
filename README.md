@@ -83,3 +83,12 @@ python3 -m http.server 8000
 - Реквизиты владельца или компании и контактный email в `terms.html`.
 - ID аналитики и ссылки на соцсети в `assets/js/config.js` (по желанию).
 - При каждом обновлении файлов меняйте `VERSION` в `sw.js`, чтобы установленное приложение подтянуло новую версию.
+
+## Второй сайт в репозитории: Opal Quest Lounge
+
+Папка [`opalquestlounge/`](opalquestlounge/) содержит отдельный сайт для **opalquestlounge.com**:
+бесплатное социальное казино для UK в концепции викторианского минералогического кабинета
+(слот Seven Systems, европейская рулетка Lapidary Wheel, блэкджек Brilliant Twenty-One).
+Он собран по промту `prompts/social-casino-uk.md`, не зависит от файлов Pixel Crown Club и деплоится отдельно.
+Как собрать и опубликовать — в [`opalquestlounge/README.md`](opalquestlounge/README.md),
+чеклист соответствия — в [`opalquestlounge/COMPLIANCE.md`](opalquestlounge/COMPLIANCE.md).

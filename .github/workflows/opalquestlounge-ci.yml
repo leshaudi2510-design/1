@@ -1,0 +1,25 @@
+name: Opal Quest Lounge · build and lint
+
+on:
+  pull_request:
+    paths: ['opalquestlounge/**', '.github/workflows/opalquestlounge-*.yml']
+  push:
+    paths: ['opalquestlounge/**']
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: opalquestlounge
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # The build has no dependencies. It fails on broken links, missing
+      # disclaimers, banned wording, SEO limits, invalid JSON-LD and the page budget.
+      - run: node build.mjs

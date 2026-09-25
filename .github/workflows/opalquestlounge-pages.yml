@@ -1,0 +1,44 @@
+name: Deploy Opal Quest Lounge to GitHub Pages
+
+# Manual on purpose: GitHub Pages for this repository currently serves the
+# Pixel Crown Club site from the branch root. Switch Settings → Pages →
+# Source to "GitHub Actions" (or move opalquestlounge/ to its own repository)
+# before running this. See opalquestlounge/README.md.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: opalquestlounge
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # --strict stops the deploy while operator details are still placeholders.
+      - run: node build.mjs --strict
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: opalquestlounge/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
