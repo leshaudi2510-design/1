@@ -12,10 +12,21 @@
 <meta property="og:title" content="Pixel Crown Club">
 <meta property="og:description" content="Free pixel-art slots, roulette and blackjack, played with virtual Crowns. No real money. Adults 18+.">
 <meta property="og:url" content="https://pixelcrownclub.com/">
+<meta property="og:image" content="https://pixelcrownclub.com/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Pixel Crown Club">
+<meta name="twitter:description" content="Free pixel-art slots, roulette and blackjack, played with virtual Crowns. No real money. Adults 18+.">
+<meta name="twitter:image" content="https://pixelcrownclub.com/assets/og-image.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Crown Club">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&family=Pixelify+Sans:wght@400..700&family=Silkscreen&display=swap">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="preload" href="assets/fonts/pixelify-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/silkscreen-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/site.css">
 </head>
 <body>
@@ -29,10 +40,14 @@
     </a>
     <nav class="nav" aria-label="Main">
       <a href="#tables">Tables</a>
+      <a href="#club">Club</a>
       <a href="#allowance">Allowance</a>
       <a href="#play-well">Play well</a>
       <a href="#faq">FAQ</a>
     </nav>
+    <button class="sound-toggle" type="button" data-sound-toggle aria-pressed="false" aria-label="Sound and haptics off">
+      <svg viewBox="0 0 16 16" aria-hidden="true" shape-rendering="crispEdges"><path d="M2 6h3l4-3v10l-4-3H2z" fill="currentColor"/><path class="sound-toggle__waves" d="M11 6h1v4h-1zM13 4h1v8h-1z" fill="currentColor"/><path class="sound-toggle__mute" d="M11 5h1v1h1v1h1v1h-1v1h1v1h-1v1h-1v-1h-1v-1h1V7h-1z" fill="currentColor"/></svg>
+    </button>
     <div class="purse">
       <span class="purse__coin" data-sym="coin" aria-hidden="true"></span>
       <span class="sr-only">Your balance:</span>
@@ -59,10 +74,16 @@
           <div><dt>Price to play</dt><dd>Free, always</dd></div>
         </dl>
       </div>
-      <figure class="screen">
+      <figure class="screen" data-spot>
         <canvas class="screen__canvas" id="crown" aria-hidden="true"></canvas>
         <figcaption class="screen__caption">Crown Reels · three crowns pay 128× your stake</figcaption>
       </figure>
+    </div>
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker__track">
+        <span>Crown Reels · three crowns pay 128×</span><span>Royal Wheel · single zero · straight up 35 to 1</span><span>Club 21 · blackjack pays 3 to 2</span><span>1,024 free Crowns every 8 hours</span><span>Five membership tiers · Copper to Crown</span><span>No real money · Adults 18+</span>
+        <span>Crown Reels · three crowns pay 128×</span><span>Royal Wheel · single zero · straight up 35 to 1</span><span>Club 21 · blackjack pays 3 to 2</span><span>1,024 free Crowns every 8 hours</span><span>Five membership tiers · Copper to Crown</span><span>No real money · Adults 18+</span>
+      </div>
     </div>
   </section>
 
@@ -75,17 +96,17 @@
       </header>
 
       <div class="tabs" role="tablist" aria-label="Tables">
-        <button class="tab" type="button" role="tab" id="tab-reels" data-tab="reels" aria-controls="panel-reels" aria-selected="true">
+        <button class="tab" data-spot type="button" role="tab" id="tab-reels" data-tab="reels" aria-controls="panel-reels" aria-selected="true">
           <span class="tab__kind">Slots · 3 reels</span>
           <span class="tab__name">Crown Reels</span>
           <span class="tab__meta">Top line 128×</span>
         </button>
-        <button class="tab" type="button" role="tab" id="tab-wheel" data-tab="wheel" aria-controls="panel-wheel" aria-selected="false" tabindex="-1">
+        <button class="tab" data-spot type="button" role="tab" id="tab-wheel" data-tab="wheel" aria-controls="panel-wheel" aria-selected="false" tabindex="-1">
           <span class="tab__kind">Roulette · single zero</span>
           <span class="tab__name">Royal Wheel</span>
           <span class="tab__meta">Straight up 35 to 1</span>
         </button>
-        <button class="tab" type="button" role="tab" id="tab-club21" data-tab="club21" aria-controls="panel-club21" aria-selected="false" tabindex="-1">
+        <button class="tab" data-spot type="button" role="tab" id="tab-club21" data-tab="club21" aria-controls="panel-club21" aria-selected="false" tabindex="-1">
           <span class="tab__kind">Blackjack · six decks</span>
           <span class="tab__name">Club 21</span>
           <span class="tab__meta">Blackjack 3 to 2</span>
@@ -93,7 +114,7 @@
       </div>
 
       <!-- Crown Reels -->
-      <div class="panel" id="panel-reels" role="tabpanel" aria-labelledby="tab-reels">
+      <div class="panel" data-spot id="panel-reels" role="tabpanel" aria-labelledby="tab-reels">
         <div class="stage">
           <div class="reels" id="reels" role="img" aria-label="Reels">
             <div class="reel"><div class="reel__strip"></div></div>
@@ -118,7 +139,7 @@
       </div>
 
       <!-- Royal Wheel -->
-      <div class="panel panel--wheel" id="panel-wheel" role="tabpanel" aria-labelledby="tab-wheel" hidden>
+      <div class="panel panel--wheel" data-spot id="panel-wheel" role="tabpanel" aria-labelledby="tab-wheel" hidden>
         <div class="stage">
           <div class="wheel">
             <canvas id="wheel" aria-hidden="true"></canvas>
@@ -154,7 +175,7 @@
       </div>
 
       <!-- Club 21 -->
-      <div class="panel" id="panel-club21" role="tabpanel" aria-labelledby="tab-club21" hidden>
+      <div class="panel" data-spot id="panel-club21" role="tabpanel" aria-labelledby="tab-club21" hidden>
         <div class="stage stage--felt">
           <div class="hand">
             <p class="hand__label">Dealer <output class="tally" id="dealer-total"></output></p>
@@ -189,6 +210,53 @@
     </div>
   </section>
 
+  <section class="section section--club" id="club" aria-labelledby="club-title">
+    <div class="wrap">
+      <div class="club">
+        <div class="club__stage">
+          <div class="member-card" id="member-card" data-tier="copper">
+            <div class="member-card__face">
+              <div class="member-card__top">
+                <svg class="member-card__mark" viewBox="0 0 11 6" aria-hidden="true" shape-rendering="crispEdges"><path d="M0 0h1v1H0zM5 0h1v1H5zM10 0h1v1h-1zM0 1h2v1H0zM4 1h3v1H4zM9 1h2v1H9zM0 2h11v3H0z" fill="currentColor"/><path d="M0 5h11v1H0z" fill="currentColor" opacity=".6"/></svg>
+                <span>Pixel Crown Club</span>
+              </div>
+              <span class="member-card__chip" aria-hidden="true"></span>
+              <p class="member-card__tier" id="card-tier">Copper</p>
+              <p class="member-card__no" id="card-no">0000 0000 0000</p>
+              <div class="member-card__foot">
+                <span>Member since <b id="card-since">SEP 26</b></span>
+                <span>Balance <b data-balance>4,096</b></span>
+              </div>
+            </div>
+            <div class="member-card__foil" aria-hidden="true"></div>
+            <div class="member-card__glare" aria-hidden="true"></div>
+          </div>
+          <p class="club__hint">Your card changes finish as you climb. Move over it to catch the light.</p>
+        </div>
+
+        <div class="club__info">
+          <p class="eyebrow">Membership</p>
+          <h2 id="club-title">Five tiers, one crown at the top</h2>
+          <p class="section__lede">Every Crown you stake counts toward your tier. Higher tiers change your card's finish and open larger chips at every table.</p>
+          <ol class="ladder" id="tier-ladder"></ol>
+          <div class="progress" id="tier-progress" role="presentation"><span></span></div>
+          <p class="progress__label" id="tier-progress-label"></p>
+          <dl class="stats">
+            <div><dt>Games played</dt><dd id="stat-games">0</dd></div>
+            <div><dt>Biggest win</dt><dd id="stat-biggest">0</dd></div>
+            <div><dt>Crowns staked</dt><dd id="stat-staked">0</dd></div>
+            <div><dt>Trophies</dt><dd id="stat-trophies">0/8</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <div class="trophy-shelf">
+        <h3 class="trophy-shelf__title">Trophy cabinet</h3>
+        <ul class="trophies" id="trophies"></ul>
+      </div>
+    </div>
+  </section>
+
   <section class="section section--alt" id="allowance" aria-labelledby="allowance-title">
     <div class="wrap split">
       <div class="prose">
@@ -198,7 +266,7 @@
         <p>If your purse drops below 16 Crowns, you can refill it to 1,024 straight away, so nobody has to wait to play.</p>
         <p>Crowns have no cash value. You can't buy them, sell them, transfer them or exchange them for prizes.</p>
       </div>
-      <div class="vault">
+      <div class="vault" data-spot>
         <p class="field__label">Next allowance</p>
         <p class="vault__clock" id="allow-clock">Ready</p>
         <div class="bits" id="allow-bits" aria-hidden="true">
@@ -264,6 +332,14 @@
         <p>Every spin, ball and card is drawn with your browser's cryptographic random number generator. Crown Reels returns about 94.5% of stakes over the long run. Royal Wheel is a standard European single-zero wheel. Club 21 deals from a six-deck shoe.</p>
       </details>
       <details>
+        <summary>How do membership tiers work?</summary>
+        <p>Every Crown you stake counts toward your tier: Silver at 4,096, Gold at 32,768, Platinum at 131,072 and Crown at 524,288. Tiers change your card's finish and add larger chips. They never cost anything and have no cash value.</p>
+      </details>
+      <details>
+        <summary>Can I install the club as an app?</summary>
+        <p>Yes. On Android and desktop Chrome or Edge, use the install button in the footer or your browser menu. On iPhone, open the page in Safari, tap Share, then Add to Home Screen. The club keeps working offline once installed.</p>
+      </details>
+      <details>
         <summary>Why is the club 18+?</summary>
         <p>Casino-style games are made for adults, even when no money is involved. Please don't let anyone under 18 play on your device.</p>
       </details>
@@ -277,11 +353,15 @@
       <p class="brand__name">Pixel Crown <span>Club</span></p>
       <p class="footer__note">A free-to-play social casino for adults aged 18 and over. No real-money gambling, no purchases, no prizes.</p>
     </div>
-    <nav class="footer__links" aria-label="Legal">
-      <a href="terms.html">Terms of play</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="#play-well">Play well</a>
-    </nav>
+    <div class="footer__side">
+      <nav class="footer__links" aria-label="Legal">
+        <a href="terms.html">Terms of play</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="#play-well">Play well</a>
+      </nav>
+      <nav class="footer__links footer__socials" id="socials" aria-label="Social" hidden></nav>
+      <button class="btn btn--line install" type="button" data-install hidden>Install the club app</button>
+    </div>
     <p class="footer__legal">© <span id="year">2026</span> Pixel Crown Club · pixelcrownclub.com</p>
   </div>
 </footer>
@@ -302,10 +382,43 @@
   </div>
 </dialog>
 
+<dialog class="modal bigwin" id="bigwin" aria-labelledby="bigwin-title">
+  <div class="modal__body bigwin__body">
+    <p class="eyebrow" id="bigwin-title">Big win</p>
+    <p class="bigwin__mult" id="bigwin-mult">8×</p>
+    <p class="bigwin__amount" id="bigwin-amount">0 Crowns</p>
+    <p class="bigwin__where" id="bigwin-where"></p>
+    <div class="btn-row">
+      <button class="btn btn--gold" id="bigwin-share" type="button">Share this win</button>
+      <button class="btn btn--line" id="bigwin-close" type="button">Keep playing</button>
+    </div>
+    <p class="bigwin__status" id="bigwin-status" role="status"></p>
+  </div>
+</dialog>
+
+<div class="consent" id="consent" role="region" aria-label="Cookie choice" hidden>
+  <p>We'd like to use analytics cookies to see which tables people enjoy. Nothing is shared for advertising. <a href="privacy.html">Privacy</a></p>
+  <div class="btn-row">
+    <button class="btn btn--gold" id="consent-yes" type="button">Allow analytics</button>
+    <button class="btn btn--line" id="consent-no" type="button">No thanks</button>
+  </div>
+</div>
+
+<nav class="dock" aria-label="Quick navigation">
+  <a href="#tables"><svg viewBox="0 0 8 8" aria-hidden="true" shape-rendering="crispEdges"><path d="M1 1h6v6H1zM2 2v4h4V2z" fill="currentColor"/><path d="M3 3h2v2H3z" fill="currentColor"/></svg>Tables</a>
+  <a href="#club"><svg viewBox="0 0 11 6" aria-hidden="true" shape-rendering="crispEdges"><path d="M0 0h1v1H0zM5 0h1v1H5zM10 0h1v1h-1zM0 1h2v1H0zM4 1h3v1H4zM9 1h2v1H9zM0 2h11v4H0z" fill="currentColor"/></svg>Club</a>
+  <a href="#allowance"><svg viewBox="0 0 8 8" aria-hidden="true" shape-rendering="crispEdges"><path d="M2 0h4v1h1v1h1v4H7v1H6v1H2V7H1V6H0V2h1V1h1z" fill="currentColor"/><path d="M3 2h2v1H3zM3 3h1v2H3zM3 5h2v1H3z" fill="#130E17"/></svg>Allowance</a>
+  <button type="button" data-sound-toggle aria-pressed="false" aria-label="Sound and haptics off"><svg viewBox="0 0 16 16" aria-hidden="true" shape-rendering="crispEdges"><path d="M2 6h3l4-3v10l-4-3H2z" fill="currentColor"/><path class="sound-toggle__waves" d="M11 6h1v4h-1zM13 4h1v8h-1z" fill="currentColor"/><path class="sound-toggle__mute" d="M11 5h1v1h1v1h1v1h-1v1h1v1h-1v1h-1v-1h-1v-1h1V7h-1z" fill="currentColor"/></svg>Sound</button>
+</nav>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="assets/js/config.js"></script>
 <script src="assets/js/core.js"></script>
+<script src="assets/js/fx.js"></script>
 <script src="assets/js/app.js"></script>
+<script src="assets/js/club.js"></script>
+<script src="assets/js/integrations.js"></script>
 <script src="assets/js/crown.js"></script>
 <script src="assets/js/reels.js"></script>
 <script src="assets/js/wheel.js"></script>

@@ -43,7 +43,7 @@
   const msg = document.getElementById('reels-msg');
   const spinBtn = document.getElementById('reels-spin');
 
-  const stake = Lounge.chips(document.getElementById('reels-chips'), [16, 32, 64, 128, 256], 32, label);
+  const stake = Lounge.chips(document.getElementById('reels-chips'), 32, label);
   function label() { spinBtn.textContent = `Spin for ${Wallet.fmt(stake.get())} Crowns`; }
 
   let showing = strips.map(() => [pick(), pick(), pick()]);
@@ -67,7 +67,10 @@
 
   function evaluate(line, bet) {
     const [a, b, c] = line;
-    if (a === b && b === c) return { win: bet * a.pay, text: `Three ${a.name}s` };
+    if (a === b && b === c) {
+      const trophy = a.id === 'crown' ? 'crowns' : a.id === 'seven' ? 'sevens' : null;
+      return { win: bet * a.pay, text: `Three ${a.name}s`, trophy };
+    }
     const crowns = line.filter((s) => s.id === 'crown').length;
     if (crowns === 2) return { win: bet * 4, text: 'Two Crowns' };
     if (crowns === 1) return { win: bet * 2, text: 'One Crown' };
@@ -96,6 +99,7 @@
       setTimeout(() => {
         showing[i] = [above, result, below];
         paint(strip, showing[i]);
+        Lounge.sfx('stop');
         resolve();
       }, dur + 40);
     });
@@ -109,6 +113,8 @@
       msg.textContent = 'Not enough Crowns for that stake. Pick a smaller chip or claim your allowance.';
       return;
     }
+    Lounge.emit('bet', { game: 'reels', amount: bet });
+    Lounge.sfx('spin');
     spinning = true;
     spinBtn.disabled = true;
     stake.disable(true);
@@ -120,7 +126,7 @@
     await Promise.all(strips.map((s, i) => spinReel(s, i, line[i])));
     describe();
 
-    const { win, text } = evaluate(line, bet);
+    const { win, text, trophy } = evaluate(line, bet);
     if (win) {
       Wallet.give(win);
       reelsEl.classList.add('is-win');
@@ -130,6 +136,7 @@
       msg.textContent = MISSES[Lounge.rint(MISSES.length)];
     }
 
+    Lounge.emit('result', { game: 'reels', bet, win, text, trophy });
     spinning = false;
     spinBtn.disabled = false;
     stake.disable(false);

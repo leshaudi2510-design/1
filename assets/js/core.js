@@ -23,7 +23,7 @@
   function save() {
     try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* ignore */ }
   }
-  function emit(delta) { listeners.forEach((fn) => fn(state.crowns, delta)); }
+  function notify(delta) { listeners.forEach((fn) => fn(state.crowns, delta)); }
 
   const fmt = (n) => Math.round(n).toLocaleString('en-US');
 
@@ -32,13 +32,13 @@
     get: () => state.crowns,
     take(n) {
       if (!(n > 0) || n > state.crowns) return false;
-      state.crowns -= n; save(); emit(-n);
+      state.crowns -= n; save(); notify(-n);
       return true;
     },
     give(n) {
       n = Math.floor(n);
       if (!(n > 0)) return;
-      state.crowns += n; save(); emit(n);
+      state.crowns += n; save(); notify(n);
     },
     allowanceIn() { return Math.max(0, state.lastClaim + ALLOWANCE_MS - Date.now()); },
     claimAllowance() {
@@ -51,7 +51,7 @@
     refill() {
       if (!this.canRefill()) return false;
       const delta = ALLOWANCE - state.crowns;
-      state.crowns = ALLOWANCE; save(); emit(delta);
+      state.crowns = ALLOWANCE; save(); notify(delta);
       return true;
     },
     onChange(fn) { listeners.push(fn); },
@@ -174,27 +174,53 @@
     return url;
   }
 
+  // ---------- Events ----------
+  // Games announce 'bet' and 'result'; the club, sound and celebrations listen.
+  const handlers = {};
+  const on = (name, fn) => { (handlers[name] = handlers[name] || []).push(fn); };
+  const emit = (name, data) => { (handlers[name] || []).forEach((fn) => fn(data)); };
+
   // ---------- Chip selector ----------
-  function chips(el, values, initial, onChange) {
+  // Chip values grow with membership tier; see club.js.
+  const BASE_CHIPS = [16, 32, 64, 128, 256];
+  let chipValues = BASE_CHIPS.slice();
+  const chipSets = [];
+
+  function chips(el, initial, onChange) {
     let current = initial;
-    el.replaceChildren(...values.map((v) => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'chip';
-      b.textContent = v;
-      b.setAttribute('aria-label', `${v} Crowns`);
-      b.setAttribute('aria-pressed', String(v === current));
-      b.addEventListener('click', () => {
-        current = v;
-        [...el.children].forEach((c) => c.setAttribute('aria-pressed', String(c === b)));
-        if (onChange) onChange(v);
-      });
-      return b;
-    }));
-    return {
+    let disabled = false;
+    function build(first) {
+      if (!chipValues.includes(current)) current = chipValues[1];
+      el.replaceChildren(...chipValues.map((v) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip' + (v > 256 ? ' chip--vip' : '');
+        b.textContent = v >= 1024 ? `${v / 1024}K` : v;
+        b.disabled = disabled;
+        b.setAttribute('aria-label', `${v} Crowns`);
+        b.setAttribute('aria-pressed', String(v === current));
+        b.addEventListener('click', () => {
+          current = v;
+          [...el.children].forEach((c) => c.setAttribute('aria-pressed', String(c === b)));
+          emit('chip', v);
+          if (onChange) onChange(v);
+        });
+        return b;
+      }));
+      if (!first && onChange) onChange(current);
+    }
+    build(true);
+    const api = {
       get: () => current,
-      disable(on) { [...el.children].forEach((c) => { c.disabled = on; }); },
+      disable(state) { disabled = state; [...el.children].forEach((c) => { c.disabled = state; }); },
+      rebuild: () => build(false),
     };
+    chipSets.push(api);
+    return api;
+  }
+  function setChipValues(values) {
+    chipValues = values.slice();
+    chipSets.forEach((s) => s.rebuild());
   }
 
   // ---------- Toast ----------
@@ -211,5 +237,11 @@
   const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  window.Lounge = { rint, PALETTE, SPRITES, SUITS, sprite, chips, toast, reduceMotion, sleep };
+  // Sound effects are provided by fx.js; this keeps games working without it.
+  const sfx = (name) => { if (window.Lounge.playSound) window.Lounge.playSound(name); };
+
+  window.Lounge = {
+    rint, PALETTE, SPRITES, SUITS, sprite, chips, setChipValues, BASE_CHIPS,
+    toast, reduceMotion, sleep, on, emit, sfx,
+  };
 })();

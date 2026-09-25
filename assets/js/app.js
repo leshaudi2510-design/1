@@ -14,7 +14,9 @@
   $('.purse__coin').style.backgroundImage = `url(${Lounge.sprite(Lounge.SPRITES.coin)})`;
 
   function renderBalance(value, delta) {
-    balance.textContent = Wallet.fmt(value);
+    if (Lounge.countTo) Lounge.countTo(balance, value);
+    else balance.textContent = Wallet.fmt(value);
+    document.querySelectorAll('[data-balance]').forEach((el) => { el.textContent = Wallet.fmt(value); });
     if (delta) {
       purse.classList.remove('is-up', 'is-down');
       void purse.offsetWidth; // restart the animation
@@ -29,6 +31,15 @@
   const names = tabs.map((t) => t.dataset.tab);
 
   function selectTab(name, focus) {
+    // Cross-fade between tables where the browser supports View Transitions.
+    if (document.startViewTransition && !Lounge.reduceMotion() && tabs.some((t) => t.getAttribute('aria-selected') === 'true' && t.dataset.tab !== name)) {
+      document.startViewTransition(() => applyTab(name, focus));
+    } else {
+      applyTab(name, focus);
+    }
+  }
+
+  function applyTab(name, focus) {
     tabs.forEach((t) => {
       const on = t.dataset.tab === name;
       t.setAttribute('aria-selected', String(on));
@@ -96,7 +107,12 @@
   }
 
   claim.addEventListener('click', () => {
-    if (Wallet.claimAllowance()) Lounge.toast(`+${Wallet.fmt(Wallet.ALLOWANCE)} Crowns added to your purse.`);
+    if (Wallet.claimAllowance()) {
+      Lounge.toast(`+${Wallet.fmt(Wallet.ALLOWANCE)} Crowns added to your purse.`);
+      Lounge.sfx('coin');
+      if (Lounge.confetti) Lounge.confetti(claim, 60);
+      Lounge.emit('allowance');
+    }
     renderAllowance();
   });
   refill.addEventListener('click', () => {

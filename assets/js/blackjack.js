@@ -56,7 +56,7 @@
   const hitBtn = document.getElementById('bj-hit');
   const standBtn = document.getElementById('bj-stand');
   const doubleBtn = document.getElementById('bj-double');
-  const stake = Lounge.chips(document.getElementById('bj-chips'), [16, 32, 64, 128, 256], 32, label);
+  const stake = Lounge.chips(document.getElementById('bj-chips'), 32, label);
   function label() { dealBtn.textContent = `Deal for ${Wallet.fmt(stake.get())} Crowns`; }
 
   function cardEl(card, faceDown) {
@@ -88,7 +88,7 @@
       hand.forEach((c, i) => {
         const face = !(hideSecond && i === 1);
         const existing = el.children[i];
-        if (!existing) el.appendChild(cardEl(c, !face));
+        if (!existing) { el.appendChild(cardEl(c, !face)); Lounge.sfx('deal'); }
         else if (existing.classList.contains('card--back') && face) existing.replaceWith(cardEl(c, false));
       });
     };
@@ -128,6 +128,10 @@
     if (paid > bet) msg.classList.add('is-win');
     msg.textContent = text;
     render();
+    Lounge.emit('result', {
+      game: 'club21', bet, win: paid > bet ? paid : 0, text: text.split('.')[0],
+      trophy: outcome === 'blackjack' ? 'natural' : null,
+    });
   }
 
   async function deal() {
@@ -137,6 +141,7 @@
       return;
     }
     bet = b;
+    Lounge.emit('bet', { game: 'club21', amount: b });
     dealer = []; player = [];
     dealerCards.replaceChildren(); playerCards.replaceChildren();
     holeHidden = true;
@@ -191,6 +196,7 @@
 
   async function double() {
     if (phase !== 'player' || player.length !== 2 || !Wallet.take(bet)) return;
+    Lounge.emit('bet', { game: 'club21', amount: bet });
     bet *= 2;
     phase = 'dealer';
     player.push(drawCard());

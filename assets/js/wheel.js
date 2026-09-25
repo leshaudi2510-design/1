@@ -72,7 +72,7 @@
   const spinBtn = document.getElementById('wheel-spin');
   const clearBtn = document.getElementById('wheel-clear');
   const historyEl = document.getElementById('wheel-history');
-  const chip = Lounge.chips(document.getElementById('wheel-chips'), [16, 32, 64, 128, 256], 32);
+  const chip = Lounge.chips(document.getElementById('wheel-chips'), 32);
 
   const total = () => [...bets.values()].reduce((a, b) => a + b, 0);
   const short = (v) => (v >= 1000 ? `${Math.round(v / 100) / 10}k` : String(v));
@@ -96,6 +96,7 @@
       return;
     }
     bets.set(key, (bets.get(key) || 0) + v);
+    Lounge.sfx('chip');
     cells.forEach(({ el }) => el.classList.remove('is-hit'));
     renderBets();
   }
@@ -229,6 +230,8 @@
     if (!stake) { msg.textContent = 'Place at least one chip on the board first.'; return; }
     if (!Wallet.take(stake)) { msg.textContent = 'Not enough Crowns to cover the board. Remove some chips.'; return; }
 
+    Lounge.emit('bet', { game: 'wheel', amount: stake });
+    Lounge.sfx('spin');
     spinning = true;
     spinBtn.disabled = true;
     clearBtn.disabled = true;
@@ -240,10 +243,14 @@
     const pocket = Lounge.rint(ORDER.length);
     const n = ORDER[pocket];
     await animateTo(pocket);
+    Lounge.sfx('ball');
 
     let win = 0;
+    let straightHit = false;
     bets.forEach((amount, key) => {
-      if (DEFS.get(key).wins(n)) win += amount * (DEFS.get(key).pays + 1);
+      if (!DEFS.get(key).wins(n)) return;
+      win += amount * (DEFS.get(key).pays + 1);
+      if (/^n\d+$/.test(key)) straightHit = true;
     });
     DEFS.forEach((d, key) => { if (d.wins(n)) cells.get(key).el.classList.add('is-hit'); });
     addHistory(n);
@@ -263,6 +270,7 @@
       msg.textContent += ' Board cleared, it was more than your balance.';
     }
     renderBets();
+    Lounge.emit('result', { game: 'wheel', bet: stake, win, text: `${n} ${colorOf(n)}`, trophy: straightHit ? 'straight' : null });
     spinning = false;
     spinBtn.disabled = false;
     clearBtn.disabled = false;
