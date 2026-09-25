@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pixel Crown Club</title>
+<meta name="description" content="Pixel Crown Club is a free-to-play social casino for adults: pixel-art slots, roulette and blackjack played with free virtual Crowns. No real money, no prizes.">
+<link rel="canonical" href="https://pixelcrownclub.com/">
+<meta name="theme-color" content="#130E17">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pixel Crown Club">
+<meta property="og:title" content="Pixel Crown Club">
+<meta property="og:description" content="Free pixel-art slots, roulette and blackjack, played with virtual Crowns. No real money. Adults 18+.">
+<meta property="og:url" content="https://pixelcrownclub.com/">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&family=Pixelify+Sans:wght@400..700&family=Silkscreen&display=swap">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+<a class="skip" href="#tables">Skip to the tables</a>
+
+<header class="topbar">
+  <div class="wrap topbar__row">
+    <a class="brand" href="#top" aria-label="Pixel Crown Club, back to top">
+      <svg class="brand__mark" viewBox="0 0 11 6" aria-hidden="true" shape-rendering="crispEdges"><rect x="0" y="0" width="1" height="1" fill="#F2C14E"/><rect x="5" y="0" width="1" height="1" fill="#F2C14E"/><rect x="10" y="0" width="1" height="1" fill="#F2C14E"/><rect x="0" y="1" width="2" height="1" fill="#F2C14E"/><rect x="4" y="1" width="3" height="1" fill="#F2C14E"/><rect x="9" y="1" width="2" height="1" fill="#F2C14E"/><rect x="0" y="2" width="11" height="1" fill="#F2C14E"/><rect x="0" y="3" width="1" height="1" fill="#F2C14E"/><rect x="1" y="3" width="1" height="1" fill="#E0475B"/><rect x="2" y="3" width="3" height="1" fill="#F2C14E"/><rect x="5" y="3" width="1" height="1" fill="#35C08A"/><rect x="6" y="3" width="3" height="1" fill="#F2C14E"/><rect x="9" y="3" width="1" height="1" fill="#E0475B"/><rect x="10" y="3" width="1" height="1" fill="#F2C14E"/><rect x="0" y="4" width="11" height="1" fill="#F2C14E"/><rect x="0" y="5" width="11" height="1" fill="#B8862B"/></svg>
+      <span class="brand__name">Pixel Crown <span>Club</span></span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="#tables">Tables</a>
+      <a href="#allowance">Allowance</a>
+      <a href="#play-well">Play well</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="purse">
+      <span class="purse__coin" data-sym="coin" aria-hidden="true"></span>
+      <span class="sr-only">Your balance:</span>
+      <output class="purse__value" id="balance">4,096</output>
+      <span class="purse__unit">Crowns</span>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero__grid">
+      <div class="hero__copy">
+        <p class="eyebrow">Free-to-play social casino · Adults 18+ · No real money</p>
+        <h1 class="hero__title">Royal tables, <span class="gild">rendered in pixels.</span></h1>
+        <p class="hero__lede">Slots, roulette and blackjack, redrawn as pixel art. You play with Crowns, our free virtual chips. There are no deposits, no cash prizes and nothing to buy.</p>
+        <div class="hero__actions">
+          <a class="btn btn--gold" href="#tables">Take a seat</a>
+          <a class="btn btn--line" href="#allowance">How Crowns work</a>
+        </div>
+        <dl class="facts">
+          <div><dt>Welcome purse</dt><dd>4,096 Crowns</dd></div>
+          <div><dt>8-bit allowance</dt><dd>+1,024 every 8 h</dd></div>
+          <div><dt>Price to play</dt><dd>Free, always</dd></div>
+        </dl>
+      </div>
+      <figure class="screen">
+        <canvas class="screen__canvas" id="crown" aria-hidden="true"></canvas>
+        <figcaption class="screen__caption">Crown Reels · three crowns pay 128× your stake</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section" id="tables" aria-labelledby="tables-title">
+    <div class="wrap">
+      <header class="section__head">
+        <p class="eyebrow">The tables</p>
+        <h2 id="tables-title">Three classics, one purse</h2>
+        <p class="section__lede">Pick a table. Your Crowns move with you between games and stay saved in this browser.</p>
+      </header>
+
+      <div class="tabs" role="tablist" aria-label="Tables">
+        <button class="tab" type="button" role="tab" id="tab-reels" data-tab="reels" aria-controls="panel-reels" aria-selected="true">
+          <span class="tab__kind">Slots · 3 reels</span>
+          <span class="tab__name">Crown Reels</span>
+          <span class="tab__meta">Top line 128×</span>
+        </button>
+        <button class="tab" type="button" role="tab" id="tab-wheel" data-tab="wheel" aria-controls="panel-wheel" aria-selected="false" tabindex="-1">
+          <span class="tab__kind">Roulette · single zero</span>
+          <span class="tab__name">Royal Wheel</span>
+          <span class="tab__meta">Straight up 35 to 1</span>
+        </button>
+        <button class="tab" type="button" role="tab" id="tab-club21" data-tab="club21" aria-controls="panel-club21" aria-selected="false" tabindex="-1">
+          <span class="tab__kind">Blackjack · six decks</span>
+          <span class="tab__name">Club 21</span>
+          <span class="tab__meta">Blackjack 3 to 2</span>
+        </button>
+      </div>
+
+      <!-- Crown Reels -->
+      <div class="panel" id="panel-reels" role="tabpanel" aria-labelledby="tab-reels">
+        <div class="stage">
+          <div class="reels" id="reels" role="img" aria-label="Reels">
+            <div class="reel"><div class="reel__strip"></div></div>
+            <div class="reel"><div class="reel__strip"></div></div>
+            <div class="reel"><div class="reel__strip"></div></div>
+            <span class="payline" aria-hidden="true"></span>
+          </div>
+          <p class="stage__msg" id="reels-msg" aria-live="polite">Three of a kind on the centre line wins.</p>
+        </div>
+        <div class="console">
+          <div class="field">
+            <span class="field__label" id="reels-stake-label">Stake per spin</span>
+            <div class="chips" id="reels-chips" role="group" aria-labelledby="reels-stake-label"></div>
+          </div>
+          <button class="btn btn--gold btn--wide" id="reels-spin" type="button">Spin for 32 Crowns</button>
+          <table class="paytable">
+            <caption>Paytable, as a multiple of your stake</caption>
+            <tbody id="paytable"></tbody>
+          </table>
+          <p class="fineprint">Long-run return is about 94.5%. Every result comes from your browser's cryptographic random number generator.</p>
+        </div>
+      </div>
+
+      <!-- Royal Wheel -->
+      <div class="panel panel--wheel" id="panel-wheel" role="tabpanel" aria-labelledby="tab-wheel" hidden>
+        <div class="stage">
+          <div class="wheel">
+            <canvas id="wheel" aria-hidden="true"></canvas>
+            <span class="wheel__pointer" aria-hidden="true"></span>
+          </div>
+          <p class="stage__msg" id="wheel-msg" aria-live="polite">Tap the board to place chips, then spin.</p>
+        </div>
+        <div class="console">
+          <div class="field">
+            <span class="field__label" id="wheel-chip-label">Chip value</span>
+            <div class="chips" id="wheel-chips" role="group" aria-labelledby="wheel-chip-label"></div>
+          </div>
+          <div class="ledger">
+            <div>
+              <span class="field__label">On the board</span>
+              <output class="ledger__value" id="wheel-stake">0</output>
+            </div>
+            <div>
+              <span class="field__label">Last numbers</span>
+              <div class="history" id="wheel-history"><span class="history__empty">None yet</span></div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn--line" id="wheel-clear" type="button">Clear bets</button>
+            <button class="btn btn--gold" id="wheel-spin" type="button">Spin</button>
+          </div>
+          <p class="fineprint">European single-zero wheel. Straight up pays 35 to 1. Columns and dozens pay 2 to 1. Red, black, odd, even, 1–18 and 19–36 pay 1 to 1. Bets stay on the board after each spin.</p>
+        </div>
+        <div class="board" role="group" aria-label="Betting board">
+          <div class="board__numbers" id="board-numbers"></div>
+          <div class="board__outside" id="board-outside"></div>
+        </div>
+      </div>
+
+      <!-- Club 21 -->
+      <div class="panel" id="panel-club21" role="tabpanel" aria-labelledby="tab-club21" hidden>
+        <div class="stage stage--felt">
+          <div class="hand">
+            <p class="hand__label">Dealer <output class="tally" id="dealer-total"></output></p>
+            <div class="cards" id="dealer-cards"></div>
+          </div>
+          <p class="felt-print">Blackjack pays 3 to 2 · Dealer must draw to 16 and stand on all 17s</p>
+          <div class="hand">
+            <div class="cards" id="player-cards"></div>
+            <p class="hand__label">You <output class="tally" id="player-total"></output></p>
+          </div>
+          <p class="stage__msg" id="bj-msg" aria-live="polite">Choose a stake and deal.</p>
+        </div>
+        <div class="console">
+          <div class="field">
+            <span class="field__label" id="bj-stake-label">Stake per hand</span>
+            <div class="chips" id="bj-chips" role="group" aria-labelledby="bj-stake-label"></div>
+          </div>
+          <button class="btn btn--gold btn--wide" id="bj-deal" type="button">Deal for 32 Crowns</button>
+          <div class="btn-row btn-row--3">
+            <button class="btn btn--line" id="bj-hit" type="button" disabled>Hit</button>
+            <button class="btn btn--line" id="bj-stand" type="button" disabled>Stand</button>
+            <button class="btn btn--line" id="bj-double" type="button" disabled>Double</button>
+          </div>
+          <ul class="rules">
+            <li>Six decks, reshuffled when fewer than 52 cards remain.</li>
+            <li>Double down on any first two cards.</li>
+            <li>Wins pay 1 to 1 and a push returns your stake.</li>
+            <li>No splitting or insurance at this table.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="allowance" aria-labelledby="allowance-title">
+    <div class="wrap split">
+      <div class="prose">
+        <p class="eyebrow">The 8-bit allowance</p>
+        <h2 id="allowance-title">1,024 free Crowns, every 8 hours</h2>
+        <p>The club counts in powers of two. You start with 4,096 Crowns, chips come in 16, 32, 64, 128 and 256, and every 8 hours the club tops you up with another 1,024.</p>
+        <p>If your purse drops below 16 Crowns, you can refill it to 1,024 straight away, so nobody has to wait to play.</p>
+        <p>Crowns have no cash value. You can't buy them, sell them, transfer them or exchange them for prizes.</p>
+      </div>
+      <div class="vault">
+        <p class="field__label">Next allowance</p>
+        <p class="vault__clock" id="allow-clock">Ready</p>
+        <div class="bits" id="allow-bits" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <p class="vault__note">One block fills for each hour that passes.</p>
+        <button class="btn btn--gold btn--wide" id="allow-claim" type="button">Claim 1,024 Crowns</button>
+        <button class="btn btn--line btn--wide" id="refill" type="button" hidden>Refill to 1,024 Crowns</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="play-well" aria-labelledby="play-well-title">
+    <div class="wrap split">
+      <div class="prose">
+        <p class="eyebrow">Play well</p>
+        <h2 id="play-well-title">A club for fun, never for money</h2>
+        <p>Pixel Crown Club is a social game for adults. Doing well here does not mean you would win at real-money gambling, where the odds always favour the house.</p>
+        <ul class="checklist">
+          <li>Decide how long you'll play before you sit down, and stop when the time is up.</li>
+          <li>Take a break when it stops feeling like fun. The club reminds you every 30 minutes.</li>
+          <li>Never chase a losing streak with real money anywhere else.</li>
+        </ul>
+        <p class="session">This visit: <output id="session-time">under a minute</output></p>
+      </div>
+      <aside class="helpline" aria-labelledby="helpline-title">
+        <p class="field__label" id="helpline-title">If gambling is causing you harm</p>
+        <div class="helpline__entry">
+          <p class="helpline__where">United Kingdom · National Gambling Helpline</p>
+          <p class="helpline__num">0808 8020 133</p>
+          <p class="helpline__note">Free and confidential, 24 hours a day. Run by <a href="https://www.gamcare.org.uk" target="_blank" rel="noopener">GamCare</a>.</p>
+        </div>
+        <div class="helpline__entry">
+          <p class="helpline__where">United States · National Problem Gambling Helpline</p>
+          <p class="helpline__num">1-800-GAMBLER</p>
+          <p class="helpline__note">Call or text, 24 hours a day. Run by the <a href="https://www.ncpgambling.org" target="_blank" rel="noopener">NCPG</a>.</p>
+        </div>
+        <p class="helpline__note">More support: <a href="https://www.begambleaware.org" target="_blank" rel="noopener">BeGambleAware</a> · <a href="https://www.gamblersanonymous.org" target="_blank" rel="noopener">Gamblers Anonymous</a></p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="faq" aria-labelledby="faq-title">
+    <div class="wrap faq">
+      <header class="section__head">
+        <p class="eyebrow">Questions</p>
+        <h2 id="faq-title">Before you play</h2>
+      </header>
+      <details>
+        <summary>Is this real gambling?</summary>
+        <p>No. Pixel Crown Club is a social casino game. You never pay to play, and nothing you win can be turned into money, goods or prizes.</p>
+      </details>
+      <details>
+        <summary>Can I buy more Crowns?</summary>
+        <p>No. Crowns are only given away: 4,096 when you arrive, 1,024 every 8 hours, and a refill to 1,024 whenever you drop below 16.</p>
+      </details>
+      <details>
+        <summary>Where is my balance saved?</summary>
+        <p>In your browser's local storage on this device. There is no account. Clearing your browser's site data, or playing on another device, starts you again with 4,096 Crowns.</p>
+      </details>
+      <details>
+        <summary>Are the games fair?</summary>
+        <p>Every spin, ball and card is drawn with your browser's cryptographic random number generator. Crown Reels returns about 94.5% of stakes over the long run. Royal Wheel is a standard European single-zero wheel. Club 21 deals from a six-deck shoe.</p>
+      </details>
+      <details>
+        <summary>Why is the club 18+?</summary>
+        <p>Casino-style games are made for adults, even when no money is involved. Please don't let anyone under 18 play on your device.</p>
+      </details>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer__row">
+    <div class="footer__brand">
+      <p class="brand__name">Pixel Crown <span>Club</span></p>
+      <p class="footer__note">A free-to-play social casino for adults aged 18 and over. No real-money gambling, no purchases, no prizes.</p>
+    </div>
+    <nav class="footer__links" aria-label="Legal">
+      <a href="terms.html">Terms of play</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="#play-well">Play well</a>
+    </nav>
+    <p class="footer__legal">© <span id="year">2026</span> Pixel Crown Club · pixelcrownclub.com</p>
+  </div>
+</footer>
+
+<dialog class="modal" id="age-gate" aria-labelledby="age-title">
+  <div class="modal__body" id="age-ask">
+    <svg class="modal__mark" viewBox="0 0 11 6" aria-hidden="true" shape-rendering="crispEdges"><rect x="0" y="0" width="1" height="1" fill="#F2C14E"/><rect x="5" y="0" width="1" height="1" fill="#F2C14E"/><rect x="10" y="0" width="1" height="1" fill="#F2C14E"/><rect x="0" y="1" width="2" height="1" fill="#F2C14E"/><rect x="4" y="1" width="3" height="1" fill="#F2C14E"/><rect x="9" y="1" width="2" height="1" fill="#F2C14E"/><rect x="0" y="2" width="11" height="1" fill="#F2C14E"/><rect x="0" y="3" width="1" height="1" fill="#F2C14E"/><rect x="1" y="3" width="1" height="1" fill="#E0475B"/><rect x="2" y="3" width="3" height="1" fill="#F2C14E"/><rect x="5" y="3" width="1" height="1" fill="#35C08A"/><rect x="6" y="3" width="3" height="1" fill="#F2C14E"/><rect x="9" y="3" width="1" height="1" fill="#E0475B"/><rect x="10" y="3" width="1" height="1" fill="#F2C14E"/><rect x="0" y="4" width="11" height="1" fill="#F2C14E"/><rect x="0" y="5" width="11" height="1" fill="#B8862B"/></svg>
+    <h2 id="age-title">Welcome to the club</h2>
+    <p>Pixel Crown Club is for adults aged 18 and over. It's a free social game: you play with virtual Crowns, with no real money and no prizes.</p>
+    <div class="btn-row">
+      <button class="btn btn--gold" id="age-yes" type="button">I'm 18 or over</button>
+      <button class="btn btn--line" id="age-no" type="button">I'm under 18</button>
+    </div>
+  </div>
+  <div class="modal__body" id="age-left" hidden>
+    <h2>See you when you're 18</h2>
+    <p>The club is only open to adults. You can close this page now.</p>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/js/core.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/crown.js"></script>
+<script src="assets/js/reels.js"></script>
+<script src="assets/js/wheel.js"></script>
+<script src="assets/js/blackjack.js"></script>
+</body>
+</html>
