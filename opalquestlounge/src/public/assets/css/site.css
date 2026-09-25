@@ -433,14 +433,18 @@
     font-weight: 540; line-height: 1.2; text-align: center; text-decoration: none;
     font-variation-settings: "SHRP" 0;
     transition: background-color 0.2s, color 0.2s, font-variation-settings 0.35s, scale 0.35s var(--spring), opacity 0.2s;
-    &:hover { font-variation-settings: "SHRP" 100; color: inherit; }
+    &:hover { font-variation-settings: "SHRP" 100; }
     &:active:not(:disabled, [aria-disabled="true"]) { scale: 0.97; }
     &:is(:disabled, [aria-disabled="true"]) { opacity: 0.45; cursor: not-allowed; }
   }
+  /* Each variant sets its own hover colour, so link hover styles and
+     disabled states can never leave text the same colour as its button. */
   .btn--primary {
     background: var(--ink); color: var(--paper);
-    &:hover:not(:disabled, [aria-disabled="true"]) { background: var(--ink-hover); color: var(--paper); }
+    &:hover { color: var(--paper); }
+    &:hover:not(:disabled, [aria-disabled="true"]) { background: var(--ink-hover); }
   }
+  .btn--secondary, .btn--quiet { color: var(--ink); &:hover { color: var(--ink); } }
   .btn--secondary {
     background: transparent;
     &:hover:not(:disabled) { background: var(--paper-3); }
