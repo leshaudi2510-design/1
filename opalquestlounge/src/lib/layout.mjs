@@ -22,6 +22,8 @@ export function csp(ctx) {
     `connect-src 'self'${gConnect}${endpoint}`,
     "manifest-src 'self'",
     "worker-src 'self'",
+    // Pragmatic Play demos, loaded only when the visitor presses "Play demo".
+    `frame-src ${(ctx.cfg.pragmatic?.frameHosts || []).join(' ') || "'none'"}`,
     "object-src 'none'",
     "base-uri 'self'",
     `form-action 'self' mailto:${endpoint}`,

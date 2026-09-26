@@ -59,6 +59,15 @@ const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
 await fs.rm(OUT, { recursive: true, force: true });
 await fs.cp(PUBLIC, OUT, { recursive: true });
 
+// The stylesheet is written as partials in src/styles/, joined in file-name
+// order (00-tokens.css, 10-base.css, …) into one file for the browser.
+const STYLES = path.join(ROOT, 'src/styles');
+const partials = (await fs.readdir(STYLES).catch(() => [])).filter((f) => f.endsWith('.css')).sort();
+if (partials.length) {
+  const parts = await Promise.all(partials.map(async (f) => `/* ---- ${f} ---- */\n${(await fs.readFile(path.join(STYLES, f), 'utf8')).trim()}\n`));
+  await write('assets/css/site.css', parts.join('\n'));
+}
+
 // Asset version: a hash of every CSS and JS file, for cache busting.
 const assetFiles = (await walk(path.join(OUT, 'assets'))).filter((f) => /\.(css|js)$/.test(f)).sort();
 const h = crypto.createHash('sha256');
@@ -76,6 +85,7 @@ await write(
       currency: cfg.currency,
       analytics: cfg.analytics,
       contactEndpoint: cfg.contactEndpoint,
+      pragmatic: { demoUrl: cfg.pragmatic?.demoUrl, params: cfg.pragmatic?.params },
       version,
     },
     null,

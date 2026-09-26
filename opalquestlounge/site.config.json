@@ -28,5 +28,18 @@
   "themeColor": {
     "light": "#f6f2ea",
     "dark": "#0d0f18"
+  },
+  "pragmatic": {
+    "demoUrl": "https://demogamesfree.pragmaticplay.net/gs2c/openGame.do",
+    "params": {
+      "lang": "en",
+      "cur": "USD",
+      "jurisdiction": "99",
+      "websiteUrl": "https://opalquestlounge.com",
+      "lobby_url": "https://opalquestlounge.com/games/"
+    },
+    "frameHosts": [
+      "https://demogamesfree.pragmaticplay.net"
+    ]
   }
 }
