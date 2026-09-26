@@ -12,7 +12,6 @@ import { reducedMotion, spring } from '../lib/ui.js';
 import { fmt, carats } from '../lib/format.js';
 import { shell, shortcuts, fitCanvas, setOff, isOff } from './common.js';
 
-const RATIO = 420 / 720;
 const RESHUFFLE_AT = Math.round(DECKS * 52 * CUT_AT);
 const RED = new Set(['hearts', 'diamonds']);
 const wait = (ms) => new Promise((r) => setTimeout(r, reducedMotion() ? 0 : ms));
@@ -92,10 +91,11 @@ export function mount(root) {
   let sprites = []; // cards on the table, with positions for animation
 
   // ---------- layout ----------
-  // Wide tables are 720 × 420. Narrow ones (phones) are nearly square, so
-  // the dealer's cards sit below the dealer's badge and the player's above
-  // the player's badge, and the cards stay big enough to read.
-  const ratioFor = (cssWidth) => (cssWidth < 520 ? 0.86 : RATIO);
+  // Wide tables are 720 × 420. Narrow ones (under 520 px, phones) are nearly
+  // square (1 : 0.86), so the dealer's cards sit below the dealer's badge and
+  // the player's above the player's badge, and the cards stay big enough to
+  // read. The CSS sets that shape (80-tables.css) before this script runs, so
+  // the page doesn't move when the game starts; the canvas copies its box.
   function geometry() {
     const W = canvas.width;
     const H = canvas.height;
@@ -331,7 +331,8 @@ export function mount(root) {
   }
 
   function resize() {
-    if (fitCanvas(canvas, ratioFor(canvas.getBoundingClientRect().width))) {
+    const box = canvas.getBoundingClientRect();
+    if (box.width && fitCanvas(canvas, box.height / box.width)) {
       layoutSprites(true);
       draw();
     }

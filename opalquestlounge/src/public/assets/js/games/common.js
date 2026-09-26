@@ -8,8 +8,9 @@ import { buzz } from '../lib/haptics.js';
 import { track } from '../lib/consent.js';
 import { toast, reducedMotion } from '../lib/ui.js';
 
-// Buttons that change state during play use aria-disabled rather than
-// disabled, so keyboard focus stays on them instead of falling to <body>.
+// Buttons and stake radios that change state during play use aria-disabled
+// rather than disabled, so keyboard focus stays on them instead of falling to
+// <body>.
 export const setOff = (el, off) => el && el.setAttribute('aria-disabled', String(Boolean(off)));
 export const isOff = (el) => !el || el.getAttribute('aria-disabled') === 'true';
 
@@ -19,7 +20,10 @@ export function shell(root, { playSelector = '[data-action="spin"]', needed }) {
   const result = root.querySelector('[data-result]');
   const stakeLabel = root.querySelector('[data-stake-label]');
   const radios = [...root.querySelectorAll('.stake input[type="radio"]')];
-  const state = { busy: false, lockedMessage: '' };
+  // result: the last round's result line, kept until anything else is said,
+  // so a lock that arrives with or just after it is added to it, not put in
+  // its place.
+  const state = { busy: false, lockedMessage: '', result: '' };
   let flashTimer = 0;
 
   const api = {
@@ -30,7 +34,9 @@ export function shell(root, { playSelector = '[data-action="spin"]', needed }) {
     set busy(v) {
       state.busy = v;
       play?.setAttribute('aria-busy', String(v));
-      radios.forEach((r) => (r.disabled = v));
+      // Not r.disabled: that would drop a focused radio's focus to <body>,
+      // and the game's keys with it. Clicks are refused below instead.
+      radios.forEach((r) => r.setAttribute('aria-disabled', String(v)));
       api.refresh();
     },
     stake() {
@@ -38,6 +44,7 @@ export function shell(root, { playSelector = '[data-action="spin"]', needed }) {
       return r ? Number(r.value) : 0;
     },
     say(text, tone = '') {
+      state.result = '';
       if (!result) return;
       clearTimeout(flashTimer);
       result.classList.remove('is-flash');
@@ -67,14 +74,23 @@ export function shell(root, { playSelector = '[data-action="spin"]', needed }) {
       }
       if (topup) topup.hidden = state.busy || !wallet.canTopUp() || !status.ok;
       if (!status.ok && !state.busy) {
-        if (state.lockedMessage !== status.message) api.say(status.message, 'locked');
+        if (state.lockedMessage !== status.message) {
+          const last = state.result;
+          api.say(last ? `${last} ${status.message}` : status.message, 'locked');
+          state.result = last;
+        }
         state.lockedMessage = status.message;
       } else if (state.lockedMessage) {
         state.lockedMessage = '';
         api.say('The games are open. Choose a stake and play.', '');
       }
     },
-    /** Tell the player how a round went, honestly: net result first. */
+    /**
+     * Tell the player how a round went, honestly: net result first. If the
+     * games locked during the round (a daily limit reached, a break started
+     * in another tab), the reason follows in the same line, so neither
+     * replaces the other and the live region reads both.
+     */
     settled({ staked, returned, detail = '' }) {
       const net = returned - staked;
       let line;
@@ -82,7 +98,14 @@ export function shell(root, { playSelector = '[data-action="spin"]', needed }) {
       else if (net > 0) line = `${detail} ${fmt(returned)} back from your ${fmt(staked)}: ${fmt(net)} up. Balance ${fmt(wallet.settled)}.`;
       else if (net === 0) line = `${detail} ${fmt(returned)} back: you broke even. Balance ${fmt(wallet.settled)}.`;
       else line = `${detail} ${fmt(returned)} back from your ${fmt(staked)} stake, so ${fmt(-net)} down on this one. Balance ${fmt(wallet.settled)}.`;
-      api.say(line.trim(), net > 0 ? 'up' : 'down');
+      line = line.trim();
+      const status = rg.canPlay();
+      if (status.ok) api.say(line, net > 0 ? 'up' : 'down');
+      else {
+        api.say(`${line} ${status.message}`, 'locked');
+        state.lockedMessage = status.message;
+      }
+      state.result = line;
       track('game_round', { game: root.dataset.game, staked, returned });
       return net;
     },
@@ -107,6 +130,9 @@ export function shell(root, { playSelector = '[data-action="spin"]', needed }) {
     },
   };
 
+  // While a round runs the stake can't change. Cancelling the click puts the
+  // old stake back; it covers the mouse, labels, Space and the arrow keys.
+  radios.forEach((r) => r.addEventListener('click', (e) => state.busy && e.preventDefault()));
   radios.forEach((r) =>
     r.addEventListener('change', () => {
       if (stakeLabel) stakeLabel.textContent = fmt(api.stake());
@@ -130,16 +156,19 @@ export function shell(root, { playSelector = '[data-action="spin"]', needed }) {
 
 /**
  * Single-key shortcuts, active only while focus is inside the game
- * (WCAG 2.1.4). Number keys pick stakes.
+ * (WCAG 2.1.4). Number keys pick stakes. Space and Enter are never taken:
+ * they belong to the focused button or radio. A handler that returns false
+ * has done nothing, and the key keeps its usual meaning.
  */
 export function shortcuts(root, map, stakeRadios) {
   root.addEventListener('keydown', (e) => {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     if (e.target.matches('textarea, input[type="text"], select')) return;
     const k = e.key.toLowerCase();
+    if (k === ' ' || k === 'spacebar' || k === 'enter') return;
     if (/^[1-9]$/.test(k) && stakeRadios?.length) {
       const r = stakeRadios[Number(k) - 1];
-      if (r && !r.disabled) {
+      if (r && !isOff(r)) {
         r.checked = true;
         r.dispatchEvent(new Event('change', { bubbles: true }));
         e.preventDefault();
@@ -147,10 +176,7 @@ export function shortcuts(root, map, stakeRadios) {
       return;
     }
     const fn = map[k];
-    if (fn) {
-      e.preventDefault();
-      fn();
-    }
+    if (fn && fn() !== false) e.preventDefault();
   });
 }
 

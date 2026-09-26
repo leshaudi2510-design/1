@@ -153,7 +153,7 @@
 .rg-panel .segmented{max-width:420px}
 .rg-stats{display:grid;grid-template-columns:repeat(4, minmax(0,1fr));gap:10px;margin:0}
 .rg-stats > div{display:grid;gap:4px;align-content:start;padding:10px 12px;border-radius:10px;background:var(--surface-2);border:2px solid color-mix(in srgb, var(--text) 18%, transparent)}
-.rg-stats dt{font:800 11.5px/1.2 var(--f-ui);font-stretch:112%;text-transform:uppercase;letter-spacing:.1em;color:var(--text-2)}
+.rg-stats dt{font:800 13px/1.2 var(--f-ui);font-stretch:112%;text-transform:uppercase;letter-spacing:.06em;color:var(--text-2)}
 .rg-stats dd{margin:0;font:900 19px/1.15 var(--f-ui);font-variant-numeric:tabular-nums}
 .rg-stats__unit{font:700 13px/1 var(--f-ui);color:var(--text-2)}
 
@@ -212,12 +212,16 @@
 .contact__email svg{width:24px;height:24px;flex:none}
 
 /* ---- responsive ---- */
+/* The four stats sit two by two whenever their panel is narrow: from 861 to
+   1239px, where it shares the row with the other panel, and on phones. */
+@media (max-width: 1239px){
+  .rg-stats{grid-template-columns:repeat(2, minmax(0,1fr))}
+}
 @media (max-width: 999px){
   .split,.legal{grid-template-columns:minmax(0,1fr)}
   .legal__main{max-width:none}
   .toc__list{columns:2;column-gap:8px}
   .toc__list li{break-inside:avoid}
-  .rg-stats{grid-template-columns:repeat(2, minmax(0,1fr))}
 }
 @media (max-width: 860px){
   .rg-panels{grid-template-columns:minmax(0,1fr)}
