@@ -71,13 +71,15 @@ export function tile(ctx, g, { headingLevel = 3, wide = Boolean(g.table), short 
  * Grids of one to three tiles get .grid--few (no two-column table cards
  * unless `wide` is true, and on phones an odd first tile turns into a
  * full-width card), so no row ends on a lone tile.
+ *   lead  the first tile is a wide card, two columns across, with its
+ *         one-line description (.grid--lead): for an odd number of tiles
  */
-export function tileGrid(ctx, games, { headingLevel = 3, id = '', cls = '', wide, short = false } = {}) {
+export function tileGrid(ctx, games, { headingLevel = 3, id = '', cls = '', wide, short = false, lead = false } = {}) {
   const n = games.length;
   const few = n <= 3;
-  const classes = ['grid', cls, few ? `grid--few grid--n${n}` : ''].filter(Boolean).join(' ');
+  const classes = ['grid', cls, few ? `grid--few grid--n${n}` : '', lead ? 'grid--lead' : ''].filter(Boolean).join(' ');
   return `<ul class="${classes}"${id ? ` id="${esc(id)}"` : ''}>
-  ${games.map((g) => tile(ctx, g, { headingLevel, short, wide: few ? wide === true : wide ?? Boolean(g.table) })).join('\n  ')}
+  ${games.map((g, i) => tile(ctx, g, { headingLevel, short: short || (lead && i === 0), wide: few ? wide === true : wide ?? Boolean(g.table) })).join('\n  ')}
   </ul>`;
 }
 
@@ -112,8 +114,8 @@ export function filterBar(games, { id = 'lobby', controls = '', filters, label =
  *   games         the games to show (default: every game)
  *   id            prefix for the ids inside: `${id}-count`, `${id}-grid`
  *   headingLevel  tile titles; group titles are one level above
- *   groups        [{ id, title, intro, games, cls, short }]: one section each
- *   split         lay short groups side by side from 600px (for when there are
+ *   groups        [{ id, title, intro, games, cls, short, wide, lead }]: one section each
+ *   split         lay short groups side by side from 721px (for when there are
  *                 only three games in all)
  */
 export function lobby(ctx, { games = ctx.games, filters, id = 'lobby', headingLevel = 3, groups, split = false } = {}) {
@@ -135,7 +137,7 @@ export function lobby(ctx, { games = ctx.games, filters, id = 'lobby', headingLe
       <${gh} class="display" id="${esc(gr.id)}-h">${gr.title}</${gh}>
       ${gr.intro ? `<p>${gr.intro}</p>` : ''}
     </div>
-    ${tileGrid(ctx, gr.games, { headingLevel, id: `${gr.id}-grid`, cls: gr.cls || '', short: gr.short, wide: gr.wide })}
+    ${tileGrid(ctx, gr.games, { headingLevel, id: `${gr.id}-grid`, cls: gr.cls || '', short: gr.short, wide: gr.wide, lead: gr.lead })}
   </section>`,
     )
     .join('\n  ')}
@@ -146,7 +148,9 @@ export function lobby(ctx, { games = ctx.games, filters, id = 'lobby', headingLe
 /**
  * "More games" tiles for the foot of a game page: the games after this one
  * in lobby order (same kind first, wrapping round), up to `limit`. Five fill
- * a row at 1240px and wider; below that the grid shows four.
+ * a row at 1240px and wider; below that the grid shows four. Just two (the
+ * demos switched off) sit side by side as wide cards with a line about each,
+ * like the table pair on the games index, so the row closes.
  *   current  the page's path or slug (left out of the list)
  */
 export function gameList(ctx, { current, headingLevel = 3, limit = 5 } = {}) {
@@ -157,5 +161,7 @@ export function gameList(ctx, { current, headingLevel = 3, limit = 5 } = {}) {
     const k = same.indexOf(here);
     pick = [...same.slice(k + 1), ...same.slice(0, k), ...ctx.games.filter((g) => Boolean(g.table) !== Boolean(here.table))];
   }
-  return tileGrid(ctx, pick.slice(0, limit), { headingLevel, cls: 'grid--more', wide: false });
+  const list = pick.slice(0, limit);
+  const pair = list.length === 2;
+  return tileGrid(ctx, list, { headingLevel, cls: pair ? 'grid--more grid--pair' : 'grid--more', wide: pair, short: pair });
 }

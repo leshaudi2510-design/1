@@ -76,7 +76,38 @@ function setup(root, key) {
     chips[Math.min(last, Math.max(0, next))].focus();
   });
 
+  // A same-page link into a group the filter has hidden (the nav's "Slots"
+  // and "Table games", the dock's "Slots" and "Tables" on /games/) would
+  // otherwise go nowhere. Show every game again before the browser follows
+  // the link: it then scrolls there itself, keeps the scroll margin and moves
+  // the Tab starting point, even when the hash is already in the address.
+  // The live count says "Showing all …", so the change isn't silent.
+  const hiddenTarget = (hash) => {
+    if (!hash || hash.length < 2) return null;
+    let t = null;
+    try {
+      t = document.getElementById(decodeURIComponent(hash.slice(1)));
+    } catch {}
+    const g = t && root.contains(t) ? t.closest('[data-lobby-group]') : null;
+    return g && g.hidden ? t : null;
+  };
+  document.addEventListener('click', (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const a = e.target.closest?.('a[href*="#"]');
+    if (!a || (a.target && a.target !== '_self')) return;
+    if (a.origin !== location.origin || a.pathname !== location.pathname || a.search !== location.search) return;
+    if (hiddenTarget(a.hash)) apply('all');
+  });
+  // Back, Forward or a typed #tables: the same, then scroll there ourselves.
+  addEventListener('hashchange', () => {
+    const t = hiddenTarget(location.hash);
+    if (!t) return;
+    apply('all');
+    t.scrollIntoView();
+  });
+
   // Back from a game page: put the last choice back, without announcing it.
+  // (Not undone for a hash in the address: this is the view the player left.)
   const saved = readState()[key];
   if (saved && saved !== 'all') apply(saved, { remember: false });
 }

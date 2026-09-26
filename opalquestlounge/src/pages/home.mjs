@@ -61,7 +61,9 @@ export default function home(ctx) {
       };
 
   const lobbyIntro = pp
-    ? `${cap(words(shownSlots))} Pragmatic Play slot demos and ${words(tables.length)} tables of our own. Every game is free, and each one has its rules and RTP on its own page.`
+    ? shownSlots < slots.length
+      ? `${cap(words(shownSlots))} of the ${words(slots.length)} Pragmatic Play slot demos, and our ${words(tables.length)} tables. Every game is free, and each one has its rules and RTP on its own page.`
+      : `${cap(words(shownSlots))} Pragmatic Play slot demos and ${words(tables.length)} tables of our own. Every game is free, and each one has its rules and RTP on its own page.`
     : `Our own slot and ${words(tables.length)} tables. Every game is free, and each one has its rules and RTP on its own page.`;
   const more =
     shown.length < ctx.games.length
@@ -70,7 +72,7 @@ export default function home(ctx) {
 
   const steps = pp
     ? [
-        ['Press play on a demo', `Slot demos stay switched off until you press Play. Then they load from Pragmatic Play's servers, with Pragmatic's own practice credits.`],
+        ['Press play on a demo', `Slot demos stay switched off until you press Play. Then they load from Pragmatic Play's servers and play with demo credits, which have no value.`],
         [`Take a seat with ${esc(c.plural)}`, `Our roulette and blackjack tables use ${esc(c.plural)}, a free virtual currency. You start with ${num(c.startingBalance)}. Drop below ${num(c.topUpBelow)} and you can claim another ${num(c.topUpAmount)} at any time.`],
         ['Nothing pays out', ctx.cfg.purchases
           ? `You can buy extra ${esc(c.plural)} if you choose, but ${esc(c.plural)} and demo credits can't be sold, paid out or swapped for prizes. Nothing on this site has a cash value.`
@@ -126,7 +128,7 @@ export default function home(ctx) {
 <section class="hero${pp ? '' : ' hero--house'}" aria-labelledby="hero-h">
   <div class="wrap hero__grid">
     <div class="hero__head">
-      <p class="kicker"><span class="sticker">Free to play</span> ${hero.kicker}</p>
+      <p class="kicker"><span class="sticker">Free to play</span> <span class="kicker__text">${hero.kicker}</span></p>
       <h1 id="hero-h" class="display">${hero.h1} <span class="hl">Played for fun.</span></h1>
     </div>
     <div class="hero__stage">

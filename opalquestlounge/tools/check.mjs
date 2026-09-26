@@ -215,6 +215,41 @@ if (want('pages'))
     }
   });
 
+// ---------- a2. the home first screen on phones, and one name for demo credits ----------
+if (want('pages'))
+  await section('Home first screen on phones (both modes): the play control above the dock; demo credits by one name', async () => {
+    for (const site of modes) {
+      // Spec 13: ribbon, H1 and the stage with its play button above the dock
+      // at the spec's phone sizes (0: 390×844 and 360×780), demos on or off.
+      for (const [width, height] of [[360, 780], [390, 844]]) {
+        const ctx = await context(browser, { viewport: { width, height } });
+        await refuseOthers(ctx, site.base);
+        await ctx.route((u) => PRAGMATIC_HOST.test(u.hostname), (r) => r.abort('blockedbyclient'));
+        const page = await ctx.newPage();
+        await page.goto(site.base + '/', { waitUntil: 'networkidle' });
+        await page.evaluate(() => document.fonts.ready);
+        const r = await page.evaluate(() => {
+          const play = document.querySelector('.hero .stage .btn--play, .hero [data-action="spin"]');
+          const dock = document.querySelector('.dock');
+          return {
+            play: play ? `${play.className} "${play.textContent.trim().replace(/\s+/g, ' ')}"` : null,
+            bottom: play && Math.round(play.getBoundingClientRect().bottom),
+            dock: dock && Math.round(dock.getBoundingClientRect().top),
+            scrollY: Math.round(scrollY),
+          };
+        });
+        expect(r.play && r.dock && r.scrollY === 0 && r.bottom <= r.dock - 4,
+          `${site.name} ${width}×${height}: the hero's play control ends above the dock (${r.bottom} ≤ ${r.dock} − 4)`, JSON.stringify(r));
+        await ctx.close();
+      }
+      // The demos' play money is "demo credits" everywhere (spec 12), never a second name.
+      const hits = [];
+      const files = (await fs.readdir(site.dir, { recursive: true })).filter((f) => /\.(html|js)$/.test(f));
+      for (const f of files) if (/practice credit/i.test(await fs.readFile(path.join(site.dir, f), 'utf8'))) hits.push(f);
+      expect(!hits.length, `${site.name}: no page or script calls demo credits "practice credits" (${files.length} files)`, hits.join(', '));
+    }
+  });
+
 // ---------- c. the Pragmatic Play demo stage ----------
 if (want('stage') && PP)
   await section('Pragmatic Play demo stage (host stubbed)', async () => {
@@ -587,6 +622,169 @@ if (want('lobby'))
       expect(!w.errors.length, `${site.name}: no errors on the lobby`, w.errors.join(' | '));
       await ctx.close();
     }
+  });
+
+// ---------- e2. links into a group the filter has hidden ----------
+if (want('lobby'))
+  await section('Lobby on /games/: nav and dock links into a group the filter has hidden', async () => {
+    for (const site of modes) {
+      const ctx = await context(browser);
+      await refuseOthers(ctx, site.base);
+      await ctx.route((u) => PRAGMATIC_HOST.test(u.hostname), (r) => r.abort('blockedbyclient'));
+      const page = await ctx.newPage();
+      const w = watch(page, site.base);
+      await page.goto(site.base + '/games/', { waitUntil: 'networkidle' });
+      if (!(await until(page, () => document.querySelector('[data-filters][data-ready]')))) {
+        fail(`${site.name}: the filter bar never started`);
+        await ctx.close();
+        continue;
+      }
+      // A chip that empties each group: any slot feature empties #tables, Table games empties #slots.
+      const hiding = await page.evaluate(() => {
+        const out = {};
+        for (const id of ['slots', 'tables']) {
+          const tags = [...document.querySelectorAll(`#${id} li[data-tags]`)].map((t) => t.dataset.tags.split(/\s+/));
+          out[id] = [...document.querySelectorAll('[data-filters] .chip[data-filter]')].map((c) => c.dataset.filter).find((f) => f !== 'all' && !tags.some((t) => t.includes(f)));
+        }
+        return out;
+      });
+      // Choose a filter (a click on the chip already pressed would go back to All).
+      const press = async (f) => {
+        const chip = `[data-filters] .chip[data-filter="${f}"]`;
+        if ((await page.getAttribute(chip, 'aria-pressed')) !== 'true') await page.click(chip);
+        await until(page, (f) => document.querySelector(`[data-filters] .chip[data-filter="${f}"]`).getAttribute('aria-pressed') === 'true', f);
+      };
+      const state = (id) =>
+        page.evaluate((id) => {
+          const g = document.getElementById(id);
+          return {
+            hash: location.hash,
+            hidden: g.hidden,
+            top: Math.round(g.getBoundingClientRect().top),
+            pressed: document.querySelector('[data-filters] .chip[aria-pressed="true"]')?.dataset.filter,
+            count: document.querySelector('[data-filter-count]').textContent,
+          };
+        }, id);
+      // Shown, scrolled to (under the sticky header, not far below it), and the filter back on All.
+      const landed = async (id, what) => {
+        await until(page, (id) => {
+          const g = document.getElementById(id);
+          const t = g.getBoundingClientRect().top;
+          return !g.hidden && t >= 0 && t < 240;
+        }, id, 3000);
+        const s = await state(id);
+        expect(s.hash === `#${id}` && !s.hidden && s.top >= 0 && s.top < 240 && s.pressed === 'all' && /^Showing all /.test(s.count),
+          `${site.name}: ${what}: #${id} is shown and scrolled to, and the filter is back on All ("${s.count}")`, JSON.stringify(s));
+      };
+      if (!hiding.tables || !hiding.slots) {
+        fail(`${site.name}: no chip empties a group (${JSON.stringify(hiding)})`);
+        await ctx.close();
+        continue;
+      }
+      await press(hiding.tables);
+      await page.click('.nav a[href="/games/#tables"]');
+      await landed('tables', `"${hiding.tables}" chip, then the nav's Table games`);
+      // The same link again, with #tables already in the address (no hashchange).
+      await page.evaluate(() => scrollTo(0, 0));
+      await press(hiding.tables);
+      await page.click('.nav a[href="/games/#tables"]');
+      await landed('tables', `"${hiding.tables}" chip, then Table games again with #tables already in the address`);
+      // From the keyboard, the other way round.
+      await press(hiding.slots);
+      await page.focus('.nav a[href="/games/#slots"]');
+      await page.keyboard.press('Enter');
+      await landed('slots', `"${hiding.slots}" chip, then Enter on the nav's Slots`);
+      // Back to #tables while a filter hides it.
+      await press(hiding.tables);
+      await page.goBack();
+      await landed('tables', `"${hiding.tables}" chip, then Back to #tables`);
+      // Back from a game page still brings the filter back, #tables in the address or not.
+      await press(hiding.tables);
+      const tile = await page.$eval('#slots li[data-tags]:not([hidden]) .tile__title a', (a) => a.getAttribute('href'));
+      await Promise.all([page.waitForURL((u) => u.pathname === tile), page.click(`#slots .tile__title a[href="${tile}"]`)]);
+      await page.goBack();
+      await until(page, () => document.querySelector('[data-filters][data-ready]'));
+      const back = await state('tables');
+      expect(back.pressed === hiding.tables && back.hidden && back.hash === '#tables',
+        `${site.name}: Back from a game page to /games/#tables keeps the "${hiding.tables}" filter`, JSON.stringify(back));
+      expect(!w.errors.length, `${site.name}: no errors`, w.errors.join(' | '));
+      await ctx.close();
+
+      // Phones: the dock's Tables.
+      const phone = await context(browser, { viewport: { width: 390, height: 844 } });
+      await refuseOthers(phone, site.base);
+      const mob = await phone.newPage();
+      await mob.goto(site.base + '/games/', { waitUntil: 'networkidle' });
+      await until(mob, () => document.querySelector('[data-filters][data-ready]'));
+      await mob.click(`[data-filters] .chip[data-filter="${hiding.tables}"]`);
+      await until(mob, () => document.getElementById('tables').hidden);
+      await mob.click('.dock a[href="/games/#tables"]');
+      await until(mob, () => {
+        const t = document.getElementById('tables');
+        return !t.hidden && t.getBoundingClientRect().top < 240 && t.getBoundingClientRect().top >= 0;
+      }, undefined, 3000);
+      const ph = await mob.evaluate(() => ({ hidden: document.getElementById('tables').hidden, top: Math.round(document.getElementById('tables').getBoundingClientRect().top) }));
+      expect(!ph.hidden && ph.top >= 0 && ph.top < 240, `${site.name} 390px: "${hiding.tables}" chip, then the dock's Tables: #tables is shown and scrolled to`, JSON.stringify(ph));
+      await phone.close();
+    }
+  });
+
+// ---------- e3. lobby layout at every width ----------
+// Spec 7.7 and 5: a tile's two tags are never cut short (one that doesn't fit
+// drops to a second row whole), a tile's body stays inside the tile, and
+// every row of the lobby reaches its right edge, from 320 to 1440 px.
+if (want('lobby'))
+  await section('Lobby layout on / and /games/, 320–1440 px in 1 px steps: whole tags, bodies inside tiles, rows that close', async () => {
+    const measure = () => {
+      const shown = (el) => el.getClientRects().length > 0;
+      const out = [];
+      for (const s of document.querySelectorAll('[data-lobby] .tile__facts span')) {
+        if (shown(s) && s.scrollWidth > s.clientWidth) out.push(`tag "${s.textContent}" cut short on ${s.closest('.tile').dataset.cover}`);
+      }
+      for (const t of document.querySelectorAll('[data-lobby] li.tile')) {
+        if (!shown(t)) continue;
+        const over = t.querySelector('.tile__body').getBoundingClientRect().right - t.getBoundingClientRect().right;
+        if (over > 0.5) out.push(`body wider than the tile on ${t.dataset.cover}`);
+      }
+      for (const lobby of document.querySelectorAll('[data-lobby]')) {
+        const right = lobby.getBoundingClientRect().right;
+        const rows = new Map();
+        for (const t of lobby.querySelectorAll('li.tile')) {
+          if (!shown(t)) continue;
+          const r = t.getBoundingClientRect();
+          rows.set(Math.round(r.top), Math.max(rows.get(Math.round(r.top)) ?? -Infinity, r.right));
+        }
+        const short = [...rows.values()].filter((r) => right - r > 2).length;
+        if (short) out.push(`${short} row(s) of ${rows.size} end short of the lobby's right edge`);
+      }
+      return out;
+    };
+    const runs = modes.flatMap((site) => ['/', '/games/'].map((p) => ({ site, p })));
+    await pool(runs, 4, async ({ site, p }) => {
+      const ctx = await context(browser, { viewport: { width: 1440, height: 900 } });
+      await refuseOthers(ctx, site.base);
+      await ctx.route((u) => PRAGMATIC_HOST.test(u.hostname), (r) => r.abort('blockedbyclient'));
+      const page = await ctx.newPage();
+      await page.goto(site.base + p, { waitUntil: 'networkidle' });
+      await page.evaluate(() => document.fonts.ready);
+      const seen = new Map(); // problem → widths
+      for (let width = 320; width <= 1440; width++) {
+        await page.setViewportSize({ width, height: 900 });
+        for (const problem of await page.evaluate(measure)) {
+          if (!seen.has(problem)) seen.set(problem, []);
+          seen.get(problem).push(width);
+        }
+      }
+      const span = (ws) => ws.reduce((acc, x) => {
+        const last = acc.at(-1);
+        if (last && x === last[1] + 1) last[1] = x;
+        else acc.push([x, x]);
+        return acc;
+      }, []).map(([a, b]) => (a === b ? `${a}` : `${a}–${b}`)).join(', ');
+      if (!seen.size) pass(`${site.name} ${p}: 1,121 widths: every tag whole, every tile body inside its tile, every row closed`);
+      for (const [problem, ws] of seen) fail(`${site.name} ${p}: ${problem} at ${span(ws)} px`);
+      await ctx.close();
+    });
   });
 
 // ---------- f. consent with a test GA4 ID ----------
