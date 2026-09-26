@@ -469,7 +469,7 @@ async function stageExtras() {
       const b = document.querySelector(`${S} .stage__msg--failed [data-action="load"]`);
       return { shown: Boolean(b?.getClientRects().length), focused: document.activeElement === b };
     }, STAGE);
-    expect(failed && f.framesOnPage === 0 && retry.shown && retry.focused && /didn't load/.test(f.status),
+    expect(failed && f.framesOnPage === 0 && retry.shown && retry.focused && /didn’t load/.test(f.status),
       `failed when ${how}: no iframe, "Try again" shown with focus, and the status says so`, JSON.stringify({ state: f.state, frames: f.framesOnPage, retry, status: f.status }));
     if (!setup) await ctx.setOffline(false);
     await ctx.close();
@@ -1115,55 +1115,67 @@ if (want('lobby'))
         expect(s.hash === `#${id}` && !s.hidden && s.top >= 0 && s.top < 240 && s.pressed === 'all' && /^Showing all /.test(s.count),
           `${site.name}: ${what}: #${id} is shown and scrolled to, and the filter is back on All ("${s.count}")`, JSON.stringify(s));
       };
-      if (!hiding.tables || !hiding.slots) {
+      // With the demos on, a slot feature hides #tables and Table games hides
+      // #slots. With them off, our one slot has no slot features (build.mjs
+      // rejects false ones), so only Table games can hide a group (#slots),
+      // and the steps below that hide #tables run on #slots instead.
+      const G = hiding.tables ? 'tables' : 'slots';
+      const O = G === 'tables' ? 'slots' : 'tables';
+      if (!hiding.slots || (!hiding.tables && site !== FB)) {
         fail(`${site.name}: no chip empties a group (${JSON.stringify(hiding)})`);
         await ctx.close();
         continue;
       }
-      await press(hiding.tables);
-      await page.click('.nav a[href="/games/#tables"]');
-      await landed('tables', `"${hiding.tables}" chip, then the nav's Table games`);
-      // The same link again, with #tables already in the address (no hashchange).
+      const navTo = { tables: 'Table games', slots: 'Slots' };
+      await press(hiding[G]);
+      await page.click(`.nav a[href="/games/#${G}"]`);
+      await landed(G, `"${hiding[G]}" chip, then the nav's ${navTo[G]}`);
+      // The same link again, with #G already in the address (no hashchange).
       await page.evaluate(() => scrollTo(0, 0));
-      await press(hiding.tables);
-      await page.click('.nav a[href="/games/#tables"]');
-      await landed('tables', `"${hiding.tables}" chip, then Table games again with #tables already in the address`);
-      // From the keyboard, the other way round.
+      await press(hiding[G]);
+      await page.click(`.nav a[href="/games/#${G}"]`);
+      await landed(G, `"${hiding[G]}" chip, then ${navTo[G]} again with #${G} already in the address`);
+      // From the keyboard, the other way round (#slots).
       await press(hiding.slots);
       await page.focus('.nav a[href="/games/#slots"]');
       await page.keyboard.press('Enter');
       await landed('slots', `"${hiding.slots}" chip, then Enter on the nav's Slots`);
-      // Back to #tables while a filter hides it.
-      await press(hiding.tables);
+      // Back to #G while a filter hides it. When #G is #slots, first step on to
+      // #tables, so there is an entry to go back to.
+      if (G === 'slots') {
+        await page.click('.nav a[href="/games/#tables"]');
+        await landed('tables', 'the nav\'s Table games');
+      }
+      await press(hiding[G]);
       await page.goBack();
-      await landed('tables', `"${hiding.tables}" chip, then Back to #tables`);
-      // Back from a game page still brings the filter back, #tables in the address or not.
-      await press(hiding.tables);
-      const tile = await page.$eval('#slots li[data-tags]:not([hidden]) .tile__title a', (a) => a.getAttribute('href'));
-      await Promise.all([page.waitForURL((u) => u.pathname === tile), page.click(`#slots .tile__title a[href="${tile}"]`)]);
+      await landed(G, `"${hiding[G]}" chip, then Back to #${G}`);
+      // Back from a game page still brings the filter back, #G in the address or not.
+      await press(hiding[G]);
+      const tile = await page.$eval(`#${O} li[data-tags]:not([hidden]) .tile__title a`, (a) => a.getAttribute('href'));
+      await Promise.all([page.waitForURL((u) => u.pathname === tile), page.click(`#${O} .tile__title a[href="${tile}"]`)]);
       await page.goBack();
       await until(page, () => document.querySelector('[data-filters][data-ready]'));
-      const back = await state('tables');
-      expect(back.pressed === hiding.tables && back.hidden && back.hash === '#tables',
-        `${site.name}: Back from a game page to /games/#tables keeps the "${hiding.tables}" filter`, JSON.stringify(back));
+      const back = await state(G);
+      expect(back.pressed === hiding[G] && back.hidden && back.hash === `#${G}`,
+        `${site.name}: Back from a game page to /games/#${G} keeps the "${hiding[G]}" filter`, JSON.stringify(back));
       expect(!w.errors.length, `${site.name}: no errors`, w.errors.join(' | '));
       await ctx.close();
 
-      // Phones: the dock's Tables.
+      // Phones: the dock's link to #G.
       const phone = await context(browser, { viewport: { width: 390, height: 844 } });
       await refuseOthers(phone, site.base);
       const mob = await phone.newPage();
       await mob.goto(site.base + '/games/', { waitUntil: 'networkidle' });
       await until(mob, () => document.querySelector('[data-filters][data-ready]'));
-      await mob.click(`[data-filters] .chip[data-filter="${hiding.tables}"]`);
-      await until(mob, () => document.getElementById('tables').hidden);
-      await mob.click('.dock a[href="/games/#tables"]');
-      await until(mob, () => {
-        const t = document.getElementById('tables');
+      await mob.click(`[data-filters] .chip[data-filter="${hiding[G]}"]`);
+      await until(mob, (G) => document.getElementById(G).hidden, G);
+      await mob.click(`.dock a[href="/games/#${G}"]`);
+      await until(mob, (G) => {
+        const t = document.getElementById(G);
         return !t.hidden && t.getBoundingClientRect().top < 240 && t.getBoundingClientRect().top >= 0;
-      }, undefined, 3000);
-      const ph = await mob.evaluate(() => ({ hidden: document.getElementById('tables').hidden, top: Math.round(document.getElementById('tables').getBoundingClientRect().top) }));
-      expect(!ph.hidden && ph.top >= 0 && ph.top < 240, `${site.name} 390px: "${hiding.tables}" chip, then the dock's Tables: #tables is shown and scrolled to`, JSON.stringify(ph));
+      }, G, 3000);
+      const ph = await mob.evaluate((G) => ({ hidden: document.getElementById(G).hidden, top: Math.round(document.getElementById(G).getBoundingClientRect().top) }), G);
+      expect(!ph.hidden && ph.top >= 0 && ph.top < 240, `${site.name} 390px: "${hiding[G]}" chip, then the dock's ${G === 'tables' ? 'Tables' : 'Slots'}: #${G} is shown and scrolled to`, JSON.stringify(ph));
       await phone.close();
     }
   });
@@ -1891,7 +1903,8 @@ if (want('chrome') && PP)
       await refuseOthers(ctx, PP.base);
       let release;
       const held = new Promise((r) => (release = r));
-      await ctx.route(/\/assets\/js\/app\.js/, async (route) => {
+      // Scripts live under /assets/v<version>/js/ in the build.
+      await ctx.route(/\/assets\/(?:v\w+\/)?js\/app\.js/, async (route) => {
         await held;
         await route.continue();
       });
