@@ -5,7 +5,8 @@ import { store } from './store.js';
 const IDLE_RESET = 30 * 60 * 1000; // a gap this long starts a new session
 
 function fresh() {
-  return { start: Date.now(), seen: Date.now(), staked: 0, returned: 0, reminders: 0 };
+  // remindedAt: seconds into the session when the last reality check was due.
+  return { start: Date.now(), seen: Date.now(), staked: 0, returned: 0, reminders: 0, remindedAt: 0 };
 }
 
 let state = store.get('session', null, 'session');

@@ -1,25 +1,70 @@
-/* ---------- 19. Breadcrumbs, prose, tables ---------- */
+/* ---------- 19. Breadcrumbs, title band, prose, tables ---------- */
 .crumbs{padding:14px 0 0}
 .crumbs ol{display:flex;flex-wrap:wrap;align-items:center;font:700 15px/1.2 var(--f-ui)}
 .crumbs li{display:flex;align-items:center}
 .crumbs li + li::before{content:"";width:9px;height:9px;margin:0 10px 0 8px;border-top:2.5px solid currentColor;border-right:2.5px solid currentColor;transform:rotate(45deg);opacity:.7}
 .crumbs a{display:inline-block;padding:6px 2px;color:inherit;text-decoration:underline;text-decoration-thickness:2px;text-decoration-color:var(--m);text-underline-offset:4px}
 .crumbs a[aria-current="page"]{text-decoration:none}
+
+/* Title band for info and legal pages: the game-hero panel without rays, dots
+   or stage. Yellow by day, violet by night, so every page opens bright.
+   <header class="page-hero"><div class="wrap">crumbs, h1.display, p.lede</div></header> */
+.page-hero{background:var(--hero-bg);color:var(--hero-text);border-bottom:var(--bw) solid var(--line);padding:0 0 clamp(32px, 4vw, 52px)}
+.page-hero .crumbs a{color:var(--hero-text)}
+.page-hero h1{margin-top:clamp(12px, 1.6vw, 22px);font-size:clamp(34px, 2.2vw + 18px, 56px);max-width:20em;text-wrap:balance}
+.page-hero .eyebrow{color:inherit;margin-top:18px}
+.page-hero .eyebrow + h1{margin-top:10px}
+.page-hero .lede{margin:clamp(16px, 1.6vw, 22px) 0 0;max-width:40em}
+.page-hero .lede:last-child{margin-bottom:0}
+.page-hero a:not(.btn){color:inherit}
+/* Optional wrapper for the content under the band */
+.page-body{width:min(var(--wrap), 100% - 2*var(--gutter));margin-inline:auto;padding-block:clamp(36px, 5vw, 64px) var(--section)}
+
+/* Prose: legal pages, rules, long answers. Measure 68ch, 14px rhythm. */
 .prose{max-width:68ch}
 .prose > * + *{margin-top:14px}
-.prose h2{font:900 clamp(26px, 1.6vw + 16px, 36px)/1.1 var(--f-display);font-stretch:112%;margin-top:40px}
-.prose h3{font:800 21px/1.2 var(--f-ui);margin-top:28px}
+.prose h2{font:900 clamp(26px, 1.6vw + 16px, 36px)/1.1 var(--f-display);font-stretch:112%;letter-spacing:-.012em;margin-top:40px;
+  text-shadow:.025em .025em 0 var(--plate), .05em .05em 0 var(--plate), .075em .075em 0 var(--plate)}
+.prose > h2:first-child,.prose > :first-child{margin-top:0}
+.prose h3{font:800 21px/1.2 var(--f-ui);font-stretch:104%;margin-top:28px}
+.prose h2 + *,.prose h3 + *{margin-top:10px}
+.prose :is(h2,h3)[id]{scroll-margin-top:24px}
+.prose strong{font-weight:700}
+.prose a:not(.btn){font-weight:500}
 .prose ol{counter-reset:li;display:grid;gap:14px}
-.prose ol > li{position:relative;padding-left:52px;counter-increment:li}
-.prose ol > li::before{content:counter(li);position:absolute;left:0;top:-2px;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--y);color:var(--k);border:var(--bw-ctl) solid var(--k);font:900 17px/1 var(--f-ui)}
+.prose ol > li{position:relative;min-height:36px;padding:4px 0 0 52px;counter-increment:li}
+.prose ol > li::before{content:counter(li);position:absolute;left:0;top:0;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--y);color:var(--k);border:var(--bw-ctl) solid var(--k);font:900 17px/1 var(--f-ui)}
+.prose ul{display:grid;gap:8px}
 .prose ul > li{position:relative;padding-left:26px}
 .prose ul > li::before{content:"";position:absolute;left:4px;top:.62em;width:10px;height:10px;background:var(--m);border:2px solid var(--k);transform:rotate(45deg)}
-.callout{padding:16px 18px;border:var(--bw) solid var(--line);border-left-width:12px;border-radius:var(--r-box);background:var(--surface);box-shadow:5px 5px 0 var(--pop)}
+.prose li > ul,.prose li > ol{margin-top:8px}
+.prose dl{display:grid;gap:10px}
+.prose dt{font:800 16.5px/1.3 var(--f-ui)}
+.prose dd{color:var(--text-2)}
+.prose small,.prose .fine{font-size:15px;color:var(--text-2)}
+.prose code{font:600 .92em/1 ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;padding:2px 5px;border-radius:5px;background:var(--surface-2)}
+.prose hr{border:0;border-top:2.5px dashed color-mix(in srgb, var(--text) 30%, transparent);margin-block:32px}
+.callout{padding:16px 18px;border:var(--bw) solid var(--line);border-left-width:12px;border-radius:var(--r-box);background:var(--surface);color:var(--text);box-shadow:5px 5px 0 var(--pop)}
+.callout > * + *{margin-top:8px}
+.callout--note{border-left-color:var(--c)}
+.callout--warn{border-left-color:var(--r)}
+.prose .callout{margin-block:22px}
+.table-wrap{max-width:100%;overflow-x:auto;padding:0 8px 10px 0}
+.table-wrap:focus-visible{outline-offset:2px}
+
+/* ---------- 20. Tables: paytables, facts, the games index ---------- */
 .paytable{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);border:var(--bw) solid var(--line);border-radius:var(--r-ctl);overflow:hidden;box-shadow:6px 6px 0 var(--pop);font-size:16px}
-.paytable caption{text-align:left;font:800 15px/1.3 var(--f-ui);padding:0 0 10px;color:var(--text-2)}
+.paytable caption{text-align:left;font:800 15px/1.3 var(--f-ui);padding:0 0 10px 2px;color:var(--text-2)}
 .paytable th,.paytable td{padding:12px 16px;text-align:left;vertical-align:top;border-bottom:2px solid color-mix(in srgb, var(--text) 16%, transparent)}
 .paytable tr:last-child > *{border-bottom:0}
 .paytable thead th{background:var(--k);color:var(--y);font:800 13px/1.2 var(--f-ui);text-transform:uppercase;letter-spacing:.1em}
 .paytable tbody th{font:800 15.5px/1.3 var(--f-ui);color:var(--text-2);width:42%}
 .paytable td{font:800 17px/1.3 var(--f-ui);font-variant-numeric:tabular-nums}
 .paytable td small{display:block;font:400 14px/1.4 var(--f-body);color:var(--text-2);margin-top:2px}
+
+@media (max-width: 720px){
+  .page-hero h1{font-size:clamp(32px, 9vw, 40px);font-stretch:104%}
+  .page-hero .lede{font-size:17px}
+  .prose ol > li{padding-left:46px}
+  .paytable th,.paytable td{padding:10px 12px}
+}

@@ -15,6 +15,15 @@ export function spokenDuration(seconds) {
   return parts.join(' ');
 }
 
+/** Minutes in a short label for pills: 30 → "30 min"; 60 → "1 hour"; 90 → "1 hr 30 min" */
+export function shortDuration(minutes) {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (!h) return `${m} min`;
+  if (!m) return `${h} hour${h === 1 ? '' : 's'}`;
+  return `${h} hr ${m} min`;
+}
+
 /** 754 → "12:34"; 3754 → "1:02:34" */
 export function clock(seconds) {
   const h = Math.floor(seconds / 3600);

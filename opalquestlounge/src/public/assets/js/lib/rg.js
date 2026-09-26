@@ -1,14 +1,22 @@
-// Responsible gaming: session clock, a break reminder every 30 minutes,
-// an optional daily time limit, and breaks that lock the games.
-// Games ask rg.canPlay() before every stake and listen for changes.
+// Responsible gaming: session clock, a reality check every 15, 30 or 60
+// minutes (30 by default), an optional daily time limit, and breaks that lock
+// the games. Games ask rg.canPlay() before every stake and listen for changes.
+//
+// Stored (localStorage, via store.js):
+//   oql.limits   { minutes, pending: { minutes, from } | null, reality }
+//                reality is the reality-check interval in minutes (15, 30 or 60)
+//   oql.playtime { date, seconds }
+//   oql.pause    { until, kind: 'break' | 'cooloff' }
+//   oql.age      { answer, at }
 import { store } from './store.js';
 import { session } from './session.js';
 import { wallet } from './wallet.js';
-import { clock, fmt, spokenDuration, timeOfDay, dayAndDate, today } from './format.js';
+import { clock, fmt, spokenDuration, shortDuration, timeOfDay, dayAndDate, today } from './format.js';
 import { openDialog, toast, ask } from './ui.js';
 import { sound } from './sound.js';
 
-const REMINDER_EVERY = 30 * 60; // seconds
+const REALITY_CHOICES = [15, 30, 60]; // minutes
+const REALITY_DEFAULT = 30;
 const SHORT_BREAK = 5 * 60 * 1000;
 const target = new EventTarget();
 const emit = () => target.dispatchEvent(new Event('change'));
@@ -22,6 +30,10 @@ function limits() {
     store.set('limits', l);
   }
   return l;
+}
+function realityMinutes() {
+  const m = Number(store.get('limits', {})?.reality);
+  return REALITY_CHOICES.includes(m) ? m : REALITY_DEFAULT;
 }
 function playtime() {
   const p = store.get('playtime', null);
@@ -63,6 +75,18 @@ export const rg = {
   limits,
   playtime,
   pause,
+  /** The reality-check interval in minutes: 15, 30 or 60. */
+  realityMinutes,
+  /** Change how often the reality check appears. Applies at once. */
+  setReality(minutes) {
+    const m = Number(minutes);
+    if (!REALITY_CHOICES.includes(m)) return false;
+    const l = limits();
+    l.reality = m;
+    store.set('limits', l);
+    emit();
+    return true;
+  },
   setLimit(minutes) {
     const l = limits();
     const current = l.minutes || Infinity;
@@ -116,10 +140,14 @@ function tick() {
   p.seconds += 1;
   store.set('playtime', p);
 
+  // Reality check: due once the chosen interval has passed since the last one.
+  // (Sessions saved before remindedAt existed counted 30-minute reminders.)
   const s = session.state;
-  const due = Math.floor(session.elapsed() / REMINDER_EVERY);
-  if (due > s.reminders) {
-    s.reminders = due;
+  const elapsed = session.elapsed();
+  const last = s.remindedAt ?? (s.reminders || 0) * 30 * 60;
+  if (elapsed - last >= realityMinutes() * 60) {
+    s.remindedAt = elapsed;
+    s.reminders = (s.reminders || 0) + 1;
     session.save();
     if (rg.canPlay().ok) showReminder();
   }
@@ -150,16 +178,45 @@ export function startRg() {
     }
   });
 
-  // Reality check buttons
+  // A 5-minute break: from the reality check, or from Settings
+  // ([data-action="break-5"] anywhere). A break never shortens a longer one.
+  const shortBreak = () => {
+    const before = pause();
+    rg.startPause(SHORT_BREAK, 'break');
+    const now = pause();
+    if (before && now && now.until === before.until && before.until > Date.now() + SHORT_BREAK) {
+      toast(`You're already on a break until ${timeOfDay(now.until)}${now.until - Date.now() > 20 * 3600 * 1000 ? ` on ${dayAndDate(now.until)}` : ''}.`);
+    } else {
+      toast(`Break started. The games open again at ${timeOfDay(Date.now() + SHORT_BREAK)}.`);
+    }
+  };
   const rc = document.getElementById('reality-check');
   rc?.addEventListener('click', (e) => {
     const b = e.target.closest('[data-rc]');
     if (!b) return;
-    if (b.dataset.rc === 'break') {
-      rg.startPause(SHORT_BREAK, 'break');
-      toast(`Break started. The games open again at ${timeOfDay(Date.now() + SHORT_BREAK)}.`);
-    }
+    if (b.dataset.rc === 'break') shortBreak();
     rc.close();
+  });
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-action="break-5"]');
+    if (!b || b.getAttribute('aria-disabled') === 'true') return;
+    shortBreak();
+    showStates();
+  });
+
+  // Reality-check interval: radios named "rc" (Settings, and any page that offers them)
+  const syncReality = () => {
+    const m = String(realityMinutes());
+    document.querySelectorAll('input[name="rc"]').forEach((r) => (r.checked = r.value === m));
+  };
+  syncReality();
+  document.addEventListener('change', (e) => {
+    const r = e.target;
+    if (!(r instanceof HTMLInputElement) || r.name !== 'rc' || !r.checked) return;
+    if (!rg.setReality(r.value)) return;
+    syncReality();
+    showStates();
+    toast(`Saved. You'll see a reality check every ${realityMinutes()} minutes.`);
   });
 
   // Daily limit: settings dialog and responsible gaming page
@@ -179,6 +236,7 @@ export function startRg() {
     const r = rg.setLimit(Number(settingsLimit.value));
     toast(r.applied === 'now' ? describeLimit() : `Saved. Your new limit starts tomorrow.`);
     if (r.applied === 'tomorrow') settingsLimit.value = String(limits().minutes || 0);
+    showStates();
   });
   const form = document.querySelector('[data-rg="limit"]');
   const limitStatus = document.querySelector('[data-rg-limit-status]');
@@ -214,6 +272,31 @@ export function startRg() {
     if (!ok) return;
     rg.startPause(days * 24 * 3600 * 1000, 'cooloff');
     coolStatus.textContent = describePause();
+  });
+
+  // State pills in Settings ([data-rg-state]), refreshed whenever anything changes
+  const showStates = () => {
+    const l = limits();
+    const set = (key, text) =>
+      document.querySelectorAll(`[data-rg-state="${key}"]`).forEach((el) => {
+        el.textContent = text;
+        el.hidden = !text;
+      });
+    set('limit', l.minutes ? `${shortDuration(l.minutes)} a day` : 'Off');
+    set('limit-pending', l.pending ? `From tomorrow: ${l.pending.minutes ? `${spokenDuration(l.pending.minutes * 60)} a day` : 'no limit'}.` : '');
+    set('reality', `Every ${realityMinutes()} min`);
+    const p = pause();
+    set('break', p ? `Until ${timeOfDay(p.until)}${p.until - Date.now() > 20 * 3600 * 1000 ? `, ${dayAndDate(p.until)}` : ''}` : 'None set');
+    if (settingsLimit && document.activeElement !== settingsLimit) settingsLimit.value = String(l.minutes || 0);
+  };
+  showStates();
+  rg.onChange(() => {
+    showStates();
+    syncReality();
+  });
+  document.getElementById('settings')?.addEventListener('toggle', showStates);
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('[data-open="settings"]')) showStates();
   });
 
   store.watch('pause', emit);

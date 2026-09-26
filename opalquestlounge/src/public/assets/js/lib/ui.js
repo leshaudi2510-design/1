@@ -11,13 +11,21 @@ export function announce(message) {
 }
 
 let toastTimer;
-export function toast(message, ms = 4000) {
+/**
+ * Show a short message in the toast (a role="status" popover) for `ms`
+ * milliseconds. The popover opens first and the text lands a frame later,
+ * so screen readers hear it as a change inside a visible live region.
+ * Never use it to announce outcomes as "wins".
+ */
+export function toast(message, ms = 5000) {
   const el = document.getElementById('toast');
   if (!el) return;
-  el.textContent = message;
+  const msg = el.querySelector('.toast__msg') || el;
+  msg.textContent = '';
   try {
     if (!el.matches(':popover-open')) el.showPopover();
   } catch {}
+  requestAnimationFrame(() => (msg.textContent = message));
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => {
     try {
