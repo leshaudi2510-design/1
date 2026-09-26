@@ -4,14 +4,19 @@ on:
   pull_request:
     paths: ['opalquestlounge/**', '.github/workflows/opalquestlounge-*.yml']
   push:
-    paths: ['opalquestlounge/**']
+    paths: ['opalquestlounge/**', '.github/workflows/opalquestlounge-*.yml']
 
 permissions:
   contents: read
 
+concurrency:
+  group: opalquestlounge-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: opalquestlounge
@@ -20,6 +25,38 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      # The build has no dependencies. It fails on broken links, missing
-      # disclaimers, banned wording, SEO limits, invalid JSON-LD and the page budget.
-      - run: node build.mjs
+
+      # The build has no dependencies, so there is no npm install. It fails on
+      # broken links and fragments, duplicate ids, inline styles or scripts,
+      # a missing age notice or disclaimer, banned wording, American spelling,
+      # SEO limits, invalid JSON-LD, missing share images, the Pragmatic Play
+      # data and stages, the CSP frame-src and the page budget.
+      # The browser checks (npm run check) need Playwright and run locally.
+      - name: Build and lint (site.config.json as it is)
+        run: node build.mjs
+        env:
+          OUT_DIR: ${{ runner.temp }}/dist
+
+      - name: Derive the other configurations
+        run: |
+          node -e '
+            const fs = require("fs");
+            const base = JSON.parse(fs.readFileSync("site.config.json", "utf8"));
+            const out = process.env.RUNNER_TEMP;
+            // The fallback: our own slot, Seven Systems, instead of the demos.
+            fs.writeFileSync(`${out}/no-pragmatic.json`, JSON.stringify({ ...base, pragmatic: { ...base.pragmatic, enabled: false } }, null, 2));
+            // Analytics switched on, which changes the consent UI, the CSP and some page copy.
+            fs.writeFileSync(`${out}/analytics.json`, JSON.stringify({ ...base, analytics: { ga4: "G-TEST000000", adsConversionId: "" } }, null, 2));
+          '
+
+      - name: Build and lint (Pragmatic Play demos off)
+        run: node build.mjs
+        env:
+          SITE_CONFIG: ${{ runner.temp }}/no-pragmatic.json
+          OUT_DIR: ${{ runner.temp }}/dist-no-pragmatic
+
+      - name: Build and lint (with a test GA4 ID)
+        run: node build.mjs
+        env:
+          SITE_CONFIG: ${{ runner.temp }}/analytics.json
+          OUT_DIR: ${{ runner.temp }}/dist-analytics
