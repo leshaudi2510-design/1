@@ -1,0 +1,269 @@
+/* ---------- 22. Info and legal pages ----------
+   About, responsible gaming, terms, privacy, cookies, contact, 404, offline.
+   Every page opens with the .page-hero title band (25-prose.css), then a
+   .page-body. Reuses .tools/.tool/.helpline (50-home.css), .prose, .callout
+   and .paytable (25-prose.css), .field/.segmented/.settings__state (40-dialogs.css). */
+
+/* Error colour for form messages (text on --surface and --bg) */
+:root{--err:#B0102A}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--err:#FF8F85} }
+:root[data-theme="dark"]{--err:#FF8F85}
+
+/* ---- Title band extras: fact pills, actions, a starburst sticker ---- */
+.page-hero .wrap{position:relative}
+.page-hero--plain{padding-top:clamp(28px, 3.4vw, 48px)}
+.page-hero--plain .eyebrow{margin-top:0}
+.page-hero__meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.page-hero__actions{display:flex;flex-wrap:wrap;gap:12px 14px;margin-top:24px}
+/* a yellow button would vanish on the yellow band: use the hero CTA tokens */
+.page-hero .btn--primary{background:var(--cta-bg);color:var(--cta-text);border-color:var(--cta-line);--btn-pop:var(--cta-pop);--gloss:inset 0 3px 0 rgb(255 255 255 / .18)}
+.page-hero .btn--secondary{border-color:var(--k);--btn-pop:var(--k)}
+.page-hero__art{position:absolute;right:0;top:50%;width:188px;height:188px;transform:translateY(-44%) rotate(-7deg);pointer-events:none;
+  filter:drop-shadow(6px 6px 0 var(--k))}
+.page-hero__burst{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.page-hero__burst use{--bf:var(--tone)}
+.page-hero__art--c{--tone:var(--c)} .page-hero__art--m{--tone:var(--m)} .page-hero__art--r{--tone:var(--r)}
+.page-hero__disc{position:absolute;inset:29%;display:grid;place-items:center;border-radius:50%;background:#FFFFFF;color:var(--k);border:var(--bw) solid var(--k)}
+.page-hero__disc svg{width:54%;height:54%}
+.page-hero__disc .disc-opal{width:76%;height:76%}
+/* on a yellow band a yellow burst needs the magenta plate instead */
+.page-hero__art--y{--tone:var(--m)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .page-hero__art--y{--tone:var(--y)} }
+:root[data-theme="dark"] .page-hero__art--y{--tone:var(--y)}
+@media (min-width: 1000px){
+  .page-hero--art .wrap > :not(.page-hero__art,.crumbs){max-width:calc(100% - 250px)}
+}
+@media (max-width: 999px){
+  .page-hero__art{display:none}
+}
+
+/* A section title that sits straight on the page (404, offline) */
+.page-body__title{font:900 clamp(26px, 1.6vw + 16px, 36px)/1.1 var(--f-display);font-stretch:112%;letter-spacing:-.012em;margin-bottom:24px;
+  text-shadow:.025em .025em 0 var(--plate), .05em .05em 0 var(--plate), .075em .075em 0 var(--plate)}
+
+/* ---- Prose: sections inside .prose keep the 14px rhythm ---- */
+.prose section > * + *{margin-top:14px}
+.prose section > h2 + *,.prose section > h3 + *{margin-top:10px}
+.prose > section:first-child > h2:first-child{margin-top:0}
+.legal code,.split code{overflow-wrap:anywhere}
+.prose .ext-ico,.helplist .ext-ico{display:inline-block;width:.85em;height:.85em;margin-left:.2em;vertical-align:-.05em}
+
+/* ---- Two columns: content and a side column (about, contact, responsible gaming) ---- */
+.split{display:grid;grid-template-columns:minmax(0,8fr) minmax(0,4fr);gap:clamp(28px, 4vw, 64px);align-items:start}
+.split__side{display:grid;gap:24px;align-content:start}
+@media (min-width: 1024px){
+  .split > .split__side{position:sticky;top:110px}
+}
+.side-card{background:var(--surface);color:var(--text);border:var(--bw) solid var(--line);border-radius:var(--r-box);box-shadow:6px 6px 0 var(--pop);overflow:hidden}
+.side-card__head{display:block;padding:14px 18px 13px;background:var(--y);color:var(--k);border-bottom:var(--bw) solid var(--line);
+  font:900 20px/1.15 var(--f-display);font-stretch:110%;letter-spacing:-.005em;text-shadow:none;margin:0}
+.side-card__body{padding:18px 18px 20px;display:grid;gap:16px}
+.side-card :focus-visible{outline-color:var(--focus-card)}
+.split__side .callout{box-shadow:5px 5px 0 var(--pop)}
+.split__side .callout p{font-size:16px;line-height:1.5}
+
+/* Operator details (about, contact) */
+.operator{display:grid;gap:0;margin:0}
+.operator > div{display:grid;gap:2px;padding:10px 0;border-bottom:2px dashed color-mix(in srgb, var(--text) 22%, transparent)}
+.operator > div:first-child{padding-top:0}
+.operator > div:last-child{border-bottom:0;padding-bottom:0}
+.operator dt{font:800 12.5px/1.2 var(--f-ui);font-stretch:112%;text-transform:uppercase;letter-spacing:.1em;color:var(--text-2)}
+.operator dd{margin:0;font:500 16px/1.4 var(--f-body);overflow-wrap:anywhere}
+
+/* ---- About: the two kinds of game ---- */
+.kinds,.prose .kinds{display:grid;grid-template-columns:repeat(2, minmax(0,1fr));gap:20px}
+.prose section > .kinds{margin-top:18px}
+.kinds--one,.prose .kinds--one{grid-template-columns:minmax(0,1fr)}
+.kind,.prose .kinds > .kind{position:relative;display:flex;flex-direction:column;gap:8px;padding:0 18px 18px;background:var(--surface);color:var(--text);
+  border:var(--bw) solid var(--line);border-radius:var(--r-ctl);box-shadow:6px 6px 0 var(--pop);overflow:hidden}
+/* a colour strip along the top (and no prose diamond) */
+.kind::before,.prose .kinds > .kind::before{content:"";position:static;display:block;width:auto;height:12px;margin:0 -18px 6px;border:0;border-bottom:var(--bw) solid var(--line);
+  transform:none;background:var(--kc, var(--c))}
+.kind--oq{--kc:var(--m)}
+.kind__by{display:flex;align-items:center;gap:7px;font:600 14px/1.2 var(--f-body);color:var(--text-2)}
+.kind h3{margin:0;font:900 22px/1.15 var(--f-ui);font-stretch:110%}
+.kind p{font-size:16px;line-height:1.5}
+.kind__go{margin-top:auto;padding-top:4px;font:700 16px/1.3 var(--f-ui)}
+.kind__go a{display:inline-block;padding:3px 0}
+.kind :focus-visible{outline-color:var(--focus-card)}
+
+/* ---- Legal pages: "On this page", "In short", numbered sections ---- */
+.legal{display:grid;grid-template-columns:minmax(0,272px) minmax(0,1fr);gap:clamp(32px, 4vw, 60px);align-items:start}
+.legal__main{min-width:0;max-width:940px}
+.prose--legal{max-width:none}
+.prose--legal > section > :not(.table-wrap){max-width:68ch}
+.toc{background:var(--surface);color:var(--text);border:var(--bw) solid var(--line);border-radius:var(--r-box);box-shadow:6px 6px 0 var(--pop);overflow:hidden}
+@media (min-width: 1024px){
+  .toc{position:sticky;top:106px;max-height:calc(100vh - 130px);overflow:auto}
+}
+.toc__title{padding:11px 16px 10px;background:var(--k);color:var(--y);font:800 13px/1.2 var(--f-ui);font-stretch:118%;text-transform:uppercase;letter-spacing:.12em}
+.toc__list{padding:8px 0 10px}
+.toc__list a{display:flex;align-items:flex-start;gap:10px;min-height:36px;padding:7px 16px;color:var(--text);text-decoration:none;font:700 15.5px/1.3 var(--f-ui);font-stretch:102%}
+.toc__list a:hover{background:var(--surface-2);text-decoration:underline;text-decoration-color:var(--m);text-decoration-thickness:2px;text-underline-offset:3px}
+.toc__list a:focus-visible{outline-offset:-3px;outline-color:var(--focus-card)}
+.toc__no{flex:none;display:grid;place-items:center;width:26px;height:26px;margin-top:-2px;letter-spacing:-.03em;border-radius:50%;background:var(--y);color:var(--k);border:2px solid var(--k);font:900 12px/1 var(--f-ui);font-stretch:100%}
+
+.in-short{position:relative;margin:14px 0 44px;padding:30px 22px 20px;background:var(--surface);color:var(--text);border:var(--bw) solid var(--line);border-radius:var(--r-box);box-shadow:7px 7px 0 var(--pop);max-width:68ch}
+.in-short .sticker{position:absolute;top:-17px;left:16px;margin:0}
+.in-short ul{display:grid;gap:10px}
+.in-short li{display:flex;align-items:flex-start;gap:11px;font:600 17px/1.45 var(--f-body)}
+.in-short li svg{width:24px;height:24px;flex:none;margin-top:1px}
+
+.prose--legal h2{display:flex;align-items:flex-start;gap:14px}
+.h-no{flex:none;display:inline-grid;place-items:center;width:40px;height:40px;margin-top:-1px;border-radius:50%;background:var(--y);color:var(--k);
+  border:var(--bw-ctl) solid var(--k);font:900 19px/1 var(--f-ui);font-stretch:100%;letter-spacing:0;text-shadow:none;box-shadow:3px 3px 0 var(--k)}
+
+/* The storage and cookie tables: descriptive text, so body type in the cells */
+.storage{min-width:640px;font-size:15.5px}
+.storage caption{font-size:15px;padding-left:4px}
+.storage tbody th{width:auto;white-space:nowrap;color:var(--text)}
+.storage tbody th code{font-size:14px}
+.storage td{font:400 15.5px/1.45 var(--f-body)}
+.storage td:nth-child(2){white-space:nowrap}
+
+/* ---- Responsible gaming ---- */
+.rg-band .tools > li,.jump > li{display:flex}
+.rg-band .tool,.jump .tool{flex:1 1 auto}
+.rg-band .helpline h2{font:900 28px/1.05 var(--f-display);font-stretch:112%;margin-bottom:8px}
+.rg-band .helpline .tel .num{font:inherit}
+.ti--y{--tc:#FFE11A} .ti--m{--tc:#FF4FB0} .ti--c{--tc:#3DD6FF} .ti--r{--tc:#FF6A4D} .ti--g{--tc:#18CF96}
+.rg-panel .ti{width:46px;height:46px;border-radius:12px;border:var(--bw-ctl) solid var(--k);display:grid;place-items:center;flex:none;color:var(--k);background:var(--tc)}
+.rg-panel .ti svg{width:25px;height:25px}
+
+.rg-panels{display:grid;grid-template-columns:repeat(2, minmax(0,1fr));gap:30px 28px}
+.rg-panel{display:grid;gap:14px;align-content:start;padding:20px 22px 24px;background:var(--surface);color:var(--text);
+  border:var(--bw) solid var(--line);border-radius:var(--r-box);box-shadow:7px 7px 0 var(--pop);scroll-margin-top:24px}
+.rg-panel :focus-visible{outline-color:var(--focus-card)}
+.rg-panel__head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 14px;padding-bottom:14px;margin-bottom:2px;border-bottom:2.5px dashed color-mix(in srgb, var(--text) 26%, transparent)}
+.rg-panel__title{display:flex;align-items:center;gap:14px;min-width:0}
+.rg-panel__head h2{font:900 24px/1.1 var(--f-display);font-stretch:110%;letter-spacing:-.008em}
+.rg-panel__head .settings__state{margin-left:auto;font-size:12.5px;line-height:1.2;padding:5px 10px}
+.rg-panel > p{font-size:16.5px;line-height:1.55}
+.rg-panel__sub{font:800 18px/1.2 var(--f-ui);font-stretch:104%;margin-top:6px}
+.rg-form{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 14px}
+.rg-form .field{flex:1 1 220px}
+.rg-form .btn{min-height:46px;padding:8px 18px;font-size:16px}
+.rg-panel > :is(.rg-rule,.rg-panel__fine){font-size:15.5px;color:var(--text-2)}
+.rg-panel > .rg-panel__fine{padding-top:12px;border-top:2px dashed color-mix(in srgb, var(--text) 18%, transparent)}
+.rg-status{font:600 15.5px/1.45 var(--f-body);color:var(--text)}
+.rg-status:empty{margin-top:0}
+.rg-pending{font:700 15.5px/1.4 var(--f-ui);padding:8px 12px;border-radius:10px;background:var(--surface-2);border:2px solid color-mix(in srgb, var(--text) 26%, transparent)}
+.rg-actions{display:flex;flex-wrap:wrap;gap:10px 12px}
+.rg-actions .btn{flex:1 1 auto;min-height:48px;padding:8px 16px;font-size:16px}
+.rg-panel .segmented{max-width:420px}
+.rg-stats{display:grid;grid-template-columns:repeat(4, minmax(0,1fr));gap:10px;margin:0}
+.rg-stats > div{display:grid;gap:4px;align-content:start;padding:10px 12px;border-radius:10px;background:var(--surface-2);border:2px solid color-mix(in srgb, var(--text) 18%, transparent)}
+.rg-stats dt{font:800 11.5px/1.2 var(--f-ui);font-stretch:112%;text-transform:uppercase;letter-spacing:.1em;color:var(--text-2)}
+.rg-stats dd{margin:0;font:900 19px/1.15 var(--f-ui);font-variant-numeric:tabular-nums}
+.rg-stats__unit{font:700 13px/1 var(--f-ui);color:var(--text-2)}
+
+.note-strip{display:flex;align-items:center;gap:18px;margin:44px 0 12px;padding:16px 20px;max-width:56em;
+  background:var(--surface);color:var(--text);border:var(--bw) solid var(--line);border-radius:var(--r-box);box-shadow:6px 6px 0 var(--pop)}
+.note-strip .sticker{--sticker-bg:#FFE11A;--sticker-text:#18122B;flex:none;margin:0}
+.note-strip p:not(.sticker){font:700 18px/1.4 var(--f-ui)}
+.rg-more{margin-top:clamp(36px, 4vw, 56px)}
+
+.helplist{margin:0;gap:0}
+.helplist > div{padding:12px 0;border-bottom:2px dashed color-mix(in srgb, var(--text) 22%, transparent)}
+.helplist > div:first-child{padding-top:0}
+.helplist > div:last-child{border-bottom:0;padding-bottom:0}
+.helplist dt{font:800 16.5px/1.3 var(--f-ui)}
+.helplist dd{margin:3px 0 0;font-size:15.5px;line-height:1.5;color:var(--text-2)}
+.helplist a{display:inline-block;padding:2px 0;font-weight:700}
+.helplist .tel-link{font:900 19px/1.2 var(--f-ui);color:var(--text);text-decoration-color:var(--m)}
+
+/* ---- 404 and offline: link cards in the .tools pattern ---- */
+.jump{grid-template-columns:repeat(auto-fill, minmax(min(100%, 360px), 1fr));gap:18px}
+.jump .tool{box-shadow:4px 4px 0 var(--pop)}
+.jump .tool:hover{box-shadow:6px 6px 0 var(--pop)}
+.jump .tool:active{box-shadow:1px 1px 0 var(--pop)}
+.jump .tool:focus-visible{outline-offset:4px}
+
+/* ---- Contact ---- */
+.form{background:var(--surface);color:var(--text);border:var(--bw-heavy) solid var(--line);border-radius:var(--r-stage);box-shadow:10px 10px 0 var(--pop);overflow:hidden;min-width:0}
+.form__head{padding:16px 22px 15px;background:var(--y);color:var(--k);border-bottom:var(--bw) solid var(--line)}
+.form__head h2{font:900 26px/1.05 var(--f-display);font-stretch:112%;letter-spacing:-.012em}
+.form__body{display:grid;gap:20px;padding:22px 24px 26px}
+.form__how{font-size:16px;line-height:1.5;color:var(--text-2);max-width:60ch}
+.form__row{display:grid;grid-template-columns:repeat(2, minmax(0,1fr));gap:20px}
+.form .field{display:grid;gap:7px;align-content:start}
+.form .field > label{font:800 16px/1.2 var(--f-ui);font-stretch:102%}
+.form .field input,.form .field textarea{display:block;width:100%;min-height:48px;padding:10px 14px;border:var(--bw-ctl) solid var(--ctl-line);border-radius:12px;
+  background:var(--surface);color:var(--text);font:400 17px/1.4 var(--f-body)}
+.form .field textarea{min-height:170px;resize:vertical}
+.form .field select{min-height:48px;font-size:16.5px}
+.form .field input:hover,.form .field textarea:hover{background-color:var(--surface-2)}
+.form .field :is(input,select,textarea):focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.form .field [aria-invalid="true"]{border-color:var(--err);box-shadow:inset 5px 0 0 var(--err)}
+.field__hint{font-size:14.5px;line-height:1.4;color:var(--text-2)}
+.field__error{font:700 15px/1.35 var(--f-ui);color:var(--err)}
+.field__error:empty{display:none}
+.field__error::before{content:"";display:inline-block;width:9px;height:9px;margin-right:8px;background:var(--err);transform:rotate(45deg) translateY(-1px)}
+.form__error{padding:14px 18px 16px;border:var(--bw) solid var(--line);border-left:12px solid var(--r);border-radius:var(--r-box);background:var(--surface);box-shadow:5px 5px 0 var(--pop)}
+.form__error:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.form__error h3{display:flex;align-items:center;gap:10px;font:800 18px/1.2 var(--f-ui)}
+.form__error h3 svg{width:24px;height:24px;color:var(--err);flex:none}
+.form__error ul{display:grid;gap:4px;margin-top:10px;padding-left:34px}
+.form__error li{list-style:disc;color:var(--err)}
+.form__error a{display:inline-block;padding:2px 0;color:var(--err);font-weight:600}
+.form__actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px 18px}
+.form__status{font:600 16px/1.45 var(--f-body)}
+.contact__email a{display:inline-flex;align-items:center;gap:10px;padding:4px 0;font:800 18px/1.3 var(--f-ui);color:var(--link);overflow-wrap:anywhere}
+.contact__email svg{width:24px;height:24px;flex:none}
+
+/* ---- responsive ---- */
+@media (max-width: 999px){
+  .split,.legal{grid-template-columns:minmax(0,1fr)}
+  .legal__main{max-width:none}
+  .toc__list{columns:2;column-gap:8px}
+  .toc__list li{break-inside:avoid}
+  .rg-stats{grid-template-columns:repeat(2, minmax(0,1fr))}
+}
+@media (max-width: 860px){
+  .rg-panels{grid-template-columns:minmax(0,1fr)}
+  .rg-stats{grid-template-columns:repeat(4, minmax(0,1fr))}
+}
+@media (max-width: 720px){
+  .page-hero__actions .btn{flex:1 1 auto}
+  /* storage tables become one card per row */
+  .table-wrap:has(> .storage){padding-right:6px}
+  .storage{min-width:0}
+  .storage,.storage tbody,.storage tr,.storage tbody th,.storage td{display:block}
+  .storage caption{display:block;padding:11px 14px 10px;background:var(--k);color:var(--y);font:800 13px/1.3 var(--f-ui);text-transform:uppercase;letter-spacing:.08em;border-bottom:var(--bw) solid var(--line)}
+  .storage thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+  .storage tbody tr{padding:12px 14px 12px;border-bottom:2px solid color-mix(in srgb, var(--text) 16%, transparent)}
+  .storage tbody tr:last-child{border-bottom:0}
+  .paytable.storage tbody th{padding:0 0 6px;border:0}
+  .paytable.storage td{display:grid;grid-template-columns:8.2em minmax(0,1fr);gap:6px;padding:3px 0;border:0;white-space:normal}
+  .storage td::before{content:attr(data-label);content:attr(data-label) / "";font:800 11.5px/1.9 var(--f-ui);font-stretch:104%;text-transform:uppercase;letter-spacing:.06em;color:var(--text-2)}
+  .toc__list{columns:1}
+  .h-no{width:34px;height:34px;font-size:16.5px}
+  .prose--legal h2{gap:12px}
+  .toc__list a{min-height:32px;padding:6px 14px;font-size:15px}
+  .in-short{padding:28px 16px 16px;margin-bottom:36px}
+  .in-short li{font-size:16.5px}
+  .kinds,.prose .kinds{grid-template-columns:minmax(0,1fr)}
+  .rg-panel{padding:18px 16px 20px;box-shadow:5px 5px 0 var(--pop)}
+  .rg-panel__title{gap:12px}
+  .rg-panel__head h2{font-size:22px}
+  .rg-panel__head .settings__state{margin-left:0}
+  .rg-stats{grid-template-columns:repeat(2, minmax(0,1fr))}
+  .note-strip{flex-direction:column;align-items:flex-start;gap:12px}
+  .note-strip p:not(.sticker){font-size:16.5px}
+  .rg-band .helpline h2{font-size:25px}
+  .form{border-width:var(--bw);border-radius:18px;box-shadow:6px 6px 0 var(--pop)}
+  .form__head{padding:14px 16px 13px}
+  .form__head h2{font-size:23px}
+  .form__body{padding:18px 16px 20px}
+  .form__row{grid-template-columns:minmax(0,1fr)}
+  .form__actions .btn{flex:1 1 auto}
+}
+
+/* ---- preferences ---- */
+@media (forced-colors: active){
+  .page-hero__art{display:none}
+  .rg-panel,.side-card,.kind,.in-short,.toc,.note-strip,.form,.form__error,.rg-stats > div,.form .field input,.form .field textarea{border-color:CanvasText}
+  .form .field [aria-invalid="true"]{border-color:Mark;box-shadow:none}
+  .h-no,.toc__no{border-color:CanvasText;box-shadow:none}
+  .page-body__title{text-shadow:none}
+}
