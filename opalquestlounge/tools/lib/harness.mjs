@@ -6,6 +6,7 @@ import path from 'node:path';
 import http from 'node:http';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { parseHeaders, cacheControlFor } from './headers.mjs';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -55,22 +56,33 @@ export async function cleanTemp() {
 
 /**
  * Build the site with site.config.json changed by `edit` into a temporary
- * folder. Returns { name, dir, cfg, ok, output }.
+ * folder, from this project or from a changed copy of it (`from`).
+ * Returns { name, dir, cfg, ok, output, version, sw }: version and sw are
+ * the asset and service worker versions the build printed.
  */
-export async function buildSite(name, edit = (c) => c) {
+export async function buildSite(name, edit = (c) => c, { from = ROOT } = {}) {
   const tmp = await tempDir();
   const cfg = edit(await baseConfig());
   const cfgFile = path.join(tmp, `${name}.config.json`);
   const dir = path.join(tmp, name);
   await fs.writeFile(cfgFile, JSON.stringify(cfg, null, 2));
   const r = spawnSync(process.execPath, ['build.mjs'], {
-    cwd: ROOT,
+    cwd: from,
     env: { ...process.env, SITE_CONFIG: cfgFile, OUT_DIR: dir },
     encoding: 'utf8',
   });
   const output = `${r.stdout || ''}${r.stderr || ''}`.trim();
   const ok = r.status === 0 && /Lint: no problems found\./.test(output);
-  return { name, dir, cfg, ok, output };
+  const [, version, sw] = output.match(/\(assets v(\w+), sw (\w+)\)/) || [];
+  return { name, dir, cfg, ok, output, version, sw };
+}
+
+/** A copy of this project (without node_modules or builds) to change and build, for checks that need a second version of the site. */
+export async function copyProject(name) {
+  const dest = path.join(await tempDir(), name);
+  const skip = /^(node_modules|dist[^/]*|check-shots|\.git)(\/|$)/;
+  await fs.cp(ROOT, dest, { recursive: true, filter: (src) => !skip.test(path.relative(ROOT, src).split(path.sep).join('/')) });
+  return dest;
 }
 
 /** Every path in a build's sitemap, then the 404 page and the offline page. */
@@ -88,26 +100,51 @@ const TYPES = {
   '.webp': 'image/webp', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.xml': 'application/xml', '.txt': 'text/plain',
 };
 
-/** Serve a build folder the way the hosts do: pretty URLs and the custom 404. */
-export function serve(dir) {
+/**
+ * Serve a build folder the way the hosts do: pretty URLs and the custom 404.
+ * Every response is no-cache, unless `host` is set: then each file gets the
+ * Cache-Control Cloudflare Pages would send, from the build's _headers, so
+ * the browser's HTTP cache behaves as it does in production. setRoot()
+ * serves another build from the same address, which is how a check
+ * simulates a deploy. setDown(true) drops every connection, as an
+ * unreachable server would: Playwright's offline mode doesn't reach a
+ * service worker's own requests.
+ */
+export function serve(dir, { host = false } = {}) {
+  let root = dir;
+  let down = false;
   const server = http.createServer(async (req, res) => {
-    let p = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-    if (p.endsWith('/')) p += 'index.html';
-    const file = path.join(dir, path.normalize(p));
+    if (down) {
+      req.socket.destroy();
+      return;
+    }
+    const pathname = decodeURIComponent(new URL(req.url, 'http://x').pathname);
+    const p = pathname.endsWith('/') ? `${pathname}index.html` : pathname;
+    const file = path.join(root, path.normalize(p));
+    const cache = async (status) => {
+      if (!host) return 'no-cache';
+      if (status === 404) return 'no-store';
+      return cacheControlFor(parseHeaders(await fs.readFile(path.join(root, '_headers'), 'utf8').catch(() => '')), pathname);
+    };
     try {
-      if (!file.startsWith(dir)) throw new Error('outside');
+      if (!file.startsWith(root)) throw new Error('outside');
       const data = await fs.readFile(file);
-      res.writeHead(200, { 'content-type': TYPES[path.extname(file)] || 'application/octet-stream', 'cache-control': 'no-cache' });
+      res.writeHead(200, { 'content-type': TYPES[path.extname(file)] || 'application/octet-stream', 'cache-control': await cache(200) });
       res.end(data);
     } catch {
-      res.writeHead(404, { 'content-type': TYPES['.html'] });
-      res.end(await fs.readFile(path.join(dir, '404.html')));
+      res.writeHead(404, { 'content-type': TYPES['.html'], 'cache-control': await cache(404) });
+      res.end(await fs.readFile(path.join(root, '404.html')));
     }
   });
   return new Promise((resolve) =>
     server.listen(0, '127.0.0.1', () => {
       // "localhost" rather than 127.0.0.1: the site registers its service worker only on https or localhost.
-      resolve({ base: `http://localhost:${server.address().port}`, close: () => new Promise((r) => server.close(r)) });
+      resolve({
+        base: `http://localhost:${server.address().port}`,
+        close: () => new Promise((r) => server.close(r)),
+        setRoot: (d) => (root = d),
+        setDown: (on) => (down = on),
+      });
     }),
   );
 }

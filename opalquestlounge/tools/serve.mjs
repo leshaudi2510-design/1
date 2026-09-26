@@ -1,10 +1,15 @@
 // Static server for dist/ that behaves like the production hosts:
-// pretty URLs, the custom 404, gzip for text and long caching for fonts.
+// pretty URLs, the custom 404, gzip for text, and the Cache-Control that
+// Cloudflare Pages would send for each file, read from the build's own
+// _headers file (year-long caching for versioned scripts, styles and fonts,
+// no-cache for sw.js). The other headers in _headers, such as the CSP, are
+// not sent: the pages carry the CSP in a meta tag.
 // Usage: node tools/serve.mjs dist 8080
 import http from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import zlib from 'node:zlib';
+import { parseHeaders, cacheControlFor } from './lib/headers.mjs';
 
 const root = path.resolve(process.argv[2] || 'dist');
 const port = Number(process.argv[3] || 8080);
@@ -20,10 +25,11 @@ http
     const url = new URL(req.url, 'http://x');
     let p = decodeURIComponent(url.pathname);
     if (p.endsWith('/')) p += 'index.html';
-    let file = path.join(root, p);
+    let file = path.join(root, path.normalize(p));
     let status = 200;
     let body;
     try {
+      if (!file.startsWith(root + path.sep)) throw new Error('outside');
       body = await fs.readFile(file);
     } catch {
       status = 404;
@@ -32,7 +38,10 @@ http
     }
     const ext = path.extname(file);
     const headers = { 'content-type': TYPES[ext] || 'application/octet-stream' };
-    headers['cache-control'] = /\/assets\/fonts\//.test(p) ? 'public, max-age=31536000, immutable' : ext === '.html' ? 'no-cache' : 'public, max-age=3600';
+    // Read on every request, so a rebuild while the server runs is picked up.
+    const rules = parseHeaders(await fs.readFile(path.join(root, '_headers'), 'utf8').catch(() => ''));
+    // Like Cloudflare Pages: a 404 is never cached.
+    headers['cache-control'] = status === 404 ? 'no-store' : cacheControlFor(rules, url.pathname);
     if (TEXT.test(file) && /gzip/.test(req.headers['accept-encoding'] || '')) {
       body = zlib.gzipSync(body);
       headers['content-encoding'] = 'gzip';

@@ -24,7 +24,12 @@
     "adsConversionId": ""
   },
   "contactEndpoint": "",
-  "lastUpdated": "2026-09-25",
+  "lastUpdated": "2026-09-26",
+  "legalUpdated": {
+    "terms": "2026-09-26",
+    "privacy": "2026-09-26",
+    "cookies": "2026-09-26"
+  },
   "themeColor": {
     "light": "#18122B",
     "dark": "#0B0816"

@@ -26,7 +26,7 @@
 //
 // Needs sharp and Playwright's Chromium (both dev dependencies).
 import fs from 'node:fs/promises';
-import { existsSync, statSync, readdirSync } from 'node:fs';
+import { existsSync, statSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
 import { spawnSync } from 'node:child_process';
@@ -199,9 +199,19 @@ async function makeIcons() {
 // 2. Share cards (1200 × 630), rendered from the built site
 // ======================================================================
 
+/** The built stylesheet's URL: build.mjs publishes it under /assets/v<version>/css/. */
+function siteCss() {
+  try {
+    return readFileSync(path.join(DIST, 'index.html'), 'utf8').match(/<link rel="stylesheet" href="(\/assets\/v\w+\/css\/site\.css)"/)?.[1] || null;
+  } catch {
+    return null;
+  }
+}
+
 /** The build to render from: build it first if it's missing or older than its sources. */
 function ensureBuild() {
-  const css = path.join(DIST, 'assets/css/site.css');
+  const url = siteCss();
+  const css = url ? path.join(DIST, url) : path.join(DIST, 'assets/css/site.css');
   const newest = (dir) => {
     let t = 0;
     for (const f of readdirSync(dir, { withFileTypes: true })) {
@@ -394,7 +404,7 @@ function cardPage(ctx, cards) {
 <meta http-equiv="Content-Security-Policy" content="${csp(ctx)}">
 <meta name="robots" content="noindex">
 <title>Share cards</title>
-<link rel="stylesheet" href="/assets/css/site.css">
+<link rel="stylesheet" href="${siteCss()}">
 <link rel="stylesheet" href="/__og.css">
 </head>
 <body>

@@ -10,6 +10,8 @@
 //   fallback   "pragmatic.enabled": false, where our own slot Seven Systems
 //              takes the demos' place
 //   ga         a copy with a test GA4 ID, for the consent checks
+// and, for the deploy checks, a build from a changed copy of the project and
+// one with only its config changed.
 //
 // Nothing here reaches the internet. Pragmatic Play's demo host and Google's
 // tag host are answered by stubs; a request to any other origin fails a check.
@@ -20,12 +22,12 @@ import path from 'node:path';
 import { createRequire } from 'node:module';
 import { chromium } from 'playwright';
 import {
-  ROOT, fail, pass, expect, section, failures, summary, buildSite, sitePaths, serve, cleanTemp, tempDir,
+  ROOT, fail, pass, expect, section, failures, summary, buildSite, copyProject, sitePaths, serve, cleanTemp, tempDir,
   context, watch, until, mounted, focused, lostFocus, scrollThrough, pool, within, PRAGMATIC_HOST,
 } from './lib/harness.mjs';
 
 const arg = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.split('=')[1];
-const SECTIONS = ['pages', 'stage', 'keyboard', 'tables', 'lobby', 'consent', 'dialogs', 'prefs', 'chrome', 'axe'];
+const SECTIONS = ['pages', 'stage', 'keyboard', 'tables', 'lobby', 'consent', 'dialogs', 'prefs', 'chrome', 'offline', 'deploy', 'axe'];
 const ONLY = arg('only')?.split(',').filter(Boolean);
 if (ONLY?.some((s) => !SECTIONS.includes(s))) {
   console.error(`Unknown section in --only. Choose from: ${SECTIONS.join(', ')}`);
@@ -51,7 +53,7 @@ const withPragmatic = (on) => (c) => ({ ...c, pragmatic: { ...c.pragmatic, enabl
 const builds = {};
 const needed = [
   ['pragmatic', withPragmatic(true), SECTIONS.filter((s) => s !== 'consent')],
-  ['fallback', withPragmatic(false), ['pages', 'keyboard', 'tables', 'lobby', 'dialogs', 'prefs', 'chrome', 'axe']],
+  ['fallback', withPragmatic(false), ['pages', 'keyboard', 'tables', 'lobby', 'dialogs', 'prefs', 'chrome', 'offline', 'axe']],
   ['ga', (c) => ({ ...withPragmatic(true)(c), analytics: { ga4: 'G-TEST000000', adsConversionId: '' } }), ['consent', 'axe']],
 ];
 for (const [name, edit, uses] of needed) {
@@ -2123,6 +2125,133 @@ if (want('axe'))
     for (const [key, v] of found) {
       const where = v.where.length > 3 ? `${v.where.slice(0, 3).join('; ')} and ${v.where.length - 3} more` : v.where.join('; ');
       fail(`axe ${v.impact} ${key} (${v.help}${v.why ? `: ${v.why}` : ''}) on ${where}`);
+    }
+  });
+
+// ---------- the service worker: the offline copy, and deploys ----------
+
+/**
+ * Wait until the service worker controls the page and every path in `paths`
+ * is saved in one of its caches. Polls the caches, so it waits on state.
+ */
+const swSaved = (page, paths, timeout = 20000) =>
+  page.evaluate(
+    async ([want, ms]) => {
+      const t = Date.now();
+      await navigator.serviceWorker.ready;
+      while (Date.now() - t < ms) {
+        if (navigator.serviceWorker.controller) {
+          const keys = await caches.keys();
+          const inSome = async (p) => {
+            for (const k of keys) if (await (await caches.open(k)).match(p)) return true;
+            return false;
+          };
+          if ((await Promise.all(want.map(inSome))).every(Boolean)) return true;
+        }
+        await new Promise((r) => setTimeout(r, 100));
+      }
+      return false;
+    },
+    [paths, timeout],
+  );
+
+if (want('offline'))
+  await section('Offline: the saved copy of the home page, our own games, the safer-play tools and the page a visitor landed on', async () => {
+    for (const site of modes) {
+      // Its own server, to take down: Playwright's offline mode doesn't reach
+      // the service worker's requests. No request routing either: a routed
+      // context bypasses the service worker.
+      const server = await serve(site.dir);
+      const ctx = await context(browser, { serviceWorkers: 'allow' });
+      const first = await ctx.newPage();
+      // The first page loads before the worker controls anything; the worker saves it when it starts.
+      const landing = '/about/';
+      await first.goto(server.base + landing, { waitUntil: 'load' });
+      const house = (await sitePaths(site.dir)).filter((p) => /^\/games\/(seven-systems|lapidary-wheel|brilliant-twenty-one)\/$/.test(p));
+      const promised = ['/', '/responsible-gaming/', ...house, '/offline/'];
+      expect(await swSaved(first, [landing, ...promised]), `${site.name}: the service worker saves ${promised.join(', ')} and the landing page ${landing}`);
+      await first.close();
+      await ctx.setOffline(true);
+      server.setDown(true);
+      const bad = [];
+      for (const p of [...promised, landing]) {
+        const page = await ctx.newPage();
+        const w = watch(page, server.base);
+        try {
+          await page.goto(server.base + p, { waitUntil: 'load', timeout: 15000 });
+          const shown = await page.evaluate(() => document.documentElement.dataset.page);
+          if (shown === 'offline' && p !== '/offline/') bad.push(`${p}: the offline page instead of the saved copy`);
+          const ours = '[data-game]:not([data-game="pragmatic"])';
+          if ((await page.$$(ours)).length && !(await mounted(page, ours))) bad.push(`${p}: the game didn't start`);
+        } catch (e) {
+          bad.push(`${p}: ${e.message.split('\n')[0]}`);
+        }
+        if (w.errors.length) bad.push(`${p}: ${[...new Set(w.errors)].join(' | ')}`);
+        await page.close();
+      }
+      if (bad.length) bad.forEach((b) => fail(`${site.name} offline: ${b}`));
+      else pass(`${site.name}: offline, ${promised.length + 1} pages load from the saved copy and our games start, with no errors`);
+      // A page the visitor never opened isn't saved: the offline page says so.
+      const unvisited = site === PP ? '/games/wolf-gold/' : '/contact/';
+      const page = await ctx.newPage();
+      await page.goto(server.base + unvisited, { waitUntil: 'load' }).catch(() => {});
+      expect((await page.evaluate(() => document.documentElement.dataset.page).catch(() => '')) === 'offline', `${site.name}: offline, an unvisited page (${unvisited}) shows the offline page`);
+      await ctx.close();
+      await server.close();
+    }
+  });
+
+if (want('deploy') && PP)
+  await section('Deploys: a returning visitor runs the new scripts and styles from the first view, with or without the service worker', async () => {
+    // Build B: a copy of this project with a new stylesheet rule and a new
+    // export in lib/ui.js that app.js imports. A visitor who got the new
+    // app.js with the old lib/ui.js would get a module error.
+    const src = await copyProject('deploy-src');
+    await fs.writeFile(path.join(src, 'src/styles/99-deploy-check.css'), ':root{--deploy-check:"B"}\n');
+    await fs.appendFile(path.join(src, 'src/public/assets/js/lib/ui.js'), "\nexport const deployCheck = 'B';\n");
+    await fs.appendFile(path.join(src, 'src/public/assets/js/app.js'), "\nimport { deployCheck } from './lib/ui.js';\ndocument.documentElement.dataset.deployCheck = deployCheck;\n");
+    const B = await buildSite('deploy-b', withPragmatic(true), { from: src });
+    expect(B.ok, 'the changed copy of the project builds', B.output.slice(-400));
+    expect(B.version && B.version !== PP.version && B.sw !== PP.sw, `a changed script and stylesheet give new asset and service worker versions (v${PP.version} → v${B.version})`);
+    // config.js is cached like any script, so a config-only change needs new URLs too.
+    const C = await buildSite('deploy-config', (c) => ({ ...withPragmatic(true)(c), contactEndpoint: 'https://forms.example.com/contact' }));
+    expect(C.ok && C.version !== PP.version && C.sw !== PP.sw, `a config-only change (contactEndpoint) gives new asset and service worker versions (v${PP.version} → v${C.version})`);
+    if (!B.ok) return;
+
+    for (const sw of ['allow', 'block']) {
+      // Production caching headers (from _headers) and no request routing, which would switch the HTTP cache off.
+      const server = await serve(PP.dir, { host: true });
+      const ctx = await context(browser, { serviceWorkers: sw });
+      const page = await ctx.newPage();
+      await page.goto(server.base + '/', { waitUntil: 'load' });
+      if (sw === 'allow') expect(await swSaved(page, ['/', '/games/lapidary-wheel/']), 'before the deploy: the service worker is in control and has saved the site');
+      await page.goto(server.base + '/games/lapidary-wheel/', { waitUntil: 'load' });
+      await mounted(page, '[data-game="lapidary-wheel"]');
+
+      server.setRoot(B.dir);
+      const bad = [];
+      const views = [
+        ['/', page],
+        ['/games/lapidary-wheel/', await ctx.newPage()],
+        ['/games/', page],
+      ];
+      for (const [p, tab] of views) {
+        const w = watch(tab, server.base);
+        await tab.goto(server.base + p, { waitUntil: 'load' });
+        const got = await tab.evaluate(() => ({
+          css: getComputedStyle(document.documentElement).getPropertyValue('--deploy-check').trim(),
+          js: document.documentElement.dataset.deployCheck || '',
+        }));
+        if (got.css !== '"B"') bad.push(`${p}: the old stylesheet`);
+        if (got.js !== 'B') bad.push(`${p}: the old scripts`);
+        if (p === '/games/lapidary-wheel/' && !(await mounted(tab, '[data-game="lapidary-wheel"]'))) bad.push(`${p}: the game didn't start`);
+        if (w.errors.length) bad.push(`${p}: ${[...new Set(w.errors)].join(' | ')}`);
+      }
+      const how = sw === 'allow' ? 'with the service worker' : 'without a service worker (HTTP cache only)';
+      if (bad.length) bad.forEach((b) => fail(`after a deploy, ${how}: ${b}`));
+      else pass(`after a deploy, ${how}: the new stylesheet and scripts from the first view, in the same tab and a new one, with no errors`);
+      await ctx.close();
+      await server.close();
     }
   });
 

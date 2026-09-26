@@ -1,5 +1,5 @@
 {
-  "_about": "Pragmatic Play demo slots shown in the lobby. Facts were researched on 26 September 2026 from Pragmatic press releases, captured game configs and third-party reviews; pragmaticplay.com itself could not be reached from the build environment. Fields listed in 'verify' must be checked against the game's own information screen (the i button in the demo) before launch. Games whose art is likely to appeal to under-18s are left out on purpose: characters (The Dog House, Starlight Princess) and sweets or candy (Sugar Rush, Sweet Bonanza). See COMPLIANCE.md, section 7 (child appeal).",
+  "_about": "Pragmatic Play demo slots shown in the lobby. Facts were researched on 26 September 2026 from Pragmatic press releases, captured game configs and third-party reviews; pragmaticplay.com itself could not be reached from the build environment. Fields listed in 'verify' must be checked against the game's own information screen (the i button in the demo) before launch. Whoever checks a game (opens its demo from a UK browser, sees it load and compares every figure on its page) records the date as \"checked\": \"YYYY-MM-DD\"; while the demos are on, node build.mjs --strict fails for any game without one. Set a figure that can't be confirmed to null instead of guessing. Games whose art is likely to appeal to under-18s are left out on purpose: characters (The Dog House, Starlight Princess) and sweets or candy (Sugar Rush, Sweet Bonanza). See COMPLIANCE.md, section 7 (child appeal).",
   "games": [
     {
       "slug": "gates-of-olympus",
@@ -220,7 +220,7 @@
       "features": [
         "Released in April 2020 under a licence from Big Time Gaming, which owns the Megaways mechanic."
       ],
-      "verify": ["rtp", "grid"],
+      "verify": ["rtp", "grid", "bonus"],
       "appeal": "low"
     },
     {
@@ -235,19 +235,19 @@
       "topPayout": 5000,
       "rtp": 96.52,
       "motif": "prairie hills under a wide sun",
-      "summary": "The Megaways remake of Buffalo King: paying symbols tumble away, and wild multipliers stack up within a tumble.",
+      "summary": "The Megaways remake of Buffalo King: reel heights change every spin, and paying symbols tumble away until no new combination forms.",
       "theme": "A North American wilderness with buffalo, wolves, cougars, moose and eagles.",
       "howItPlays": [
         "Reel heights change every spin, giving up to 200,704 ways to pay.",
         "Paying symbols are removed and new ones drop in until no new combination forms.",
-        "Wilds carry 2×, 3× or 5× multipliers, and multipliers in the same tumble sequence add up."
+        "Open the information screen (the i button in the demo) for how the wilds and their multipliers work in this version."
       ],
       "bonus": "Four, five or six scatters start the free spins and pay 5×, 20× or 100× the stake on their own.",
       "features": [
         "A Megaways remake of the 2019 Buffalo King, which had 4,096 ways.",
         "Launched with a default RTP of 96.52%."
       ],
-      "verify": ["released", "grid"],
+      "verify": ["released", "grid", "topPayout", "volatility", "bonus"],
       "appeal": "low"
     },
     {
