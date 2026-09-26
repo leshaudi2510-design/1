@@ -2,7 +2,13 @@ import { html, esc, num } from '../lib/html.mjs';
 import { icons } from '../lib/icons.mjs';
 import { pageHero, updatedPill, legalBody, ext } from './misc.mjs';
 
+// Pragmatic Play's own documents, linked from the terms, privacy and cookies
+// pages. pragmaticplay.com couldn't be opened while this was written: the
+// privacy and cookie policy addresses come from a search index, so open both
+// in a UK browser before launch.
 export const PRAGMATIC_TERMS = 'https://www.pragmaticplay.com/en/terms-of-use/';
+export const PRAGMATIC_PRIVACY = 'https://www.pragmaticplay.com/en/privacy-policy/';
+export const PRAGMATIC_COOKIES = 'https://www.pragmaticplay.com/en/cookie-policy/';
 
 export default function terms(ctx) {
   const c = ctx.cur;

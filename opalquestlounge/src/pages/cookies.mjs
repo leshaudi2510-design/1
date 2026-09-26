@@ -1,6 +1,6 @@
 import { html, esc } from '../lib/html.mjs';
 import { pageHero, updatedPill, legalBody, ext, pageIcons } from './misc.mjs';
-import { PRAGMATIC_TERMS } from './terms.mjs';
+import { PRAGMATIC_TERMS, PRAGMATIC_PRIVACY, PRAGMATIC_COOKIES } from './terms.mjs';
 
 // Every item the site keeps in the browser. The client code uses exactly
 // these keys (see assets/js/lib/store.js); keep the two in step.
@@ -9,7 +9,7 @@ export const STORAGE = [
   { key: 'oql.wallet', where: 'Local storage', what: 'Your balance of Carats.', keep: 'Until you clear site data or reset it.' },
   { key: 'oql.settings', where: 'Local storage', what: 'Theme, sound and vibration choices.', keep: 'Until you clear site data.' },
   { key: 'oql.limits', where: 'Local storage', what: 'Your daily time limit, any change waiting to start tomorrow, and how often the reality check appears.', keep: 'Until you clear site data.' },
-  { key: 'oql.playtime', where: 'Local storage', what: 'Time played today, to apply your daily limit.', keep: 'Replaced each day.' },
+  { key: 'oql.playtime', where: 'Local storage', what: 'How long the site has been open in front of you today, on any page, to apply your daily limit.', keep: 'Replaced each day.' },
   { key: 'oql.pause', where: 'Local storage', what: 'The end time of a break you’ve chosen.', keep: 'Until the break ends.' },
   { key: 'oql.consent', where: 'Local storage', what: 'Your cookie choices, so we don’t ask again.', keep: '12 months, then we ask again.' },
   { key: 'oql.session', where: 'Session storage', what: 'When this session started, what you’ve staked and had back on our own games, and when the last reality check was due.', keep: 'Until you close the tab.' },
@@ -88,7 +88,7 @@ export default function cookies(ctx) {
         <li>Pragmatic Play may set cookies, or read and write other storage on your device, under its own domain (<code>pragmaticplay.net</code>).</li>
         <li>Google Analytics, running inside the demo, may also set cookies or use storage on your device under Pragmatic Play’s domain.</li>
       </ul>
-      <p>Pragmatic Play decides what its demos store, so we can’t list every item or say how long each lasts. Its ${ext(PRAGMATIC_TERMS, 'terms of use')} apply inside the demo. Some browsers block storage set inside frames like this, or keep it apart from other sites.</p>
+      <p>Pragmatic Play decides what its demos store, so we can’t list every item or say how long each lasts. Its ${ext(PRAGMATIC_COOKIES, 'cookie policy')} and ${ext(PRAGMATIC_PRIVACY, 'privacy policy')} explain what it stores and why, and its ${ext(PRAGMATIC_TERMS, 'terms of use')} apply inside the demo. Some browsers block storage set inside frames like this, or keep it apart from other sites.</p>
       <div class="callout callout--note">
         <p><strong>How to avoid it:</strong> don’t press Play on a slot demo. If you choose “Reject all” in Cookie settings, each Play button asks before it loads a demo. Our own tables, ${tables.join(' and ')}, work without it and load nothing from anyone else. To remove anything a demo has already stored, clear the site data for <code>pragmaticplay.net</code> in your browser settings.</p>
       </div>`

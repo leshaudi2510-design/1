@@ -48,12 +48,16 @@ export function pageHero(page, { eyebrow = '', title, lede = '', meta = [], acti
 /** "Updated 25 September 2026" as a fact pill for the title band. */
 export const updatedPill = (ctx) => `<span>Updated <time datetime="${ctx.updatedIso}">${ctx.updated}</time></span>`;
 
-/** The "On this page" list for legal pages. items: [{ id, title }] */
+/**
+ * The "On this page" list for legal pages. items: [{ id, title }]
+ * Named .legal-toc, not .toc: our table pages have their own "On this page"
+ * box (.toc in 80-tables.css), and the two must not style each other.
+ */
 export function toc(items, { numbered = false } = {}) {
-  return html`<nav class="toc" aria-labelledby="toc-title">
-  <h2 id="toc-title" class="toc__title">On this page</h2>
-  <ol class="toc__list${numbered ? ' toc__list--numbered' : ''}">
-    ${items.map((s, i) => `<li><a href="#${s.id}">${numbered ? `<span class="toc__no num" aria-hidden="true">${i + 1}</span>` : ''}<span>${s.title}</span></a></li>`)}
+  return html`<nav class="legal-toc" aria-labelledby="toc-title">
+  <h2 id="toc-title" class="legal-toc__title">On this page</h2>
+  <ol class="legal-toc__list${numbered ? ' legal-toc__list--numbered' : ''}">
+    ${items.map((s, i) => `<li><a href="#${s.id}">${numbered ? `<span class="legal-toc__no num" aria-hidden="true">${i + 1}</span>` : ''}<span class="legal-toc__label">${s.title}</span></a></li>`)}
   </ol>
 </nav>`;
 }
@@ -88,9 +92,13 @@ export function legalBody(sections, { numbered = false, summary = null } = {}) {
 </div>`;
 }
 
-/** Link cards (the .tools / .tool pattern) for the 404 and offline pages. */
+/**
+ * Link cards (the .tools / .tool pattern) for the 404 and offline pages.
+ * How many cards there are depends on the config, so a count that isn't a
+ * multiple of three is laid out in pairs (.jump--pairs), never 3 + 1.
+ */
 function jumpCards(items) {
-  return html`<ul class="tools jump">
+  return html`<ul class="tools jump${items.length % 3 ? ' jump--pairs' : ''}">
     ${items.map(
       (j) => `<li><a class="tool" href="${j.href}"><span class="ti ti--${j.tone}" aria-hidden="true">${j.icon}</span><span>${j.title}<small>${j.text}</small></span>${icon('i-arrow', 'go')}</a></li>`,
     )}
