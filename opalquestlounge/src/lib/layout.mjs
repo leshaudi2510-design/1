@@ -112,7 +112,8 @@ const ldScript = (items) =>
 
 // ---------- page chrome ----------
 
-function breadcrumbs(crumbs) {
+/** Visible breadcrumbs. Pages that draw them inside their own title band set page.crumbsInBody and call this. */
+export function breadcrumbs(crumbs) {
   if (!crumbs?.length) return '';
   return html`<nav class="crumbs" aria-label="Breadcrumb"><ol>
     ${crumbs.map((c, i) =>
@@ -414,7 +415,7 @@ ${ld.length ? ldScript(ld) : ''}
 <a class="skip" href="#main">Skip to content</a>
 ${masthead(ctx, page)}
 <main id="main" tabindex="-1">
-${breadcrumbs(page.breadcrumbs)}
+${page.crumbsInBody ? '' : breadcrumbs(page.breadcrumbs)}
 ${page.body}
 </main>
 ${footer(ctx)}
