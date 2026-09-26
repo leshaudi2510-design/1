@@ -3,7 +3,7 @@ import { icons } from '../lib/icons.mjs';
 import { pageHero, ext } from './misc.mjs';
 
 // Every data-* hook on this page is bound by assets/js/lib/rg.js:
-//   [data-rg="limit"] form + select[name=limit], [data-rg-limit-status], [data-playtime]
+//   [data-rg="limit"] form + select[name=limit], [data-rg-limit-text], [data-playtime]
 //   [data-rg="cooloff"] with [data-days], [data-rg-pause-status]
 //   [data-action="break-5"], radios named "rc" (15/30/60)
 //   [data-rg-state="limit|limit-pending|reality|break"] pills
@@ -12,7 +12,6 @@ import { pageHero, ext } from './misc.mjs';
 const HELP = [
   { name: 'National Gambling Helpline', text: 'Free, confidential and open 24 hours a day. Run by GamCare.', link: '<a class="tel-link" href="tel:+448088020133"><span class="num nobr">0808 8020 133</span></a>' },
   { name: 'GamCare', text: 'Advice, live chat, and support for friends and family.', link: ext('https://www.gamcare.org.uk/', 'gamcare.org.uk') },
-  { name: 'BeGambleAware', text: 'Information on gambling harms and where to find treatment.', link: ext('https://www.begambleaware.org/', 'begambleaware.org') },
   { name: 'Gamblers Anonymous', text: 'Local and online meetings.', link: ext('https://www.gamblersanonymous.org.uk/', 'gamblersanonymous.org.uk') },
   { name: 'NHS', text: 'Help with gambling, including NHS gambling clinics.', link: ext('https://www.nhs.uk/live-well/addiction-support/gambling-addiction/', 'nhs.uk') },
   { name: 'GAMSTOP', text: 'Free self-exclusion from every online gambling company licensed in Great Britain.', link: ext('https://www.gamstop.co.uk/', 'gamstop.co.uk') },
@@ -37,7 +36,7 @@ export default function responsibleGaming(ctx) {
     { href: '#limits', tone: 'y', icon: icons.timer, title: 'Set a time limit', text: 'Lower it and it applies at once. Raise it and it waits until tomorrow.' },
     { href: '#break', tone: 'm', icon: icons.pause, title: 'Take a break', text: '5 minutes, 24 hours, 7 or 30 days. Longer breaks can’t be cut short.' },
     { href: '#reality-check', tone: 'c', icon: icons.bell, title: 'Reality checks', text: 'A reminder every 15, 30 or 60 minutes, with your time played' },
-    { href: '#self-check', tone: 'r', icon: icons.check, title: 'Check in with yourself', text: 'A few minutes, with BeGambleAware or GamCare' },
+    { href: '#self-check', tone: 'r', icon: icons.check, title: 'Check in with yourself', text: 'A few minutes, with GamCare’s self-assessment' },
   ];
 
   const panelHead = (id, tone, ico, title, state = '') => html`<header class="rg-panel__head">
@@ -68,7 +67,7 @@ ${pageHero(page, {
       <h2 id="help-now-title">Need to talk?</h2>
       <p>GamCare’s National Gambling Helpline is free, confidential and open 24 hours a day.</p>
       <a class="tel" href="tel:+448088020133">${icons.phone}<span class="num">0808 8020 133</span></a>
-      <p>Or visit ${ext('https://www.begambleaware.org/', 'BeGambleAware.org', { arrow: false })} and ${ext('https://www.gamcare.org.uk/', 'GamCare.org.uk', { arrow: false })} for advice and live chat.</p>
+      <p>Or visit ${ext('https://www.gamcare.org.uk/', 'GamCare.org.uk', { arrow: false })} for advice and live chat, or ${ext('https://www.nhs.uk/live-well/addiction-support/gambling-addiction/', 'the NHS', { arrow: false })} for treatment near you.</p>
       <p class="clocknote"><span class="status__session"><span class="status__ico" aria-hidden="true">${icons.clockDisc}</span><span class="status__txt"><span class="visually-hidden">Session time:</span><b class="num" data-session>0:00</b><span class="status__unit" aria-hidden="true">Session</span></span></span><span>Your session clock stays in the header the whole time you play.</span></p>
     </aside>
   </div>
@@ -92,7 +91,8 @@ ${pageHero(page, {
         <button type="submit" class="btn btn--secondary">Save limit</button>
       </form>
       <p class="rg-rule" id="limits-rule">A lower limit applies at once; a higher one starts tomorrow.</p>
-      <p class="rg-status" data-rg-limit-status aria-live="polite">Today: <span data-playtime>0 minutes</span> on the site.</p>
+      <noscript><p class="rg-pending">These tools need JavaScript. With it off, the games can’t run either.</p></noscript>
+      <p class="rg-status" data-rg-limit-status><span data-rg-limit-text>No daily limit is set.</span> Today: <span data-playtime>0 minutes</span> on the site.</p>
       <p class="rg-pending" data-rg-state="limit-pending" hidden></p>
       <p class="rg-panel__fine">The limit counts the time this site is open in front of you, on any page, and starts again at midnight.</p>
     </section>
@@ -108,6 +108,7 @@ ${pageHero(page, {
         <button type="button" class="btn btn--secondary" data-days="7"><span><span class="visually-hidden">Pause the games for </span>7 days</span></button>
         <button type="button" class="btn btn--secondary" data-days="30"><span><span class="visually-hidden">Pause the games for </span>30 days</span></button>
       </div>
+      <noscript><p class="rg-pending">These tools need JavaScript. With it off, the games can’t run either.</p></noscript>
       <p class="rg-status" data-rg-pause-status aria-live="polite"></p>
     </section>
 
@@ -132,10 +133,10 @@ ${pageHero(page, {
     <section class="rg-panel" id="self-check" aria-labelledby="self-check-title">
       ${panelHead('self-check', 'r', icons.check, 'Check in with yourself')}
       <p>A self-assessment asks a few honest questions about how gambling has affected you over the last 12 months: your time, your money and how you feel. Many UK services use a nine-question check called the Problem Gambling Severity Index.</p>
-      <p>It takes a few minutes, and nobody else needs to see your answers. BeGambleAware and GamCare both have one on their websites, alongside advice and live chat.</p>
+      <p>It takes a few minutes, and nobody else needs to see your answers. GamCare has one on its website, alongside advice and live chat.</p>
       <p class="rg-actions">
-        ${ext('https://www.begambleaware.org/', '<span>BeGambleAware</span>').replace('<a ', '<a class="btn btn--secondary" ')}
-        ${ext('https://www.gamcare.org.uk/', '<span>GamCare</span>').replace('<a ', '<a class="btn btn--secondary" ')}
+        ${ext('https://www.gamcare.org.uk/understanding-your-gambling/self-assessment-tool/', '<span>GamCare self-assessment</span>').replace('<a ', '<a class="btn btn--secondary" ')}
+        ${ext('https://www.nhs.uk/live-well/addiction-support/gambling-addiction/', '<span>NHS gambling support</span>').replace('<a ', '<a class="btn btn--secondary" ')}
       </p>
     </section>
   </div>

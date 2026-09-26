@@ -28,6 +28,9 @@ function limits() {
     l.minutes = l.pending.minutes;
     l.pending = null;
     store.set('limits', l);
+    // A change chosen yesterday starts today (at midnight in an open tab):
+    // tell every surface, once the caller has its answer.
+    queueMicrotask(emit);
   }
   return l;
 }
@@ -113,7 +116,14 @@ export const rg = {
 };
 
 // ---------- the clock ----------
-const shownLimit = { value: false };
+// The last canPlay() answer, as a key: "ok", or "reason|message". tick()
+// compares each second's answer with it, so the games, the stage and the
+// pills follow every change however it came about: a break or a pause
+// running out, the daily limit being reached, or midnight reopening the
+// games in a tab left open. (pause() quietly drops an expired break, so the
+// stored key can't be relied on to still be there when the tick looks.)
+let lastStatus = null;
+const statusKey = (s) => (s.ok ? 'ok' : `${s.reason}|${s.message}`);
 
 function fillStats(root = document) {
   const s = session.state;
@@ -153,15 +163,13 @@ function tick() {
   }
 
   const status = rg.canPlay();
-  if (status.reason === 'limit' && !shownLimit.value) {
-    shownLimit.value = true;
-    toast(status.message, 8000);
-    emit();
-  }
-  const pz = store.get('pause', null);
-  if (pz && pz.until <= Date.now()) {
-    store.remove('pause');
-    toast('Your break is over. The games are open again.');
+  const key = statusKey(status);
+  if (key !== lastStatus) {
+    const prev = lastStatus || '';
+    lastStatus = key;
+    if (status.reason === 'limit' && !prev.startsWith('limit|')) toast(status.message, 8000);
+    else if (status.ok && /^(break|cooloff)\|/.test(prev)) toast('Your break is over. The games are open again.');
+    else if (status.ok && prev.startsWith('limit|')) toast('A new day has started. The games are open again.');
     emit();
   }
   fillStats();
@@ -185,7 +193,7 @@ export function startRg() {
     rg.startPause(SHORT_BREAK, 'break');
     const now = pause();
     if (before && now && now.until === before.until && before.until > Date.now() + SHORT_BREAK) {
-      toast(`You're already on a break until ${timeOfDay(now.until)}${now.until - Date.now() > 20 * 3600 * 1000 ? ` on ${dayAndDate(now.until)}` : ''}.`);
+      toast(`You’re already on a break until ${timeOfDay(now.until)}${now.until - Date.now() > 20 * 3600 * 1000 ? ` on ${dayAndDate(now.until)}` : ''}.`);
     } else {
       toast(`Break started. The games open again at ${timeOfDay(Date.now() + SHORT_BREAK)}.`);
     }
@@ -194,8 +202,9 @@ export function startRg() {
   rc?.addEventListener('click', (e) => {
     const b = e.target.closest('[data-rc]');
     if (!b) return;
-    if (b.dataset.rc === 'break') shortBreak();
+    // Close first, so the confirmation lands on the page, not in the closing dialog.
     rc.close();
+    if (b.dataset.rc === 'break') shortBreak();
   });
   document.addEventListener('click', (e) => {
     const b = e.target.closest('[data-action="break-5"]');
@@ -216,38 +225,93 @@ export function startRg() {
     if (!rg.setReality(r.value)) return;
     syncReality();
     showStates();
-    toast(`Saved. You'll see a reality check every ${realityMinutes()} minutes.`);
+    toast(`Saved. You’ll see a reality check every ${realityMinutes()} minutes.`);
   });
 
-  // Daily limit: settings dialog and responsible gaming page
+  // ---------- daily limit: Settings and the responsible gaming page ----------
+  // Choosing in a select saves nothing: a closed select fires change on every
+  // arrow key, and a lower limit applies at once and can't be raised again
+  // until tomorrow. Settings saves on its own button ([data-action=
+  // "save-limit"], whose label says what will happen); the page saves on its
+  // form's "Save limit".
+  const limitSentence = () => {
+    const l = limits();
+    return l.minutes ? `Your limit is ${spokenDuration(l.minutes * 60)} a day.` : 'No daily limit is set.';
+  };
   const describeLimit = () => {
     const l = limits();
-    const parts = [];
-    parts.push(l.minutes ? `Your limit is ${spokenDuration(l.minutes * 60)} a day.` : 'No daily limit is set.');
+    const parts = [limitSentence()];
     if (l.pending) parts.push(`From tomorrow it will be ${l.pending.minutes ? spokenDuration(l.pending.minutes * 60) : 'off'}.`);
     parts.push(`Today: ${spokenDuration(playtime().seconds)} on the site.`);
     return parts.join(' ');
   };
-  document.querySelectorAll('select[name="limit"]').forEach((sel) => {
-    sel.value = String(limits().minutes || 0);
-  });
+  // What a select shows: the latest choice (tomorrow's, if one is waiting).
+  const chosenLimit = () => {
+    const l = limits();
+    return l.pending ? l.pending.minutes || 0 : l.minutes || 0;
+  };
+  // Selects changed but not saved yet. Nothing overwrites them.
+  const dirty = new WeakSet();
   const settingsLimit = document.querySelector('#settings select[name="limit"]');
-  settingsLimit?.addEventListener('change', () => {
-    const r = rg.setLimit(Number(settingsLimit.value));
-    toast(r.applied === 'now' ? describeLimit() : `Saved. Your new limit starts tomorrow.`);
-    if (r.applied === 'tomorrow') settingsLimit.value = String(limits().minutes || 0);
+  const saveLimit = document.querySelector('#settings [data-action="save-limit"]');
+  const labelSave = () => {
+    if (!saveLimit || !settingsLimit) return;
+    const current = limits().minutes || 0;
+    const want = Number(settingsLimit.value) || 0;
+    const same = want === chosenLimit();
+    const d = spokenDuration(want * 60);
+    let label = 'Save limit';
+    if (same) label = 'Save limit';
+    else if (want === current) label = `Keep ${d} a day`;
+    else if ((want || Infinity) <= (current || Infinity)) label = `Set ${d} a day now`;
+    else label = want ? `Set ${d} a day from tomorrow` : 'Turn the limit off from tomorrow';
+    if (saveLimit.textContent !== label) saveLimit.textContent = label;
+    saveLimit.setAttribute('aria-disabled', String(same));
+  };
+  const syncLimits = () => {
+    const v = String(chosenLimit());
+    document.querySelectorAll('select[name="limit"]').forEach((sel) => {
+      if (!dirty.has(sel) && sel.value !== v) sel.value = v;
+    });
+    const sentence = limitSentence();
+    document.querySelectorAll('[data-rg-limit-text]').forEach((el) => {
+      if (el.textContent !== sentence) el.textContent = sentence;
+    });
+    labelSave();
+  };
+  const onPick = (e) => {
+    const sel = e.target;
+    if (!(sel instanceof HTMLSelectElement) || sel.name !== 'limit') return;
+    dirty.add(sel);
+    if (sel === settingsLimit) labelSave();
+  };
+  document.addEventListener('input', onPick);
+  document.addEventListener('change', onPick);
+  saveLimit?.addEventListener('click', () => {
+    if (saveLimit.getAttribute('aria-disabled') === 'true') return;
+    dirty.delete(settingsLimit);
+    const r = rg.setLimit(Number(settingsLimit.value) || 0);
+    toast(r.applied === 'now' ? describeLimit() : 'Saved. Your new limit starts tomorrow.');
     showStates();
   });
+  // Opening or closing Settings throws away a choice that wasn't saved.
+  const settingsDialog = document.getElementById('settings');
+  const discard = () => {
+    if (settingsLimit) dirty.delete(settingsLimit);
+    showStates();
+  };
+  settingsDialog?.addEventListener('close', discard);
+
+  // The page's form. Its limit sentence isn't a live region (it holds the
+  // ticking playtime), so the confirmation is a toast.
   const form = document.querySelector('[data-rg="limit"]');
-  const limitStatus = document.querySelector('[data-rg-limit-status]');
-  if (limitStatus) limitStatus.textContent = describeLimit();
   form?.addEventListener('submit', (e) => {
     e.preventDefault();
     const sel = form.querySelector('select');
-    const r = rg.setLimit(Number(sel.value));
-    limitStatus.textContent = (r.applied === 'now' ? 'Saved. ' : 'Saved. The change starts tomorrow. ') + describeLimit();
-    if (r.applied === 'tomorrow') sel.value = String(limits().minutes || 0);
-    if (settingsLimit) settingsLimit.value = String(limits().minutes || 0);
+    dirty.delete(sel);
+    const r = rg.setLimit(Number(sel.value) || 0);
+    toast(r.applied === 'now' ? `Saved. ${limitSentence()}` : 'Saved. The change starts tomorrow.');
+    showStates();
   });
 
   // Longer breaks
@@ -255,9 +319,10 @@ export function startRg() {
   const describePause = () => {
     const p = pause();
     if (!p) return '';
-    return `Games are paused on this device until ${timeOfDay(p.until)} on ${dayAndDate(p.until)}.`;
+    return p.kind === 'break'
+      ? `You’re on a short break until ${timeOfDay(p.until)}.`
+      : `Games are paused on this device until ${timeOfDay(p.until)} on ${dayAndDate(p.until)}.`;
   };
-  if (coolStatus) coolStatus.textContent = describePause();
   document.querySelector('[data-rg="cooloff"]')?.addEventListener('click', async (e) => {
     const b = e.target.closest('[data-days]');
     if (!b) return;
@@ -265,21 +330,23 @@ export function startRg() {
     const label = days === 1 ? '24 hours' : `${days} days`;
     const ok = await ask({
       title: `Pause the games for ${label}?`,
-      body: "They stay paused on this device until the time is up. You won't be able to undo this early.",
+      body: 'They stay paused on this device until the time is up. You won’t be able to undo this early.',
       yes: `Pause for ${label}`,
       no: 'Not now',
     });
     if (!ok) return;
     rg.startPause(days * 24 * 3600 * 1000, 'cooloff');
-    coolStatus.textContent = describePause();
+    showStates();
   });
 
-  // State pills in Settings ([data-rg-state]), refreshed whenever anything changes
+  // Everything that shows a limit or a break: the pills ([data-rg-state]),
+  // the selects, the page's limit sentence and its pause line. Refreshed
+  // whenever anything changes.
   const showStates = () => {
     const l = limits();
     const set = (key, text) =>
       document.querySelectorAll(`[data-rg-state="${key}"]`).forEach((el) => {
-        el.textContent = text;
+        if (el.textContent !== text) el.textContent = text;
         el.hidden = !text;
       });
     set('limit', l.minutes ? `${shortDuration(l.minutes)} a day` : 'Off');
@@ -287,16 +354,20 @@ export function startRg() {
     set('reality', `Every ${realityMinutes()} min`);
     const p = pause();
     set('break', p ? `Until ${timeOfDay(p.until)}${p.until - Date.now() > 20 * 3600 * 1000 ? `, ${dayAndDate(p.until)}` : ''}` : 'None set');
-    if (settingsLimit && document.activeElement !== settingsLimit) settingsLimit.value = String(l.minutes || 0);
+    syncLimits();
+    if (coolStatus) {
+      const text = describePause();
+      if (coolStatus.textContent !== text) coolStatus.textContent = text;
+    }
   };
   showStates();
   rg.onChange(() => {
     showStates();
     syncReality();
   });
-  document.getElementById('settings')?.addEventListener('toggle', showStates);
+  settingsDialog?.addEventListener('toggle', showStates);
   document.addEventListener('click', (e) => {
-    if (e.target.closest('[data-open="settings"]')) showStates();
+    if (e.target.closest('[data-open="settings"]')) discard();
   });
 
   store.watch('pause', emit);

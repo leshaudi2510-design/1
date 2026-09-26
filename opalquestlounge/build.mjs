@@ -68,15 +68,48 @@ const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
 await fs.rm(OUT, { recursive: true, force: true });
 await fs.cp(PUBLIC, OUT, { recursive: true });
 
+/**
+ * A safe, dependency-free CSS minifier: drops comments, collapses runs of
+ * whitespace and trims it around { } ; and , only. Strings (and so every
+ * quoted url(), including the data: URI in 80-tables.css) pass untouched;
+ * whitespace inside values such as calc(100% - 7px) stays as one space.
+ */
+function minifyCss(css) {
+  let out = '';
+  for (let i = 0; i < css.length; ) {
+    const c = css[i];
+    if (c === '/' && css[i + 1] === '*') {
+      const end = css.indexOf('*/', i + 2);
+      i = end < 0 ? css.length : end + 2;
+      continue;
+    }
+    if (c === '"' || c === "'") {
+      let j = i + 1;
+      while (j < css.length && css[j] !== c) j += css[j] === '\\' ? 2 : 1;
+      out += css.slice(i, j + 1);
+      i = j + 1;
+      continue;
+    }
+    if (/\s/.test(c)) {
+      while (i < css.length && /\s/.test(css[i])) i++;
+      if (out && !/[{};,\s]$/.test(out) && !/^[{};,]/.test(css[i] || '')) out += ' ';
+      continue;
+    }
+    out += c;
+    i++;
+  }
+  return out.replace(/;}/g, '}').trim() + '\n';
+}
+
 // The stylesheet is written as partials in src/styles/, joined in file-name
-// order (00-tokens.css, 10-base.css, …) into one file for the browser.
+// order (00-tokens.css, 10-base.css, …) into one minified file for the browser.
 const STYLES = path.join(ROOT, 'src/styles');
 const partials = (await fs.readdir(STYLES).catch(() => [])).filter((f) => f.endsWith('.css')).sort();
 if (partials.length) {
-  const parts = await Promise.all(partials.map(async (f) => `/* ---- ${f} ---- */\n${(await fs.readFile(path.join(STYLES, f), 'utf8')).trim()}\n`));
+  const parts = await Promise.all(partials.map(async (f) => `${(await fs.readFile(path.join(STYLES, f), 'utf8')).trim()}\n`));
   // Per-game cover colours, generated as rules because the CSP blocks inline styles.
-  parts.push(`/* ---- generated: cover colours (src/lib/art.mjs) ---- */\n${coverCss()}\n`);
-  await write('assets/css/site.css', parts.join('\n'));
+  parts.push(`${coverCss()}\n`);
+  await write('assets/css/site.css', `/* Opal Quest Lounge. Built from src/styles/*.css by build.mjs */\n${minifyCss(parts.join('\n'))}`);
 }
 
 // Asset version: a hash of every CSS and JS file, for cache busting.
@@ -222,6 +255,32 @@ const visibleText = (s) =>
 const FORBIDDEN = [/\bdeposit/i, /\bwithdraw/i, /cash[\s-]?out/i, /bonus code/i, /real[\s-]money wins?/i, /win big/i, /jackpot/i, /\bhurry\b/i, /don[’']t miss out/i];
 const AMERICAN = [/\bcolor\b/i, /\bfavor/i, /\bcenter\b/i, /\bbehavior/i, /\bgray\b/i, /\borganization\b/i, /\bcatalog\b/i, /\blicense\b/i, /\banalyz/i, /\bcustomiz/i, /\boptimiz/i, /\bjewelry\b/i];
 
+// Apostrophes: the copy uses ’ (U+2019); a straight ' beside it looks
+// different in Archivo and Radio Canada. Checked in the text people see or
+// hear on every page (entities decoded first, plus the attributes that are
+// shown or read out) and in the strings the scripts show at run time.
+// Straight apostrophes in the chrome's own scripts fail the build; the rest
+// are counted in one warning until that copy has been converted.
+const STRICT_APOSTROPHES = /^assets\/js\/(app|age-boot)\.js$|^assets\/js\/lib\/(rg|ui|age|consent|settings|store|session|format)\.js$/;
+const apostrophes = new Map(); // file → examples
+const SHOWN_ATTRS = /\s(?:aria-label|title|alt|placeholder)="([^"]*)"|<meta\s+(?:name|property)="(?:description|og:[a-z:_]+|twitter:[a-z:_]+)"\s+content="([^"]*)"/g;
+function straightApostrophes(rel, src) {
+  const found = [];
+  if (/\.html$/.test(rel)) {
+    const decoded = src.replace(/&#39;|&#x27;|&apos;/gi, "'");
+    const text = [
+      visibleText(decoded),
+      ...[...decoded.replace(/<script[\s\S]*?<\/script>/g, ' ').matchAll(SHOWN_ATTRS)].map((m) => m[1] ?? m[2]),
+      (decoded.match(/<title>([\s\S]*?)<\/title>/) || [])[1] || '',
+    ].join(' ');
+    for (const m of text.matchAll(/'/g)) found.push(text.slice(Math.max(0, m.index - 24), m.index + 24).replace(/\s+/g, ' ').trim());
+  } else if (/^assets\/js\/.*\.js$/.test(rel)) {
+    const code = src.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:\\])\/\/.*$/gm, '$1');
+    for (const m of code.matchAll(/[A-Za-z]\\?'[A-Za-z]/g)) found.push(code.slice(Math.max(0, m.index - 24), m.index + 24).trim());
+  }
+  return found;
+}
+
 const files = await walk(OUT);
 for (const f of files) {
   if (!/\.(html|js|json|webmanifest|css|txt|xml)$/.test(f)) continue;
@@ -233,6 +292,17 @@ for (const f of files) {
   // U+2011 (non-breaking hyphen) is missing from the subset fonts and reads oddly aloud; keep words together with .nobr instead.
   const nbh = src.split('\u2011').length - 1;
   if (nbh) problems.push(`${rel}: ${nbh} U+2011 non-breaking hyphen${nbh === 1 ? '' : 's'} (use a plain hyphen inside <span class="nobr">)`);
+  const web = rel.split(path.sep).join('/');
+  const straight = straightApostrophes(web, src);
+  if (straight.length && STRICT_APOSTROPHES.test(web)) problems.push(`${rel}: straight apostrophe in a UI string (use ’): ${straight.slice(0, 3).map((t) => `"${t}"`).join(', ')}`);
+  else if (straight.length) apostrophes.set(rel, straight);
+  // GambleAware closed on 31 March 2026: signpost GamCare and the NHS instead.
+  if (/\.html$/.test(f) && /href="https?:\/\/(?:www\.)?(?:be)?gambleaware\.org/i.test(src)) problems.push(`${rel}: links to (Be)GambleAware, which closed in March 2026 (use GamCare or the NHS)`);
+}
+if (apostrophes.size) {
+  const n = [...apostrophes.values()].reduce((a, l) => a + l.length, 0);
+  const [file, [example]] = apostrophes.entries().next().value;
+  warnings.push(`${n} straight apostrophes (') in the copy of ${apostrophes.size} files, for example ${file}: "${example}" (use ’)`);
 }
 
 for (const page of pages) {
@@ -248,6 +318,19 @@ for (const page of pages) {
   for (const m of s.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
     let data;
     try { data = JSON.parse(m[1]); } catch (e) { problems.push(`${rel}: invalid JSON-LD (${e.message})`); continue; }
+    // Every {"@id"} reference resolves to a node in the same page's graph (validators don't follow an @id to another page).
+    const defined = new Set();
+    const refs = new Set();
+    const walkLd = (v) => {
+      if (Array.isArray(v)) return v.forEach(walkLd);
+      if (!v || typeof v !== 'object') return;
+      const keys = Object.keys(v);
+      if (keys.length === 1 && keys[0] === '@id') refs.add(v['@id']);
+      else if (v['@id']) defined.add(v['@id']);
+      keys.forEach((k) => walkLd(v[k]));
+    };
+    walkLd(data);
+    for (const id of refs) if (!defined.has(id)) problems.push(`${rel}: JSON-LD points at {"@id": "${id}"}, which this page doesn't define`);
     for (const node of data['@graph'] || [data]) {
       if (node['@type'] === 'VideoGame') {
         const ok = node.isAccessibleForFree === true && node.offers?.price === 0 && node.gamePlatform === 'Web browser' && node.name && node.url;
@@ -275,7 +358,7 @@ for (const page of pages) {
 // ---------- 4b. markup: ids, CSP-safe markup, the notices, share images ----------
 // The CSP is script-src 'self' and style-src 'self': no style attributes (in
 // HTML or SVG), no <style> elements, no inline event handlers and no inline
-// scripts other than JSON-LD and speculation rules.
+// scripts other than JSON-LD and the ones the CSP names by hash.
 const decode = (s) =>
   s.replace(/&(amp|quot|#39|lt|gt|nbsp);/g, (_, e) => ({ amp: '&', quot: '"', '#39': "'", lt: '<', gt: '>', nbsp: '\u00a0' })[e]);
 const plainText = (s) => decode(s.replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim();
@@ -331,7 +414,6 @@ for (const page of pages) {
     for (const a of Object.keys(t.attrs)) if (/^on[a-z]+$/.test(a)) problems.push(`${rel}: inline event handler ${a} on <${t.name}> (the CSP blocks it)`);
     if (/^\s*javascript:/i.test(t.attrs.href || '')) problems.push(`${rel}: javascript: link (the CSP blocks it)`);
     if (t.name === 'style') problems.push(`${rel}: <style> element (the CSP blocks it; put the rules in src/styles/)`);
-    if (t.name === 'script' && !t.attrs.src && !['application/ld+json', 'speculationrules'].includes(t.attrs.type)) problems.push(`${rel}: inline <script> (the CSP blocks it)`);
     // Nothing is fetched from another origin before the visitor asks for it.
     const fetched = { img: 'src', script: 'src', iframe: 'src', source: 'src', video: 'src', audio: 'src', embed: 'src', object: 'data' }[t.name]
       || (t.name === 'link' && /\b(stylesheet|preload|modulepreload|prefetch|preconnect|dns-prefetch|icon|manifest|apple-touch-icon)\b/.test(t.attrs.rel || '') ? 'href' : null);
@@ -373,6 +455,13 @@ for (const page of pages) {
 
   // frame-src names Pragmatic Play's host only while the demos are on.
   const policy = tags.find((t) => t.name === 'meta' && t.attrs['http-equiv'] === 'Content-Security-Policy')?.attrs.content;
+  // An inline script runs only if the CSP names the hash of its exact text (JSON-LD is data and isn't run).
+  const scriptSrc = policy ? cspOf(policy)['script-src'] || [] : [];
+  for (const m of s.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)) {
+    if (/\ssrc=/.test(m[1]) || /type="application\/ld\+json"/.test(m[1])) continue;
+    const hash = `'sha256-${crypto.createHash('sha256').update(m[2], 'utf8').digest('base64')}'`;
+    if (!scriptSrc.includes(hash)) problems.push(`${rel}: inline <script${m[1]}> whose hash isn't in the CSP's script-src (the CSP blocks it)`);
+  }
   if (!policy) problems.push(`${rel}: no Content-Security-Policy meta tag`);
   else {
     const frames = cspOf(policy)['frame-src'] || [];
@@ -478,7 +567,7 @@ async function moduleGraph(entries) {
   return [...seen];
 }
 const homePage = pages[0];
-const firstView = await moduleGraph(['assets/js/app.js', ...[...(homePage.modules || []), ...(homePage.budgetModules || [])].map((m) => m.slice(1))]);
+const firstView = await moduleGraph(['assets/js/age-boot.js', 'assets/js/app.js', ...[...(homePage.modules || []), ...(homePage.budgetModules || [])].map((m) => m.slice(1))]);
 let budget = gz(Buffer.from(homePage.html)) + gz(await fs.readFile(path.join(OUT, 'assets/css/site.css')));
 for (const m of firstView) {
   try { budget += gz(await fs.readFile(path.join(OUT, m))); } catch {}

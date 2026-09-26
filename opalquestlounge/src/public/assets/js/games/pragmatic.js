@@ -90,8 +90,8 @@ export function mount(root) {
     frame = document.createElement('iframe');
     frame.src = src;
     frame.title = `${name}, free demo from Pragmatic Play`;
+    // allow="fullscreen" replaces the legacy allowfullscreen attribute; setting both makes Chrome log a warning.
     frame.allow = 'fullscreen; autoplay';
-    frame.allowFullscreen = true;
     frame.addEventListener(
       'load',
       () => {
@@ -107,7 +107,7 @@ export function mount(root) {
       const inside = focusInside();
       unload();
       setState('failed');
-      say(`The ${name} demo didn't load. You can try again, or open it on Pragmatic Play's site.`);
+      say(`The ${name} demo didn’t load. You can try again, or open it on Pragmatic Play’s site.`);
       if (inside) moveFocus(root.querySelector('.stage__msg--failed [data-action="load"], [data-fallback]'));
     }, LOAD_TIMEOUT);
     stage.append(frame);

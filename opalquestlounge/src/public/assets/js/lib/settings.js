@@ -35,12 +35,6 @@ export const settings = {
   on(fn) {
     target.addEventListener('change', (e) => fn(e.detail));
   },
-  /** True when the page is showing its dark theme. */
-  isDark() {
-    if (state.theme === 'dark') return true;
-    if (state.theme === 'light') return false;
-    return matchMedia('(prefers-color-scheme: dark)').matches;
-  },
 };
 
 store.watch('settings', (v) => {

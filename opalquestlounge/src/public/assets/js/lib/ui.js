@@ -3,11 +3,26 @@
 
 export const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-export function announce(message) {
-  const el = document.getElementById('announcer');
-  if (!el) return;
+/**
+ * The status line inside the open modal dialog, if there is one. While a
+ * modal is open, everything outside it (the toast, #announcer) is inert and
+ * screen readers never hear it, so messages go here instead. Each
+ * .sheet-dialog carries one ([data-dialog-status], role="status") from page
+ * load, so it is already a live region when its text changes.
+ */
+function dialogStatus() {
+  const modal = document.activeElement?.closest?.('dialog:modal') || [...document.querySelectorAll('dialog:modal')].pop();
+  return modal?.querySelector('[data-dialog-status]') || null;
+}
+
+function say(el, message) {
   el.textContent = '';
   requestAnimationFrame(() => (el.textContent = message));
+}
+
+export function announce(message) {
+  const el = dialogStatus() || document.getElementById('announcer');
+  if (el) say(el, message);
 }
 
 let toastTimer;
@@ -15,9 +30,14 @@ let toastTimer;
  * Show a short message in the toast (a role="status" popover) for `ms`
  * milliseconds. The popover opens first and the text lands a frame later,
  * so screen readers hear it as a change inside a visible live region.
+ * While a modal dialog is open the message goes to the dialog's own status
+ * line instead: the toast would be inert there, and on phones it would sit
+ * over the dialog's controls. (Settings shows the result in its pills.)
  * Never use it to announce outcomes as "wins".
  */
 export function toast(message, ms = 5000) {
+  const inDialog = dialogStatus();
+  if (inDialog) return say(inDialog, message);
   const el = document.getElementById('toast');
   if (!el) return;
   const msg = el.querySelector('.toast__msg') || el;
@@ -90,27 +110,4 @@ export function spring(t, { stiffness = 170, damping = 15, velocity = 0 } = {}) 
     return 1 + Math.exp(-z * w0 * t) * (x0 * Math.cos(wd * t) + B * Math.sin(wd * t));
   }
   return 1 + Math.exp(-w0 * t) * (x0 + (velocity + w0 * x0) * t);
-}
-
-/**
- * Resolve CSS colour tokens to strings a canvas can use, e.g.
- * cssColours(['--ink', '--paper'], el) → { ink: 'oklch(…)', paper: '…' }.
- * All tokens are read in one style recalculation.
- */
-export function cssColours(names, el = document.body) {
-  const box = document.createElement('div');
-  box.hidden = true;
-  const spans = names.map((n) => {
-    const s = document.createElement('span');
-    s.style.color = `var(${n})`;
-    box.append(s);
-    return s;
-  });
-  el.append(box);
-  const out = {};
-  names.forEach((n, i) => {
-    out[n.replace(/^--/, '').replace(/-(\w)/g, (_, c) => c.toUpperCase())] = getComputedStyle(spans[i]).color;
-  });
-  box.remove();
-  return out;
 }

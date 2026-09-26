@@ -88,7 +88,7 @@ export default function home(ctx) {
     ['limits', 'tool--y', icons.timer, 'Set a time limit', 'Lower it and it applies at once. Raise it and it waits until tomorrow.'],
     ['break', 'tool--m', icons.pause, 'Take a break', "24 hours, 7 or 30 days. It can't be cut short."],
     ['reality-check', 'tool--c', icons.bell, 'Reality checks', 'A reminder every 15, 30 or 60 minutes, with your time played'],
-    ['self-check', 'tool--r', icons.check, 'Check in with yourself', 'A few minutes, with BeGambleAware or GamCare'],
+    ['self-check', 'tool--r', icons.check, 'Check in with yourself', 'A few minutes, with GamCare’s self-assessment'],
   ];
 
   const faq = [
@@ -198,7 +198,7 @@ export default function home(ctx) {
       <h3 id="help-h">Need to talk?</h3>
       <p>GamCare's National Gambling Helpline is free, confidential and open 24 hours a day.</p>
       <a class="tel" href="tel:+448088020133">${icons.phone}<span class="num">0808 8020 133</span></a>
-      <p>Or visit <a href="https://www.begambleaware.org/">BeGambleAware.org</a> and <a href="https://www.gamcare.org.uk/">GamCare.org.uk</a> for advice and live chat.</p>
+      <p>Or visit <a href="https://www.gamcare.org.uk/">GamCare.org.uk</a> for advice and live chat, or <a href="https://www.nhs.uk/live-well/addiction-support/gambling-addiction/">the NHS</a> for treatment near you.</p>
       <p class="clocknote"><span class="status__session"><span class="status__ico" aria-hidden="true">${icons.clockDisc}</span><span class="status__txt"><span class="visually-hidden">Session time:</span><b class="num" data-session>0:00</b><span class="status__unit" aria-hidden="true">Session</span></span></span><span>Your session clock stays in the header the whole time you play.</span></p>
     </div>
   </div>

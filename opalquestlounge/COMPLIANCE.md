@@ -13,10 +13,10 @@
 | 1.4 | Никаких реальных казино и букмекеров; запрещённые слова | нет ни одной ссылки на операторов; `build.mjs:202` проверяет каждую страницу и каждый JS-файл на deposit / withdraw / cash out / bonus code / real money wins / win big / jackpot / hurry / don't miss out | ✅ |
 | 1.5 | 18+: подтверждение при первом входе | `<dialog id="age-gate">` — `src/lib/layout.mjs:239`; логика — `src/public/assets/js/lib/age.js` (Escape не закрывает; ответ «нет» блокирует игры на 30 дней); `rg.canPlay()` не даёт ставить без «yes» | ✅ |
 | 1.5 | Не привлекать несовершеннолетних (CAP/ASA) | нет персонажей: карты с буквами вместо портретов (`brilliant-21.js`, `drawCardFace`), символы — научные рисунки кристаллов (`lib/crystals.js`); взрослая типографика; без сленга и мемов | ✅ |
-| 1.6 | Responsible gaming: 0808 8020 133, BeGambleAware, GamCare | `src/pages/responsible-gaming.mjs`; номер и ссылки есть в подвале каждой страницы (`src/lib/layout.mjs`, «Need to talk?») | ✅ |
+| 1.6 | Responsible gaming: 0808 8020 133 (GamCare), GamCare, NHS | `src/pages/responsible-gaming.mjs`; номер и ссылки есть в подвале каждой страницы (`src/lib/layout.mjs`, «Need to talk?»). GambleAware (BeGambleAware.org) закрылась 31 марта 2026 г., её работу приняли NHS England, OHID и UKRI; поэтому вместо неё — GamCare (его самооценка) и страница NHS о помощи при игровой зависимости. Линию 0808 8020 133 по-прежнему ведёт GamCare. Сборка падает на ссылке на (be)gambleaware.org (`build.mjs`, lint). Это отход от п. 6 брифа, где назван BeGambleAware: нужно согласие владельца | ✅ / ⚠️ согласовать с владельцем |
 | 1.6 | Таймер сессии | `[data-session]` в шапке; `src/public/assets/js/lib/rg.js` (`tick`), `lib/session.js` | ✅ |
 | 1.6 | Напоминание о перерыве каждые 30 минут | `rg.js:11` `REMINDER_EVERY`; `<dialog id="reality-check">` показывает время, ставки и возврат за сессию; кнопка «Take a 5-minute break» | ✅ |
-| 1.6 | Лимит времени по желанию | `rg.js` `setLimit`: снижение действует сразу, повышение — с завтрашнего дня. Плюс паузы на 24 ч, 7 и 30 дней (`startPause`), досрочно не отменяются | ✅ |
+| 1.6 | Лимит времени по желанию | `rg.js` `setLimit`: снижение действует сразу, повышение — с завтрашнего дня; сохраняется только кнопкой (в Settings — «Save limit», подпись которой говорит, что произойдёт), а не при выборе в списке. Плюс паузы на 24 ч, 7 и 30 дней (`startPause`), досрочно не отменяются. Окончание перерыва, достижение лимита и полночь в открытой вкладке сразу обновляют игры и демо (`tick()` сравнивает ответ `canPlay()` каждую секунду) | ✅ |
 | 1.7 | Покупки раскрыты, если есть | `purchases: false` в конфиге. Если включить, `purchasesNote()` в `src/lib/games-ui.mjs` и тексты на главной, в Terms и About переключатся автоматически | ✅ |
 | 1.8 | Прозрачность оператора: компания, номер, адрес, email на About, Contact и в подвале | `operatorCard()` в `src/pages/about.mjs` (About и Contact); подвал — `src/lib/layout.mjs`; JSON-LD `Organization` с `identifier` | ⚠️ впишите реквизиты в `site.config.json` и соберите с `--strict` |
 | 1.8 | Страницы Terms, Privacy, Cookies, Responsible gaming | `src/pages/terms.mjs`, `privacy.mjs`, `cookies.mjs`, `responsible-gaming.mjs` | ✅ |
@@ -67,15 +67,15 @@
 
 | Критерий | Где | Статус |
 |---|---|---|
-| Контраст (1.4.3, 1.4.11) | токены в `site.css` подобраны для обеих тем; axe: 0 нарушений на 12 страницах × 2 темы × 7 состояний | ✅ |
-| Видимый фокус (2.4.7, 2.4.11) | `:focus-visible` — обводка 3px `--focus`; радиокнопки показывают фокус на сегменте | ✅ |
+| Контраст (1.4.3, 1.4.11) | токены в `src/styles/00-tokens.css` подобраны для обеих тем; axe: 0 нарушений на 12 страницах × 2 темы × 7 состояний | ✅ |
+| Видимый фокус (2.4.7, 2.4.11) | `:focus-visible` — обводка 3px `--focus`; радиокнопки показывают фокус на сегменте. На телефонах `scroll-padding-bottom` (`--dock-clear`, `src/styles/10-base.css`) не даёт фиксированному доку закрыть элемент в фокусе; баннер cookies стоит первым в разметке и держит такой же отступ, пока виден (`lib/consent.js`) | ✅ |
 | Игры полностью с клавиатуры (2.1.1) | кнопки, радиогруппы ставок; стол рулетки — стрелки (roving focus, `lapidary-wheel.js:262`), Enter/Backspace; горячие клавиши работают только при фокусе внутри игры (2.1.4) — `games/common.js:122` | ✅ проверено `check.mjs` |
 | Фокус не теряется во время раунда | кнопки используют `aria-disabled`, а не `disabled` (`games/common.js:13`) | ✅ |
 | Результаты через `aria-live` (4.1.3) | `.game__result` с `aria-live="polite"`; canvas с `role="img"` и описанием каждой клетки, карманов и карт | ✅ |
 | Цели ≥ 24×24 (2.5.8) | кнопки ≥ 44 px, ячейки стола ≥ 44×44 px (на телефоне 40 px); axe `target-size` проходит | ✅ |
-| `prefers-reduced-motion` | `site.css:1063` отключает переходы и view transitions; игры показывают результат без анимации; опал неподвижен | ✅ |
-| `prefers-contrast: more` и forced colors | `site.css:1067`: без полупрозрачности, линии цвета текста, толще рамки; `forced-colors` | ✅ |
-| Диалоги | нативный `<dialog>`, фокус внутри, подписи через `aria-labelledby` | ✅ |
+| `prefers-reduced-motion` | `src/styles/95-prefs.css` отключает переходы и анимации; игры показывают результат без анимации; опал неподвижен | ✅ |
+| `prefers-contrast: more` и forced colors | `src/styles/95-prefs.css`: без полупрозрачности, линии цвета текста, толще рамки; `forced-colors` | ✅ |
+| Диалоги | нативный `<dialog>`, фокус внутри, подписи через `aria-labelledby`; в каждом диалоге своя строка `role="status"`, куда `toast()` пишет, пока диалог открыт (снаружи всё inert) | ✅ |
 | Прокручиваемые таблицы | `role="region"`, `tabindex="0"`, имя из `<caption>` (добавляет `build.mjs`) | ✅ |
 | Ничего не мигает чаще 3 раз в секунду (2.3.1) | вспышка опала — затухающая пульсация ≈ 2.2 Гц за 1.6 s, на небольшой площади; при reduced motion — одно ровное свечение | ✅ |
 
@@ -83,15 +83,17 @@
 
 | Требование | Где | Результат |
 |---|---|---|
-| LCP < 2.0 s (мобильный 4G) | LCP-элемент — текст `h1`; preload двух шрифтов Bodoni на главной; фолбэк-шрифты с `size-adjust` | 1.5–1.9 s (Lighthouse, slow 4G) |
+| LCP < 2.0 s (мобильный 4G) | при первом визите (так приходят все из Google Ads) LCP-элемент — текст вопроса о возрасте: его открывает крошечный `assets/js/age-boot.js` до загрузки модулей `app.js`, так что LCP ≈ FCP; после ответа — текст страницы (`h1` или лид). Preload двух шрифтов (Archivo, Radio Canada); тема применяется встроенным скриптом по хешу CSP, без блокирующего запроса; `site.css` минифицируется при сборке | ≈ 1.7–1.8 s (Lighthouse, slow 4G) |
 | INP < 150 ms | игры рисуют на canvas через rAF; WebGL стартует после первого взаимодействия; тяжёлое откладывается | TBT 0–20 ms (INP — только по полевым данным после запуска) |
-| CLS < 0.05 | у canvas и картинок заданы `width`/`height`; метрики фолбэк-шрифтов (`site.css:62`); резерв строки результата | 0–0.001 |
-| HTML + CSS + JS < 150 KB gzip | считает `build.mjs:278` | ~49 KB |
-| Шрифты: свои woff2, subset, swap, preload 1–2 | `src/public/assets/fonts/`, `tools/subset-fonts.py`, `font-display: swap` | ✅ |
+| CLS < 0.05 | у canvas и картинок заданы `width`/`height`; фолбэк-шрифты с `size-adjust` и `ascent`/`descent-override`, разбитые по насыщенности и ширине (`src/styles/00-tokens.css`, генерирует `tools/font-fallbacks.mjs`); резерв строки результата | 0–0.03 (шрифты задержаны на 1,2 s) |
+| HTML + CSS + JS < 150 KB gzip | считает `build.mjs` (раздел «First-view budget») | ~58 KB |
+| Шрифты: свои woff2, subset, swap, preload 1–2 | `src/public/assets/fonts/`, `tools/subset-fonts.py` (из полных файлов google/fonts, чтобы были ≈, ç, ÷ и ›; скрипт падает, если символа нет), `font-display: swap` | ✅ |
 | Картинки AVIF/WebP с `width`/`height`, lazy ниже первого экрана | `<picture>` в `gameList()` (`src/lib/games-ui.mjs`) | ✅ |
 | Speculation Rules | `src/lib/layout.mjs:409`: prerender `/games/*` (moderate), prefetch остального; таймеры и age gate ждут `prerenderingchange` (`whenActivated` в `lib/ui.js`) | ✅ |
 
 ## 6. Дизайн: что сделано из списка «конец 2026»
+
+> Таблица ниже описывает прошлый дизайн. После редизайна «Ben-Day Brights» часть приёмов убрана, а ссылки вида `site.css:NNN` больше не действуют: стили лежат в `src/styles/*.css`, и `site.css` собирается из них минифицированным.
 
 | Приём | Где |
 |---|---|

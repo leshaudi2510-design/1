@@ -23,10 +23,12 @@
 .brand__name{display:flex;flex-direction:column;align-items:flex-start;line-height:1}
 .brand__name b{font:900 21px/1 var(--f-ui);font-stretch:125%;text-transform:uppercase;letter-spacing:-.01em}
 .brand__name span{margin-top:4px;font:800 11px/1 var(--f-ui);font-stretch:112%;text-transform:uppercase;letter-spacing:.26em;background:var(--m);color:var(--k);padding:3px 5px 3px 7px;border-radius:3px}
-.nav ul{display:flex;gap:2px}
+/* The list wraps inside the nav (never the whole row) when text is spaced
+   out (WCAG 1.4.12), so the status pills and the gear stay on screen. */
+.nav ul{display:flex;gap:2px;flex-wrap:wrap}
 .nav li{flex:none}
 .nav a{display:block;white-space:nowrap;padding:10px 12px;font:700 16px/1.2 var(--f-ui);font-stretch:104%;color:var(--text);text-decoration:none;border-radius:10px;
-  background:linear-gradient(var(--y),var(--y)) no-repeat 12px calc(100% - 7px)/0 7px;transition:background-size .15s ease}
+  background:linear-gradient(var(--y),var(--y)) no-repeat 12px var(--nav-mark-y)/0 7px;transition:background-size .15s ease}
 .nav a:hover,.nav a[aria-current]{background-size:calc(100% - 24px) 7px}
 .status{margin-left:auto;display:flex;align-items:center;gap:10px}
 .status__balance,.status__session{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:5px 14px 5px 6px;border:var(--bw-ctl) solid var(--ctl-line);border-radius:var(--r-pill);background:var(--surface);white-space:nowrap}
@@ -66,7 +68,7 @@
    compact phone header): with the self-hosted fonts the header row otherwise
    overflowed at 1100–1250 and 401–447px. */
 @media (max-width: 1259px){
-  .nav a{padding:10px 8px;font-size:15px;background-position:8px calc(100% - 7px)}
+  .nav a{padding:10px 8px;font-size:15px;background-position:8px var(--nav-mark-y)}
   .nav a:hover,.nav a[aria-current]{background-size:calc(100% - 16px) 7px}
   .masthead__row{gap:16px}
   .brand__name b{font-size:18px}
@@ -81,7 +83,7 @@
 }
 @media (max-width: 1099px){
   .masthead__row{gap:12px}
-  .nav a{padding-inline:7px;background-position:7px calc(100% - 7px)}
+  .nav a{padding-inline:7px;background-position:7px var(--nav-mark-y)}
   .nav a:hover,.nav a[aria-current]{background-size:calc(100% - 14px) 7px}
 }
 @media (max-width: 1023px){
@@ -122,6 +124,17 @@
   .dock a:hover svg,.dock button:hover svg{border-color:var(--ctl-line)}
   .dock [aria-current]:hover svg{border-color:var(--k)}
   .dock :focus-visible{outline-offset:-1px}
+}
+/* Short phone screens: landscape, or a desktop window at 400% zoom (320 × 256).
+   The dock scrolls with the page (it would otherwise take a quarter of the
+   height) and the header gets compact. The header stays sticky: the session
+   clock is always in view. 10-base.css keeps the scroll padding in step. */
+@media (max-width: 720px) and (max-height: 500px){
+  .dock{position:static;box-shadow:none}
+  .colophon{padding-bottom:40px}
+  .cmyk{height:3px}
+  .masthead__row{min-height:48px}
+  .status__balance,.status__session{min-height:38px}
 }
 @media (max-width: 460px){
   .brand{gap:6px}

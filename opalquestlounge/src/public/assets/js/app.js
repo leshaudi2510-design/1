@@ -10,9 +10,23 @@ import { hasHaptics } from './lib/haptics.js';
 import config from './config.js';
 
 // ---------- balance everywhere ----------
+// The header pill has room for six figures at phone widths, so from 100,000
+// it shows a short form ("123K", "1.23M", never rounded up). Screen readers
+// get the full figure ([data-balance] inside the pill), and so does the
+// pill's title; the dialogs always show it in full.
+let compact = null;
+try {
+  compact = new Intl.NumberFormat('en-GB', { notation: 'compact', maximumSignificantDigits: 3, roundingMode: 'floor' });
+} catch {}
+const short = (n) => (n >= 100000 && compact ? compact.format(n) : fmt(n));
 function showBalance() {
-  const text = fmt(wallet.balance);
+  const n = wallet.balance;
+  const text = fmt(n);
   document.querySelectorAll('[data-balance]').forEach((el) => (el.textContent = text));
+  document.querySelectorAll('[data-balance-short]').forEach((el) => (el.textContent = short(n)));
+  document.querySelectorAll('[data-balance-pill]').forEach(
+    (el) => (el.title = `Your free virtual balance: ${text} ${config.currency.plural}. ${config.currency.plural} have no cash value.`),
+  );
 }
 showBalance();
 wallet.on(showBalance);

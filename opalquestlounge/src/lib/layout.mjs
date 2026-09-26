@@ -1,9 +1,27 @@
+import { createHash } from 'node:crypto';
 import { html, esc } from './html.mjs';
 import { icons, icon } from './icons.mjs';
 import { SPRITE } from './art.mjs';
 
 const ASSET_VERSION = { value: 'dev' };
 export const setAssetVersion = (v) => (ASSET_VERSION.value = v);
+
+/**
+ * Runs before the first paint, inline in <head> so it costs no request and
+ * doesn't block rendering: applies a Day or Night theme chosen in Settings,
+ * so the page doesn't flash the device theme first. lib/settings.js owns the
+ * setting ("oql.settings" → theme) and keeps it in step after this. The CSP
+ * allows it by its hash (see csp()).
+ */
+export const THEME_BOOT = `(function(){try{var s=JSON.parse(localStorage.getItem('oql.settings')||'null');if(s&&(s.theme==='light'||s.theme==='dark'))document.documentElement.setAttribute('data-theme',s.theme)}catch(e){}})();`;
+
+export const SPECULATION = JSON.stringify({
+  prerender: [{ where: { href_matches: '/games/*' }, eagerness: 'moderate' }],
+  prefetch: [{ where: { and: [{ href_matches: '/*' }, { not: { href_matches: '/games/*' } }] }, eagerness: 'conservative' }],
+});
+
+/** A CSP source for an inline script's exact text. */
+export const scriptHash = (text) => `'sha256-${createHash('sha256').update(text, 'utf8').digest('base64')}'`;
 
 export function csp(ctx) {
   const ga = ctx.analyticsOn;
@@ -16,7 +34,9 @@ export function csp(ctx) {
   } catch {}
   return [
     "default-src 'self'",
-    `script-src 'self' 'inline-speculation-rules'${g}`,
+    // The two inline scripts by hash: with a hash in script-src, Chromium
+    // ignores 'inline-speculation-rules', so the speculation rules need theirs too.
+    `script-src 'self' 'inline-speculation-rules' ${scriptHash(THEME_BOOT)} ${scriptHash(SPECULATION)}${g}`,
     "style-src 'self'",
     `img-src 'self' data: blob:${gImg}`,
     "font-src 'self'",
@@ -188,9 +208,9 @@ function masthead(ctx, page, sec) {
       </ul>
     </nav>
     <div class="status">
-      <p class="status__balance" title="Your free virtual balance. ${esc(c.plural)} have no cash value.">
+      <p class="status__balance" title="Your free virtual balance: ${start} ${esc(c.plural)}. ${esc(c.plural)} have no cash value." data-balance-pill>
         <span class="status__ico" aria-hidden="true">${icons.gem}</span>
-        <span class="status__txt"><span class="visually-hidden">Balance:</span><b class="num" data-balance>${start}</b><span class="status__unit">${esc(c.plural)}</span></span>
+        <span class="status__txt"><span class="visually-hidden">Balance: <span data-balance>${start}</span></span><b class="num" aria-hidden="true" data-balance-short>${start}</b><span class="status__unit">${esc(c.plural)}</span></span>
       </p>
       <p class="status__session" title="Time on the site this session">
         <span class="status__ico" aria-hidden="true">${icons.clockDisc}</span>
@@ -227,7 +247,7 @@ function footer(ctx) {
       <section class="colophon__about" aria-label="About ${esc(ctx.brand)}">
         ${brand(ctx)}
         <p class="colophon__disclaimer"><span class="age-mark" aria-hidden="true">18+</span><span>${esc(ctx.disclaimer)}</span></p>
-        <p class="colophon__blurb">You play with virtual ${esc(ctx.cur.plural)}. They can't be bought, sold or exchanged, and nothing here pays out.</p>
+        <p class="colophon__blurb">You play with virtual ${esc(ctx.cur.plural)}. They can’t be bought, sold or exchanged, and nothing here pays out.</p>
       </section>
       <nav class="colophon__nav" aria-labelledby="f-play">
         <h2 id="f-play">Play</h2>
@@ -240,7 +260,7 @@ function footer(ctx) {
           <li><a href="/contact/">Contact</a></li>
           <li><a href="/about/">About us</a></li>
           <li><a class="colophon__tel" href="tel:+448088020133">GamCare <span class="num nobr">0808 8020 133</span></a></li>
-          <li>${newTab('https://www.begambleaware.org/', 'BeGambleAware')}</li>
+          <li>${newTab('https://www.nhs.uk/live-well/addiction-support/gambling-addiction/', 'NHS gambling support')}</li>
         </ul>
       </nav>
       <nav class="colophon__nav" aria-labelledby="f-legal">
@@ -279,24 +299,30 @@ function dock(ctx, page, sec) {
 
 function dialogs(ctx) {
   const c = ctx.cur;
+  const pp = ctx.pragmaticOn;
   const close = (label) => `<button type="submit" class="icon-btn dialog__close" value="close" aria-label="${label}">${icons.close}</button>`;
+  // A status line in every dialog, live from page load. While a modal is
+  // open, the page's toast is inert, so lib/ui.js toast() and announce()
+  // write here instead (screen readers only; the dialog shows the result).
+  const status = '<p class="visually-hidden" role="status" data-dialog-status></p>';
   return html`
 <dialog id="age-gate" class="sheet-dialog age" aria-labelledby="age-title" aria-describedby="age-desc">
   <header class="dialog__head">
-    <h2 id="age-title">Are you 18 or over?</h2>
+    <h2 id="age-title" tabindex="-1" autofocus>Are you 18 or over?</h2>
     <span class="age-mark" aria-hidden="true">18+</span>
   </header>
   <div class="dialog__body">
     <p id="age-desc">${esc(ctx.brand)} is for adults only. <strong>${esc(ctx.disclaimer)}</strong></p>
     <div class="dialog__actions age__actions">
-      <button type="button" class="btn btn--primary" data-age="yes">Yes, I'm 18 or over</button>
-      <button type="button" class="btn btn--secondary" data-age="no">No, I'm under 18</button>
+      <button type="button" class="btn btn--primary" data-age="yes">Yes, I’m 18 or over</button>
+      <button type="button" class="btn btn--secondary" data-age="no">No, I’m under 18</button>
     </div>
     <div class="age__under callout" hidden>
-      <p><strong>Sorry, you can't use the games on this site.</strong> They're locked on this device for 30 days.</p>
-      <p>If you're worried about gambling, including someone else's, you can talk to GamCare in confidence on <a href="tel:+448088020133" class="nobr">0808 8020 133</a>.</p>
+      <p tabindex="-1"><strong>Sorry, you can’t use the games on this site.</strong> They’re locked on this device for 30 days.</p>
+      <p>If you’re worried about gambling, including someone else’s, you can talk to GamCare in confidence on <a href="tel:+448088020133" class="nobr">0808 8020 133</a>.</p>
     </div>
     <p class="dialog__fine age__fine">We keep your answer on this device only. See <a href="/cookies/">cookies and storage</a>.</p>
+    ${status}
   </div>
 </dialog>
 
@@ -316,7 +342,7 @@ function dialogs(ctx) {
       <div class="settings__group">
         <label class="field">
           <span>Daily time limit <span class="settings__state" data-rg-state="limit">Off</span></span>
-          <select name="limit" aria-describedby="settings-limit-help">
+          <select name="limit" aria-describedby="settings-limit-help settings-limit-pending">
             <option value="0">No limit</option>
             <option value="30">30 minutes</option>
             <option value="60">1 hour</option>
@@ -324,8 +350,9 @@ function dialogs(ctx) {
             <option value="240">4 hours</option>
           </select>
         </label>
-        <small id="settings-limit-help">At the limit, games pause until midnight. A lower limit applies at once; a higher one starts tomorrow.</small>
-        <small class="settings__pending" data-rg-state="limit-pending" hidden></small>
+        <button type="button" class="btn btn--secondary settings__save" data-action="save-limit" aria-disabled="true">Save limit</button>
+        <small id="settings-limit-help">Choose a limit, then save it. At the limit, games pause until midnight. A lower limit applies at once; a higher one starts tomorrow.</small>
+        <small class="settings__pending" id="settings-limit-pending" data-rg-state="limit-pending" hidden></small>
       </div>
       <div class="settings__group">
         <fieldset class="segmented" data-setting="reality" aria-describedby="settings-rc-help">
@@ -334,7 +361,7 @@ function dialogs(ctx) {
           <label><input type="radio" name="rc" value="30" checked><span>30 min</span></label>
           <label><input type="radio" name="rc" value="60"><span>60 min</span></label>
         </fieldset>
-        <small id="settings-rc-help">A reminder of your time on the site and what you've staked, with the option of a short break.</small>
+        <small id="settings-rc-help">A reminder of your time on the site and what you’ve staked${pp ? ' on our own tables' : ''}, with the option of a short break.</small>
       </div>
       <div class="settings__group" role="group" aria-labelledby="settings-break-label" aria-describedby="settings-break-help">
         <p class="field"><span id="settings-break-label">Take a break <span class="settings__state" data-rg-state="break">None set</span></span></p>
@@ -342,7 +369,7 @@ function dialogs(ctx) {
           <button type="button" class="btn btn--secondary" data-action="break-5">Take a 5-minute break</button>
           <a href="/responsible-gaming/#break">24 hours, 7 or 30 days</a>
         </div>
-        <small id="settings-break-help">Longer breaks can't be cut short once they start.</small>
+        <small id="settings-break-help">Longer breaks can’t be cut short once they start.</small>
       </div>
       <div class="settings__group settings__switches">
         <label class="switch"><input type="checkbox" role="switch" name="sound"><span>Sound</span><small>Made in your browser. Off until you turn it on.</small></label>
@@ -353,24 +380,27 @@ function dialogs(ctx) {
         <button type="button" class="btn btn--secondary btn--sm" data-action="reset-balance"><span>Reset to <span class="num">${ctx.carats(c.startingBalance)}</span></span></button>
       </div>
       <p class="settings__more"><a href="/responsible-gaming/">All safer play tools</a></p>
+      ${status}
     </div>
   </form>
 </dialog>
 
-<dialog id="reality-check-dialog" class="sheet-dialog" aria-labelledby="rc-title" aria-describedby="rc-body">
+<dialog id="reality-check-dialog" class="sheet-dialog" aria-labelledby="rc-title" aria-describedby="${pp ? 'rc-body rc-note' : 'rc-body'}">
   <header class="dialog__head">
     <div>
       <p class="dialog__eyebrow">Reality check</p>
-      <h2 id="rc-title">You've been here <span data-rc-time>30 minutes</span></h2>
+      <h2 id="rc-title">You’ve been here <span data-rc-time>30 minutes</span></h2>
     </div>
   </header>
   <div class="dialog__body rc">
-    <p id="rc-body">This session you've staked <b class="num" data-rc-staked>0</b> ${esc(c.plural)} and had <b class="num" data-rc-returned>0</b> back. Your balance is <b class="num" data-balance></b>.</p>
+    <p id="rc-body">${pp ? 'On our own tables this session, you’ve' : 'This session you’ve'} staked <b class="num" data-rc-staked>0</b> ${esc(c.plural)} and had <b class="num" data-rc-returned>0</b> back. Your balance is <b class="num" data-balance></b>.</p>
+    ${pp ? '<p id="rc-note" class="dialog__fine">We can’t see inside the Pragmatic Play demos, so demo credits aren’t counted. Your time is.</p>' : ''}
     <div class="dialog__actions rc__actions">
       <button type="button" class="btn btn--primary" data-rc="break">Take a 5-minute break</button>
       <button type="button" class="btn btn--secondary" data-rc="continue">Keep playing</button>
     </div>
     <p class="dialog__fine"><a href="/responsible-gaming/">Set a daily limit or take a longer break</a></p>
+    ${status}
   </div>
 </dialog>
 
@@ -385,6 +415,7 @@ function dialogs(ctx) {
         <button class="btn btn--primary" value="yes"></button>
         <button class="btn btn--secondary" value="no" autofocus></button>
       </div>
+      ${status}
     </div>
   </form>
 </dialog>
@@ -396,12 +427,12 @@ function dialogs(ctx) {
       ${close('Close cookie settings')}
     </header>
     <div class="dialog__body">
-      <p>We use storage on your device to run the games. That's always on, because the site can't work without it. Anything else is off until you switch it on.</p>
+      <p>We use storage on your device to run the games. That’s always on, because the site can’t work without it. Anything else is off until you switch it on.</p>
       <div class="settings__switches">
         <label class="switch is-locked"><input type="checkbox" role="switch" checked disabled><span>Strictly necessary</span><small>Your balance, age answer, settings, limits and this choice. Kept on your device.</small></label>
         ${ctx.cfg.analytics?.ga4
           ? '<label class="switch"><input type="checkbox" role="switch" name="analytics"><span>Analytics</span><small>Google Analytics 4 counts visits and which games are played. Sets _ga cookies.</small></label>'
-          : '<p class="switch is-off"><span>Analytics</span><small>Not in use. We don\'t run any analytics at the moment.</small></p>'}
+          : '<p class="switch is-off"><span>Analytics</span><small>Not in use. We don’t run any analytics at the moment.</small></p>'}
         ${ctx.cfg.analytics?.adsConversionId
           ? '<label class="switch"><input type="checkbox" role="switch" name="ads"><span>Advertising measurement</span><small>Google Ads tells us whether an advert led to a visit. Sets Google Ads cookies.</small></label>'
           : ''}
@@ -412,30 +443,48 @@ function dialogs(ctx) {
         <button type="button" class="btn btn--secondary" data-consent="accept">Accept all</button>
       </div>
       <p class="dialog__fine">Read the <a href="/cookies/">cookie policy</a>. You can change your mind at any time${ctx.analyticsOn ? ' from the footer' : ' from the cookies page'}.</p>
+      ${status}
     </div>
   </form>
 </dialog>
-
-${ctx.analyticsOn
-    ? html`<section class="consent-banner" aria-labelledby="cb-title" hidden>
-  <h2 id="cb-title">Cookie choices</h2>
-  <p>We'd like to use ${ctx.cfg.analytics.adsConversionId ? 'Google Analytics and Google Ads measurement' : 'Google Analytics'} to see how the site is used. ${ctx.cfg.analytics.adsConversionId ? 'They set' : 'It sets'} cookies, and nothing loads unless you say yes. <a href="/cookies/">Cookie policy</a></p>
-  <div class="dialog__actions dialog__actions--equal consent__actions">
-    <button type="button" class="btn btn--secondary btn--sm" data-consent="reject">Reject all</button>
-    <button type="button" class="btn btn--secondary btn--sm" data-open="consent" aria-haspopup="dialog">Manage</button>
-    <button type="button" class="btn btn--secondary btn--sm" data-consent="accept">Accept all</button>
-  </div>
-</section>`
-    : ''}
 
 <div class="toast" popover="manual" id="toast" role="status">${icons.info}<span class="toast__msg"></span></div>
 <p id="announcer" class="visually-hidden" aria-live="polite"></p>`;
 }
 
-const SPECULATION = JSON.stringify({
-  prerender: [{ where: { href_matches: '/games/*' }, eagerness: 'moderate' }],
-  prefetch: [{ where: { and: [{ href_matches: '/*' }, { not: { href_matches: '/games/*' } }] }, eagerness: 'conservative' }],
-});
+/**
+ * The cookie banner (only when analytics is configured). It is fixed to the
+ * bottom of the screen but comes first in the markup, straight after the skip
+ * link, so keyboard and screen-reader users meet it before the page it covers.
+ * lib/consent.js shows it, keeps focused controls clear of it and hides it.
+ */
+function consentBanner(ctx) {
+  if (!ctx.analyticsOn) return '';
+  const ads = ctx.cfg.analytics.adsConversionId;
+  return html`<section class="consent-banner" aria-labelledby="cb-title" hidden>
+  <h2 id="cb-title">Cookie choices</h2>
+  <p>We’d like to use ${ads ? 'Google Analytics and Google Ads measurement' : 'Google Analytics'} to see how the site is used. ${ads ? 'They set' : 'It sets'} cookies, and nothing loads unless you say yes. <a href="/cookies/">Cookie policy</a></p>
+  <div class="dialog__actions dialog__actions--equal consent__actions">
+    <button type="button" class="btn btn--secondary btn--sm" data-consent="reject">Reject all</button>
+    <button type="button" class="btn btn--secondary btn--sm" data-open="consent" aria-haspopup="dialog">Manage</button>
+    <button type="button" class="btn btn--secondary btn--sm" data-consent="accept">Accept all</button>
+  </div>
+</section>`;
+}
+
+/**
+ * Add the site-wide JSON-LD nodes this page points at by @id but doesn't
+ * carry, so each page's graph resolves on its own (validators don't follow
+ * an @id to another page). The WebSite goes first: it points at the
+ * Organization itself.
+ */
+function resolveLd(ctx, ld) {
+  const has = (id) => ld.some((n) => n['@id'] === id);
+  const refers = (id) => JSON.stringify(ld).includes(`"${id}"`);
+  if (refers(ctx.websiteId) && !has(ctx.websiteId)) ld.push(websiteLd(ctx));
+  if (refers(ctx.orgId) && !has(ctx.orgId)) ld.push(organizationLd(ctx));
+  return ld;
+}
 
 export function layout(ctx, page) {
   const v = ASSET_VERSION.value;
@@ -443,6 +492,7 @@ export function layout(ctx, page) {
   const ogImage = ctx.origin + (page.ogImage || (ctx.pragmaticOn ? '/assets/img/og-home.png' : '/assets/img/og-home-house.png'));
   const ld = [...(page.jsonld || [])];
   if (page.breadcrumbs?.length) ld.push(breadcrumbLd(ctx, page.breadcrumbs));
+  resolveLd(ctx, ld);
   const modules = page.modules || [];
   const robots = page.noindex ? '<meta name="robots" content="noindex">' : '';
   const sec = sectionOf(ctx, page);
@@ -453,6 +503,7 @@ export function layout(ctx, page) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="${csp(ctx)}">
+<script>${THEME_BOOT}</script>
 <title>${esc(page.title)}</title>
 <meta name="description" content="${esc(page.description)}">
 ${page.canonical === false ? '' : `<link rel="canonical" href="${url}">`}
@@ -462,7 +513,7 @@ ${robots}
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="${ctx.cfg.themeColor.dark}">
 ${(page.preloadFonts || ['archivo', 'radio-canada']).map((f) => `<link rel="preload" href="/assets/fonts/${f}.woff2" as="font" type="font/woff2" crossorigin>`)}
 <link rel="stylesheet" href="/assets/css/site.css?v=${v}">
-<script src="/assets/js/theme-boot.js?v=${v}"></script>
+<script src="/assets/js/age-boot.js?v=${v}" defer></script>
 <link rel="modulepreload" href="/assets/js/app.js?v=${v}">
 ${modules.map((m) => `<link rel="modulepreload" href="${m}">`)}
 <script type="module" src="/assets/js/app.js?v=${v}"></script>
@@ -491,16 +542,17 @@ ${ld.length ? ldScript(ld) : ''}
 <body class="${page.bodyClass || ''}">
 ${SPRITE}
 <a class="skip" href="#main">Skip to main content</a>
+${consentBanner(ctx)}
 ${ageNotice(ctx)}
 ${masthead(ctx, page, sec)}
 <main id="main" tabindex="-1">
+<noscript><p class="noscript">The games and the safer play tools need JavaScript. The rules, paytables and policies on this site all work without it.</p></noscript>
 ${page.crumbsInBody || !page.breadcrumbs?.length ? '' : `<div class="wrap">${breadcrumbs(page.breadcrumbs)}</div>`}
 ${page.body}
 </main>
 ${footer(ctx)}
 ${dock(ctx, page, sec)}
 ${dialogs(ctx)}
-<noscript><p class="noscript">The games need JavaScript. The rules, paytables and policies on this site all work without it.</p></noscript>
 </body>
 </html>
 `;

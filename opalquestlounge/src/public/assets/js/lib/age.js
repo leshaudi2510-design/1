@@ -1,5 +1,7 @@
 // Age confirmation on the first visit. The page's content is the same for
 // everyone; the check only decides whether the games can be played here.
+// age-boot.js has usually opened the dialog already (it runs before this
+// module graph has loaded); this module saves the answer.
 import { store } from './store.js';
 import { rg } from './rg.js';
 
@@ -35,11 +37,25 @@ export function startAgeGate() {
       close.dataset.age = 'close';
       close.textContent = 'Close and read the site';
       under.append(close);
-      close.focus();
+      // Focus the explanation (it has tabindex="-1"), not the button below it:
+      // on a short screen, focusing the button would scroll the message up
+      // under the dialog's head. Tab goes on to the helpline, then the button.
+      const msg = under.querySelector('p');
+      if (msg) msg.focus();
+      else close.focus();
       rg.refresh();
       return;
     }
     if (b.dataset.age === 'close') dialog.close();
   });
-  dialog.showModal();
+  dialog.dataset.ready = '1';
+  if (!dialog.open) dialog.showModal();
+  // A button pressed while only age-boot.js was running: apply it now.
+  const pending = dialog.dataset.pending;
+  if (pending) {
+    delete dialog.dataset.pending;
+    const b = dialog.querySelector(`[data-age="${pending}"]`);
+    b?.removeAttribute('aria-busy');
+    b?.click();
+  }
 }

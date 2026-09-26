@@ -357,7 +357,7 @@ export function mount(root) {
     }
     dealerTotalEl.textContent = round.revealed ? handText(round.dealer) : `${cardValue(round.dealer[0])} showing`;
     playerTotalEl.textContent = round.hands
-      .map((h, i) => (round.hands.length > 1 && i === round.active && round.phase === 'player' ? `▸ ${handText(h.cards)}` : handText(h.cards)))
+      .map((h, i) => (round.hands.length > 1 && i === round.active && round.phase === 'player' ? `› ${handText(h.cards)}` : handText(h.cards)))
       .join(' · ');
     shoeEl.textContent = fmt(shoe.length);
     const dealerDesc = round.revealed ? round.dealer.map(cardName).join(', ') : `${cardName(round.dealer[0])} and a face-down card`;
