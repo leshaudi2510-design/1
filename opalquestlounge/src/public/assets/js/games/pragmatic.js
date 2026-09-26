@@ -62,7 +62,6 @@ export function mount(root) {
     frame.title = `${name}, free demo from Pragmatic Play`;
     frame.allow = 'fullscreen; autoplay';
     frame.allowFullscreen = true;
-    frame.referrerPolicy = 'strict-origin-when-cross-origin';
     frame.addEventListener(
       'load',
       () => {
@@ -125,6 +124,26 @@ export function mount(root) {
     else if (a.dataset.action === 'unload') {
       unload(`${name} demo closed.`);
       setState('idle');
+    }
+  });
+
+  // The game's own Home/Close button posts this message to the parent page
+  // in demo mode (Pragmatic's client, PatchHomeButtonDemoMode).
+  const origin = new URL(src).origin;
+  addEventListener('message', (e) => {
+    if (e.origin !== origin || !frame || e.source !== frame.contentWindow) return;
+    let data = e.data;
+    if (typeof data === 'string') {
+      try {
+        data = JSON.parse(data);
+      } catch {
+        return;
+      }
+    }
+    if (data?.action === 'omni-api.goTo' && data.actionData === 'lobby') {
+      unload(`${name} demo closed.`);
+      setState('idle');
+      root.querySelector('[data-action="load"]')?.focus();
     }
   });
 

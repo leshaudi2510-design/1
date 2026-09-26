@@ -1,0 +1,338 @@
+{
+  "_about": "Pragmatic Play demo slots shown in the lobby. Facts were researched on 26 September 2026 from Pragmatic press releases, captured game configs and third-party reviews; pragmaticplay.com itself could not be reached from the build environment. Fields listed in 'verify' must be checked against the game's own information screen (the i button in the demo) before launch. Games with characters likely to appeal to under-18s (The Dog House, Sugar Rush, Starlight Princess) are left out on purpose; see COMPLIANCE.md.",
+  "games": [
+    {
+      "slug": "gates-of-olympus",
+      "name": "Gates of Olympus",
+      "symbol": "vs20olympgate",
+      "released": 2021,
+      "grid": "6×5",
+      "pays": "Anywhere on the grid: 8 or more of the same symbol",
+      "tags": ["tumble", "multipliers", "free-spins", "pay-anywhere"],
+      "volatility": "High",
+      "topPayout": 5000,
+      "rtp": 96.5,
+      "motif": "lightning bolt over a gem",
+      "summary": "Zeus hovers beside a 6×5 grid of gems and crowns. Symbols pay anywhere, tumble away and can be multiplied up to 500×.",
+      "theme": "A Greek-mythology scene: Zeus beside a grid of jewels, crowns, rings and chalices, with winged orbs that carry multipliers.",
+      "howItPlays": [
+        "There are no paylines. Eight or more of the same symbol anywhere on the 6×5 grid pay, and more matching symbols pay more.",
+        "After a paying spin the winning symbols vanish and new ones drop into the gaps. This tumble repeats for as long as new combinations form, all within the same spin.",
+        "Multiplier orbs worth 2× to 500× can land on any spin. When the tumbles end, the orbs on screen are added together and multiply the spin's total pay."
+      ],
+      "bonus": "Four or more Zeus scatters start 15 free spins, and three or more during the feature add 5 more. In free spins, each multiplier that lands on a paying spin joins a running total, and that total multiplies the spin's pay. A spin that pays without a new multiplier is not multiplied.",
+      "features": [
+        "Released in February 2021.",
+        "An optional ante bet costs 25% more per spin and makes the free spins more likely to start.",
+        "Pragmatic called it highly volatile at launch: long quiet spells are normal."
+      ],
+      "verify": ["rtp", "topPayout"],
+      "appeal": "low"
+    },
+    {
+      "slug": "gates-of-olympus-1000",
+      "name": "Gates of Olympus 1000",
+      "symbol": "vs20olympx",
+      "released": 2023,
+      "grid": "6×5",
+      "pays": "Anywhere on the grid: 8 or more of the same symbol",
+      "tags": ["tumble", "multipliers", "free-spins", "pay-anywhere"],
+      "volatility": "High",
+      "topPayout": 15000,
+      "rtp": 96.5,
+      "motif": "lightning bolt with the number 1000",
+      "summary": "The sequel keeps the 6×5 pay-anywhere grid and raises the multiplier orbs to 1,000×.",
+      "theme": "The same Mount Olympus setting as the original, with Zeus presiding over reels of gems, crowns, rings and goblets.",
+      "howItPlays": [
+        "Eight or more matching symbols anywhere on the grid pay. Paying symbols tumble away and new ones fall in, so one spin can pay several times.",
+        "Multiplier orbs from 2× to 1,000× can land in the base game as well as in free spins. At the end of the tumbles their values are added together and applied to the spin's pay.",
+        "Four, five or six scatters also pay on their own: 3×, 5× or 100× the stake."
+      ],
+      "bonus": "Four or more scatters start 15 free spins, and three or more during the feature add 5 more. A multiplier that lands on a paying spin joins a running total, and the total multiplies that spin's pay. Spins that pay without a new multiplier are not multiplied.",
+      "features": [
+        "Released on 14 December 2023.",
+        "The top payout rises from 5,000× in the original to 15,000× the stake.",
+        "Not to be confused with the original Gates of Olympus, which is a separate game."
+      ],
+      "verify": ["rtp", "volatility"],
+      "appeal": "low"
+    },
+    {
+      "slug": "zeus-vs-hades-gods-of-war",
+      "name": "Zeus vs Hades – Gods of War",
+      "symbol": "vs15godsofwar",
+      "released": null,
+      "grid": "5×5",
+      "pays": "15 paylines",
+      "tags": ["free-spins", "multipliers", "paylines"],
+      "volatility": "High (Olympus) or very high (Hades)",
+      "topPayout": 15000,
+      "rtp": 96.07,
+      "motif": "lightning bolt crossing a flame",
+      "summary": "Pick a side before you spin: Olympus pays more often, Hades pays less often but bigger. Expanding wilds carry multipliers up to 100×.",
+      "theme": "A mythological battle between a sunlit Olympus led by Zeus and a fiery underworld ruled by Hades.",
+      "howItPlays": [
+        "Before playing you choose a mode. Olympus starts the free spins more often with smaller average results; Hades is the more volatile of the two.",
+        "Wilds expand to cover a whole reel and carry a multiplier of up to 100×, which applies to every line they complete.",
+        "Each symbol has an Olympus version and a Hades version, and both can land in either mode."
+      ],
+      "bonus": "Three scatters start 10 free spins. During the feature, expanding wilds stay in place until the round ends.",
+      "features": [
+        "Fifteen paylines across a 5×5 grid.",
+        "Wild multipliers up to 100× in the base game and in free spins.",
+        "The listed RTP is for Olympus mode; Hades mode is listed a little lower, at 96.05%."
+      ],
+      "verify": ["rtp", "released"],
+      "appeal": "low"
+    },
+    {
+      "slug": "sweet-bonanza",
+      "name": "Sweet Bonanza",
+      "symbol": "vs20fruitsw",
+      "released": 2019,
+      "grid": "6×5",
+      "pays": "Anywhere on the grid: 8 or more of the same symbol",
+      "tags": ["tumble", "multipliers", "free-spins", "pay-anywhere"],
+      "volatility": "High",
+      "topPayout": 21175,
+      "rtp": 96.48,
+      "motif": "a wrapped sweet and a round multiplier bomb",
+      "summary": "The slot that made pay-anywhere tumbles popular: fruit and sweets on a 6×5 grid, with multiplier bombs up to 100× in free spins.",
+      "theme": "A pastel sweet-shop setting where fruit and wrapped sweets are the symbols and lollipops are the scatters.",
+      "howItPlays": [
+        "Eight or more of the same symbol anywhere on the 6×5 grid pay. There are no lines to follow.",
+        "Paying symbols tumble away and new ones fall into their place, again and again, until no new combination forms.",
+        "Four to six lollipop scatters in one spin start the free spins."
+      ],
+      "bonus": "Four or more lollipop scatters start 10 free spins, and three or more during the feature add 5 more. Multiplier bombs worth 2× to 100× land only in free spins; at the end of each tumble sequence their values are added together and multiply that sequence's pay.",
+      "features": [
+        "Launched on 25 June 2019.",
+        "Pragmatic's launch announcement gave the top payout as 21,175× the stake.",
+        "An optional ante bet costs 25% more and makes the free spins more likely to start."
+      ],
+      "verify": ["rtp", "topPayout"],
+      "appeal": "medium",
+      "appealNote": "Sweets with no characters. The ASA found Sweet Bonanza's promotion acceptable in its 2026 Videoslots ruling."
+    },
+    {
+      "slug": "fruit-party",
+      "name": "Fruit Party",
+      "symbol": "vs20fruitparty",
+      "released": 2020,
+      "grid": "7×7",
+      "pays": "Clusters: 5 or more matching symbols touching up, down or sideways",
+      "tags": ["tumble", "multipliers", "free-spins", "cluster"],
+      "volatility": "High",
+      "topPayout": 5000,
+      "rtp": 96.47,
+      "motif": "a slice of watermelon beside a cherry pair",
+      "summary": "A 7×7 cluster-pays grid of glossy fruit. Paying symbols can pick up multipliers that combine up to 256×.",
+      "theme": "Glossy, brightly coloured fruit on a summery party backdrop.",
+      "howItPlays": [
+        "A cluster of five or more matching fruit touching horizontally or vertically pays. Bigger clusters pay more.",
+        "Paying clusters tumble away and new fruit falls in, so one spin can pay several times.",
+        "Any symbol in a paying cluster can turn into a 2× multiplier. Several multipliers in one cluster multiply each other, up to 256×."
+      ],
+      "bonus": "Three or more scatters start 10 free spins, and three to seven scatters during the feature add 10 to 14 more. Multipliers turn up more often in free spins and are worth 2× or 4×.",
+      "features": [
+        "Released in May 2020.",
+        "Pragmatic's launch announcement called it high volatility; some reviews rate it medium.",
+        "Reviews list the default RTP as 96.47%; some list 96.50%."
+      ],
+      "verify": ["rtp", "topPayout"],
+      "appeal": "medium",
+      "appealNote": "Fruit with no characters or faces."
+    },
+    {
+      "slug": "big-bass-bonanza",
+      "name": "Big Bass Bonanza",
+      "symbol": "vs10bbbonanza",
+      "released": 2020,
+      "grid": "5×3",
+      "pays": "10 fixed paylines",
+      "tags": ["free-spins", "multipliers", "paylines"],
+      "volatility": "High",
+      "topPayout": 2100,
+      "rtp": 96.71,
+      "motif": "a fishing float and hook",
+      "summary": "A 10-line fishing slot where the free spins are the whole story: every fisherman wild collects the values shown on fish symbols.",
+      "theme": "A lakeside fishing trip with an angler, fish, tackle boxes, rods and floats.",
+      "howItPlays": [
+        "Symbols pay left to right along 10 fixed lines on a 5×3 grid.",
+        "Fish symbols show a value, which only a fisherman wild can collect.",
+        "The fisherman wild appears only during the free spins."
+      ],
+      "bonus": "Three, four or five scatters start 10, 15 or 20 free spins. Each fisherman wild that lands collects the values on every fish on screen. Every fourth wild collected adds 10 more spins and raises the collection multiplier to 2×, then 3×, then 10×.",
+      "features": [
+        "Made with Reel Kingdom and released by Pragmatic Play in December 2020.",
+        "The first of a long series; the sequels are separate games with their own figures."
+      ],
+      "verify": ["rtp", "topPayout", "volatility"],
+      "appeal": "medium",
+      "appealNote": "Life-like angler. The ASA found Big Bass Bonanza's promotion acceptable in its 2026 Videoslots ruling."
+    },
+    {
+      "slug": "big-bass-splash",
+      "name": "Big Bass Splash",
+      "symbol": "vs10txbigbass",
+      "released": null,
+      "grid": "5×3",
+      "pays": "Paylines",
+      "tags": ["free-spins", "paylines"],
+      "volatility": "High",
+      "topPayout": 5000,
+      "rtp": 96.71,
+      "motif": "a float in a ring of splash ripples",
+      "summary": "A later Big Bass game with the same fishing theme and a higher top payout of 5,000× the stake.",
+      "theme": "A freshwater fishing trip with an angler reeling in fish that carry values.",
+      "howItPlays": [
+        "Symbols pay along lines on a 5×3 grid, as in the rest of the Big Bass series.",
+        "Fish symbols carry values that the fisherman wild collects during free spins.",
+        "The wild does not appear in the base game; it lands only in the free spins."
+      ],
+      "bonus": "Scatters start the free spins, where fisherman wilds collect the values on fish symbols. Open the game's information screen for the exact number of spins and the retrigger rules.",
+      "features": [
+        "Top payout of 5,000× the stake, up from 2,100× in Big Bass Bonanza.",
+        "Part of the Big Bass series made with Reel Kingdom."
+      ],
+      "verify": ["rtp", "topPayout", "volatility", "pays", "released"],
+      "appeal": "medium",
+      "appealNote": "Same art style as Big Bass Bonanza."
+    },
+    {
+      "slug": "wolf-gold",
+      "name": "Wolf Gold",
+      "symbol": "vs25wolfgold",
+      "released": 2017,
+      "grid": "5×3",
+      "pays": "25 fixed paylines",
+      "tags": ["free-spins", "respins", "paylines"],
+      "volatility": "Medium",
+      "topPayout": null,
+      "rtp": 96.01,
+      "motif": "a full moon over canyon ridges",
+      "summary": "A 25-line classic from 2017 with a moon respin feature and giant symbols in the free spins.",
+      "theme": "A North American prairie and canyon landscape with semi-realistic wildlife and glowing full moons.",
+      "howItPlays": [
+        "Symbols pay left to right along 25 fixed lines on a 5×3 grid.",
+        "Six or more moon symbols start the Money Respin: the moons stay put and you get three respins, reset to three every time another moon lands.",
+        "At the end of the respins the moons' values are added up. Fixed awards of 30× and 100× the stake can appear on moons, and filling all 15 positions awards 1,000×."
+      ],
+      "bonus": "Three scatters on reels 1, 3 and 5 start 5 free spins and also pay 1× the stake. During the free spins, reels 2, 3 and 4 spin together as one giant symbol.",
+      "features": [
+        "One of Pragmatic Play's longest-running titles, first released in 2017.",
+        "Reviews rate it medium volatility, calmer than most of the games here."
+      ],
+      "verify": ["rtp", "volatility"],
+      "appeal": "low"
+    },
+    {
+      "slug": "great-rhino-megaways",
+      "name": "Great Rhino Megaways",
+      "symbol": "vswaysrhino",
+      "released": 2020,
+      "grid": "6 reels, 2 to 7 rows",
+      "pays": "Up to 200,704 ways",
+      "tags": ["megaways", "tumble", "free-spins", "multipliers"],
+      "volatility": "High",
+      "topPayout": 20000,
+      "rtp": 96.58,
+      "motif": "an acacia tree against a low sun",
+      "summary": "Pragmatic's first Megaways game: reels change height every spin, wins tumble, and the free spins let you trade spins for a bigger multiplier.",
+      "theme": "An African savanna with semi-realistic wildlife against grassland scenery.",
+      "howItPlays": [
+        "Each reel shows between 2 and 7 symbols, so the number of ways to pay changes every spin, up to 200,704.",
+        "Matching symbols on adjacent reels from the left pay. Paying symbols tumble away and new ones fall in.",
+        "The rhino is the wild and stands in for other symbols."
+      ],
+      "bonus": "Four or more scatters start the free spins. You then choose between more spins with a lower starting multiplier or fewer spins with a higher one.",
+      "features": [
+        "Released in April 2020 under a licence from Big Time Gaming, which owns the Megaways mechanic.",
+        "Top payout of 20,000× the stake, the highest of the games here."
+      ],
+      "verify": ["rtp", "grid"],
+      "appeal": "low"
+    },
+    {
+      "slug": "buffalo-king-megaways",
+      "name": "Buffalo King Megaways",
+      "symbol": "vswaysbufking",
+      "released": 2021,
+      "grid": "6 reels, variable rows",
+      "pays": "Up to 200,704 ways",
+      "tags": ["megaways", "tumble", "free-spins", "multipliers"],
+      "volatility": "High",
+      "topPayout": 5000,
+      "rtp": 96.52,
+      "motif": "prairie hills under a wide sun",
+      "summary": "The Megaways remake of Buffalo King: tumbling wins and wild multipliers that stack up within a tumble.",
+      "theme": "A North American wilderness with buffalo, wolves, cougars, moose and eagles.",
+      "howItPlays": [
+        "Reel heights change every spin, giving up to 200,704 ways to pay.",
+        "Paying symbols are removed and new ones drop in until no new combination forms.",
+        "Wilds carry 2×, 3× or 5× multipliers, and multipliers in the same tumble sequence add up."
+      ],
+      "bonus": "Four, five or six scatters start the free spins and pay 5×, 20× or 100× the stake on their own.",
+      "features": [
+        "A Megaways remake of the 2019 Buffalo King, which had 4,096 ways.",
+        "Launched with a default RTP of 96.52%."
+      ],
+      "verify": ["released", "grid"],
+      "appeal": "low"
+    },
+    {
+      "slug": "madame-destiny-megaways",
+      "name": "Madame Destiny Megaways",
+      "symbol": "vswaysmadame",
+      "released": 2021,
+      "grid": "6 reels, 2 to 7 rows",
+      "pays": "Up to 200,704 ways",
+      "tags": ["megaways", "tumble", "free-spins", "multipliers"],
+      "volatility": "High",
+      "topPayout": 5000,
+      "rtp": 96.56,
+      "motif": "a crystal ball on a tarot card",
+      "summary": "A fortune teller's parlour on Megaways reels. A wheel decides how many free spins you get and the multiplier they start with.",
+      "theme": "A candle-lit fortune teller's parlour with tarot cards and mystic objects.",
+      "howItPlays": [
+        "Each reel shows 2 to 7 symbols, with an extra row across the top, for up to 200,704 ways to pay.",
+        "Paying symbols tumble away and new ones fall in.",
+        "Madame Destiny is the wild and doubles any combination she helps complete."
+      ],
+      "bonus": "Three or more scatters start the free spins and pay 5× to 100× the stake. A wheel then sets both the number of free spins and the starting multiplier.",
+      "features": [
+        "Launched on 28 January 2021 as the Megaways sequel to the 2018 Madame Destiny.",
+        "Pragmatic's launch announcement called it highly volatile."
+      ],
+      "verify": ["rtp", "topPayout"],
+      "appeal": "low"
+    },
+    {
+      "slug": "wild-west-gold",
+      "name": "Wild West Gold",
+      "symbol": "vs40wildwest",
+      "released": null,
+      "grid": "5×4",
+      "pays": "40 paylines",
+      "tags": ["free-spins", "multipliers", "paylines", "sticky-wilds"],
+      "volatility": null,
+      "topPayout": 10000,
+      "rtp": 96.51,
+      "motif": "a sheriff's star",
+      "summary": "A 40-line frontier town at night. Sheriff wilds carry multipliers and stick in place during the free spins.",
+      "theme": "An Old West frontier town with outlaws, bandits and a sheriff under a desert sunset.",
+      "howItPlays": [
+        "Symbols pay left to right along 40 lines on a 5×4 grid.",
+        "The sheriff wild carries a random multiplier of up to 5×.",
+        "Three sunset scatters are all it takes to start the free spins."
+      ],
+      "bonus": "Three sunset scatters start the free spins. Every wild that lands during the feature stays in place until the round ends.",
+      "features": [
+        "Top payout of 10,000× the stake.",
+        "Sticky wilds make the free spins the part of the game that matters most."
+      ],
+      "verify": ["rtp", "volatility", "released", "bonus"],
+      "appeal": "low"
+    }
+  ]
+}
