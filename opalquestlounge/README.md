@@ -221,7 +221,7 @@ GitHub Pages не умеет свои заголовки. CSP работает �
   (это был бы фейковый social proof), поэтому тест покажет VideoGame как валидную разметку без этого расширенного сниппета.
   BreadcrumbList, Organization и WebSite от этого не зависят.
 - Search Console: добавить домен, отправить `https://opalquestlounge.com/sitemap.xml`.
-- PageSpeed Insights и Lighthouse по живому домену (см. ниже: после редизайна они ещё не перемерены).
+- PageSpeed Insights по живому домену: лабораторные цифры ниже, полевые CWV (в том числе INP) появятся только на живом сайте.
 - Google Ads → сертификация **Social casino games** для UK: что вписать в форму и какой режим сертифицировать, см. `COMPLIANCE.md`.
 
 ## Проверки, которые уже пройдены
@@ -234,6 +234,6 @@ GitHub Pages не умеет свои заголовки. CSP работает �
 | Сборка, запасной режим | 13 страниц; первый экран 67,8 KB gzip (20 JS-модулей); предзагрузка 36 файлов, 199,8 KB gzip |
 | `tools/check.mjs` | 277 проверок, 0 ошибок. Разделы (`SECTIONS` в `check.mjs`): **pages** — все страницы на 360, 768 и 1440 px в обоих режимах (без горизонтальной прокрутки, без ошибок, без запросов к чужим доменам, ничего от pragmaticplay.net до Play) и первый экран главной на телефонах; **stage** — сцена демо с заглушкой вместо сервера Pragmatic (в том числе честный отказ, когда демо недоступно, и вопрос перед Play после «Reject all»); **keyboard** — все наши игры только с клавиатуры; **tables** — доска ставок рулетки, холст Twenty-One без сдвига страницы, Space, фокус на ставке, блокировки посреди раунда; **lobby** — фильтры, ссылки в скрытую фильтром группу, раскладка от 320 до 1440 px; **consent** — согласие на cookies с тестовым GA4 ID (Consent Mode v2, «Reject all» и «Accept all» равны, gtag.js только после «Accept all», баннер первым в Tab-порядке и не закрывает фокус); **dialogs**; **prefs** — reduced motion и тёмная тема; **chrome** — шапка и док, Settings, перерывы и дневной лимит во времени (в том числе в полночь), вопрос о возрасте до загрузки app.js, страница без JavaScript, CLS < 0,05 при задержанных шрифтах; **offline**; **deploy** — вернувшийся посетитель с первого просмотра получает новые скрипты и стили, с service worker и без него; **axe** |
 | axe-core, WCAG 2.2 AA + best practices | 0 нарушений в 168 прогонах: все страницы обоих режимов, обе темы, 1440 и 390 px, с открытыми диалогами, age gate, cookie-баннером и запущенным демо |
-| Lighthouse и лабораторные CWV | **Не перемерены после редизайна Ben-Day Brights.** Прежние цифры относились к старому дизайну. Прогоните Lighthouse (mobile и desktop) по `dist/` через `tools/serve.mjs` или по живому домену и впишите сюда. Цели брифа: LCP < 2,0 s, INP < 150 ms, CLS < 0,05, Lighthouse ≥ 95 |
+| Lighthouse 12 и лабораторные CWV | Прогон по `dist/` через `tools/serve.mjs` (gzip), 26 September 2026. Mobile (slow 4G, 4× CPU): `/`, `/games/`, `/games/gates-of-olympus/`, `/responsible-gaming/` — 100/100/100/100; `/games/lapidary-wheel/` — 99/100/100/100. Desktop: 100/100/100/100 на всех пяти. Mobile LCP 1,5–2,0 s, CLS 0–0,014, TBT 0–30 ms. Цели брифа: LCP < 2,0 s, CLS < 0,05, Lighthouse ≥ 95; INP покажут только полевые данные |
 
 Реальный INP и полевые CWV покажут PageSpeed Insights и Search Console после запуска.

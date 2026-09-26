@@ -121,15 +121,15 @@
 
 | Требование | Где | Результат |
 |---|---|---|
-| LCP < 2.0 s (мобильный 4G) | При первом визите (так приходят все из Google Ads) LCP-элемент — текст вопроса о возрасте: его открывает крошечный `age-boot.js` до загрузки модулей `app.js`, так что LCP ≈ FCP; после ответа — текст страницы (`h1` или лид). Preload двух шрифтов, `font-display: swap`; тема применяется встроенным скриптом по хешу CSP, без блокирующего запроса; `site.css` минифицируется при сборке | ⚠️ полный Lighthouse после редизайна не перемерен (замер при правке шапки: ≈ 1.7–1.8 s, slow 4G) |
+| LCP < 2.0 s (мобильный 4G) | При первом визите (так приходят все из Google Ads) LCP-элемент — текст вопроса о возрасте: его открывает крошечный `age-boot.js` до загрузки модулей `app.js`, так что LCP ≈ FCP; после ответа — текст страницы (`h1` или лид). Preload двух шрифтов, `font-display: swap`; тема применяется встроенным скриптом по хешу CSP, без блокирующего запроса; `site.css` минифицируется при сборке | ✅ Lighthouse mobile (slow 4G, 4× CPU), 26 September 2026: 1.5–1.7 s на `/`, `/games/`, странице демо и Responsible gaming; 2.0 s на `/games/lapidary-wheel/` (самая тяжёлая страница: canvas-колесо) |
 | INP < 150 ms | Игры рисуют на canvas через rAF, запуск игры — после первой отрисовки | ⚠️ только по полевым данным после запуска |
-| CLS < 0.05 | У canvas заданы размеры (форму стола Twenty-One задаёт CSS до запуска скрипта); резерв строки результата; у сцены демо задана пропорция 16:10; фолбэк-шрифты с `size-adjust` и `ascent`/`descent-override`, разбитые по насыщенности и ширине (`src/styles/00-tokens.css`, генерирует `tools/font-fallbacks.mjs`) | ✅ < 0.05 на трёх страницах при 390 и 1440 px со шрифтами, задержанными на 1,2 s (`check.mjs`, раздел chrome); Lighthouse ⚠️ не перемерен |
+| CLS < 0.05 | У canvas заданы размеры (форму стола Twenty-One задаёт CSS до запуска скрипта); резерв строки результата; у сцены демо задана пропорция 16:10; фолбэк-шрифты с `size-adjust` и `ascent`/`descent-override`, разбитые по насыщенности и ширине (`src/styles/00-tokens.css`, генерирует `tools/font-fallbacks.mjs`) | ✅ < 0.05 на трёх страницах при 390 и 1440 px со шрифтами, задержанными на 1,2 s (`check.mjs`, раздел chrome); Lighthouse: 0–0.016 |
 | HTML + CSS + JS первого экрана < 150 KB gzip | Считает и проверяет `build.mjs` | Режим Pragmatic: 61,7 KB (23 страницы); запасной: 67,8 KB (13 страниц) ✅ |
 | Предзагрузка service worker | Только то, что обещает offline-страница; бюджет 220 KB gzip в `build.mjs` | Pragmatic: 185,5 KB (34 файла); запасной: 199,8 KB (36 файлов) ✅ |
 | Шрифты: свои woff2, subset, swap, preload | `src/public/assets/fonts/`, `tools/subset-fonts.py` (из полных variable-шрифтов google/fonts, чтобы были ≈, ç и ÷; скрипт падает, если символа нет), хэш в имени файла; после нового subset — `node tools/font-fallbacks.mjs --measure` | ✅ |
 | Кэш | Скрипты и стили в `/assets/v<хэш>/`, шрифты с хэшем — год `immutable`; `check.mjs` (раздел deploy) проверяет, что после деплоя вернувшийся посетитель с первого просмотра получает новые файлы | ✅ |
 | Speculation Rules | `SPECULATION` в `src/lib/layout.mjs`: prerender `/games/*` (moderate), prefetch остального; таймеры и age gate ждут `prerenderingchange` (`whenActivated` в `lib/ui.js`) | ✅ |
-| Lighthouse ≥ 95 | — | ⚠️ прогнать заново (см. README) |
+| Lighthouse ≥ 95 | Lighthouse 12 по `dist/` (gzip), 26 September 2026 | ✅ mobile 99–100, desktop 100 во всех четырёх категориях на `/`, `/games/`, `/games/gates-of-olympus/`, `/games/lapidary-wheel/`, `/responsible-gaming/` |
 
 Цифры бюджета — из вывода `node build.mjs` на 26 September 2026. После изменений берите их из вывода сборки, а не переписывайте руками.
 
