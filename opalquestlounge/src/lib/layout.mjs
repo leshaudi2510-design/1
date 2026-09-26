@@ -162,13 +162,14 @@ function brand(ctx) {
 function ageNotice(ctx) {
   // The first sentence of the disclaimer leads in bold; the rest is verbatim.
   const [lead, ...rest] = ctx.disclaimer.split(/(?<=\.) /);
-  return html`<div class="age-notice" role="note" aria-label="Important information">
+  // A labelled complementary landmark, so the ribbon isn't content outside every landmark.
+  return html`<aside class="age-notice" aria-label="Important information">
   <div class="wrap age-notice__row">
     <span class="age-mark" aria-hidden="true">18+</span>
     <p><strong>${esc(lead)}</strong> ${esc(rest.join(' '))}</p>
     <a href="/responsible-gaming/">Safer play tools</a>
   </div>
-</div>`;
+</aside>`;
 }
 
 function masthead(ctx, page, sec) {
@@ -356,7 +357,7 @@ function dialogs(ctx) {
   </form>
 </dialog>
 
-<dialog id="reality-check" class="sheet-dialog" aria-labelledby="rc-title" aria-describedby="rc-body">
+<dialog id="reality-check-dialog" class="sheet-dialog" aria-labelledby="rc-title" aria-describedby="rc-body">
   <header class="dialog__head">
     <div>
       <p class="dialog__eyebrow">Reality check</p>

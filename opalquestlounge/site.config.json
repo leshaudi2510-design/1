@@ -2,7 +2,7 @@
   "brand": "Opal Quest Lounge",
   "shortName": "Opal Lounge",
   "domain": "opalquestlounge.com",
-  "concept": "A Victorian collector's mineral cabinet: specimen labels, crystal drawings, the lapidary's wheel and the play-of-colour of opal.",
+  "concept": "Ben-Day Brights: a pop-art print that plays like a slot lobby. Process yellow, cyan, magenta and red with ink outlines, halftone dots, starbursts and extruded lettering. Artwork shows objects and places only.",
   "currency": {
     "singular": "Carat",
     "plural": "Carats",
@@ -26,8 +26,8 @@
   "contactEndpoint": "",
   "lastUpdated": "2026-09-25",
   "themeColor": {
-    "light": "#f6f2ea",
-    "dark": "#0d0f18"
+    "light": "#18122B",
+    "dark": "#0B0816"
   },
   "pragmatic": {
     "enabled": true,

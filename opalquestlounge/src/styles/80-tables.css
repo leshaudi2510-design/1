@@ -279,18 +279,3 @@
   .game__result.is-flash{animation:none}
 }
 
-/* ---------- Game-page (75-game-page.css) responsive rules ----------
-   These came across from the mockup's game.css with the stylesheet split.
-   They style the Pragmatic game page's hero and body, and ours. Keep them
-   in step with 75-game-page.css; they can move there once it carries them. */
-@media (max-width: 1099px){
-  .game-hero__grid,.game-body__grid{grid-template-columns:1fr}
-  .game-hero .game__side{grid-template-columns:repeat(2, minmax(0,1fr));align-items:start}
-}
-@media (max-width: 720px){
-  .game-hero .game__side{grid-template-columns:1fr}
-  .game-hero__title{margin:10px 0 16px}
-  .game-hero h1{font-size:clamp(32px, 9vw, 40px);font-stretch:104%}
-  .game-hero .stage__after{margin-top:16px}
-  .features{grid-template-columns:1fr}
-}

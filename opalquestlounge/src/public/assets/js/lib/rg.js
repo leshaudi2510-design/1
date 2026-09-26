@@ -124,13 +124,13 @@ function fillStats(root = document) {
 }
 
 function showReminder() {
-  const d = document.getElementById('reality-check');
+  const d = document.getElementById('reality-check-dialog');
   if (!d) return;
   d.querySelector('[data-rc-time]').textContent = spokenDuration(session.elapsed());
   fillStats(d);
   d.querySelectorAll('[data-balance]').forEach((el) => (el.textContent = fmt(wallet.settled)));
   sound.soft();
-  openDialog('reality-check');
+  openDialog('reality-check-dialog');
 }
 
 function tick() {
@@ -190,7 +190,7 @@ export function startRg() {
       toast(`Break started. The games open again at ${timeOfDay(Date.now() + SHORT_BREAK)}.`);
     }
   };
-  const rc = document.getElementById('reality-check');
+  const rc = document.getElementById('reality-check-dialog');
   rc?.addEventListener('click', (e) => {
     const b = e.target.closest('[data-rc]');
     if (!b) return;

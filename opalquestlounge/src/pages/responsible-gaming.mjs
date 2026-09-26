@@ -37,7 +37,7 @@ export default function responsibleGaming(ctx) {
     { href: '#limits', tone: 'y', icon: icons.timer, title: 'Set a time limit', text: 'Lower it and it applies at once. Raise it and it waits until tomorrow.' },
     { href: '#break', tone: 'm', icon: icons.pause, title: 'Take a break', text: '5 minutes, 24 hours, 7 or 30 days. Longer breaks can’t be cut short.' },
     { href: '#reality-check', tone: 'c', icon: icons.bell, title: 'Reality checks', text: 'A reminder every 15, 30 or 60 minutes, with your time played' },
-    { href: '#self-check', tone: 'r', icon: icons.check, title: 'Check in with yourself', text: 'Nine quick questions, answered privately' },
+    { href: '#self-check', tone: 'r', icon: icons.check, title: 'Check in with yourself', text: 'A few minutes, with BeGambleAware or GamCare' },
   ];
 
   const panelHead = (id, tone, ico, title, state = '') => html`<header class="rg-panel__head">

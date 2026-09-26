@@ -37,7 +37,9 @@ for src, out, limits in JOBS:
     opts.layout_features = ["kern", "liga", "clig", "calt", "tnum", "lnum", "onum", "pnum", "frac", "case", "ss01"]
     opts.name_IDs = [0, 1, 2, 3, 4, 5, 6]
     opts.notdef_outline = True
-    opts.hinting = False
+    # Keep the prep table: without it FreeType (Linux, ChromeOS, Android) sets
+    # the text about 4% wider than the same font served by Google.
+    opts.hinting = True
     s = subset.Subsetter(opts)
     s.populate(unicodes=UNICODES)
     s.subset(font)

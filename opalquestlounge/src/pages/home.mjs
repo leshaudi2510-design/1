@@ -88,7 +88,7 @@ export default function home(ctx) {
     ['limits', 'tool--y', icons.timer, 'Set a time limit', 'Lower it and it applies at once. Raise it and it waits until tomorrow.'],
     ['break', 'tool--m', icons.pause, 'Take a break', "24 hours, 7 or 30 days. It can't be cut short."],
     ['reality-check', 'tool--c', icons.bell, 'Reality checks', 'A reminder every 15, 30 or 60 minutes, with your time played'],
-    ['self-check', 'tool--r', icons.check, 'Check in with yourself', 'Nine quick questions, answered privately'],
+    ['self-check', 'tool--r', icons.check, 'Check in with yourself', 'A few minutes, with BeGambleAware or GamCare'],
   ];
 
   const faq = [
