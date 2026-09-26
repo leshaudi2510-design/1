@@ -1,12 +1,18 @@
 #!/usr/bin/env node
 // Static site build. No dependencies: Node 20 or later.
 //
-//   node build.mjs            build into dist/
-//   node build.mjs --strict   also fail on placeholder operator details
+//   node build.mjs                  build into dist/
+//   node build.mjs --strict         also fail on placeholder operator details
+//   node build.mjs --no-pragmatic   build with the Pragmatic Play demos switched
+//                                   off (our own slot, Seven Systems, instead)
+//
+//   SITE_CONFIG=path  read another config file instead of site.config.json
+//   OUT_DIR=path      build somewhere other than dist/
 //
 // Reads site.config.json, renders every page to plain HTML, copies
 // src/public, and writes sitemap, robots, manifest, service worker and
-// hosting headers. Then it lints the output against the site's rules.
+// hosting headers. Then it lints the output against the site's rules and
+// ends with "Lint: no problems found." or exits 1.
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -20,7 +26,7 @@ import home from './src/pages/home.mjs';
 import gamesIndex from './src/pages/games-index.mjs';
 import sevenSystems from './src/pages/seven-systems.mjs';
 import pragmaticGame from './src/pages/pragmatic-game.mjs';
-import { coverCss } from './src/lib/art.mjs';
+import { coverCss, COVERS } from './src/lib/art.mjs';
 import lapidaryWheel from './src/pages/lapidary-wheel.mjs';
 import brilliant21 from './src/pages/brilliant-twenty-one.mjs';
 import about from './src/pages/about.mjs';
@@ -37,6 +43,7 @@ const PUBLIC = path.join(ROOT, 'src/public');
 const strict = process.argv.includes('--strict');
 
 const cfg = JSON.parse(await fs.readFile(path.resolve(ROOT, process.env.SITE_CONFIG || 'site.config.json'), 'utf8'));
+if (process.argv.includes('--no-pragmatic')) cfg.pragmatic = { ...cfg.pragmatic, enabled: false };
 const ctx = makeContext(cfg);
 
 // ---------- helpers ----------
@@ -223,6 +230,9 @@ for (const f of files) {
   const text = /\.html$/.test(f) ? visibleText(src) : src;
   for (const re of FORBIDDEN) if (re.test(text)) problems.push(`${rel}: forbidden wording ${re}`);
   if (/\.html$/.test(f)) for (const re of AMERICAN) if (re.test(text)) problems.push(`${rel}: American spelling ${re}`);
+  // U+2011 (non-breaking hyphen) is missing from the subset fonts and reads oddly aloud; keep words together with .nobr instead.
+  const nbh = src.split('\u2011').length - 1;
+  if (nbh) problems.push(`${rel}: ${nbh} U+2011 non-breaking hyphen${nbh === 1 ? '' : 's'} (use a plain hyphen inside <span class="nobr">)`);
 }
 
 for (const page of pages) {
@@ -262,6 +272,191 @@ for (const page of pages) {
   }
 }
 
+// ---------- 4b. markup: ids, CSP-safe markup, the notices, share images ----------
+// The CSP is script-src 'self' and style-src 'self': no style attributes (in
+// HTML or SVG), no <style> elements, no inline event handlers and no inline
+// scripts other than JSON-LD and speculation rules.
+const decode = (s) =>
+  s.replace(/&(amp|quot|#39|lt|gt|nbsp);/g, (_, e) => ({ amp: '&', quot: '"', '#39': "'", lt: '<', gt: '>', nbsp: '\u00a0' })[e]);
+const plainText = (s) => decode(s.replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim();
+const TAG = /<([a-zA-Z][\w:-]*)((?:\s+[^\s=>/]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+))?)*)\s*\/?>/g;
+const ATTR = /([^\s=>/]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+)))?/g;
+/** Every start tag outside scripts and comments, as { name, attrs }. */
+function tagsOf(s) {
+  const markup = s.replace(/<!--[\s\S]*?-->/g, '').replace(/(<script\b[^>]*>)[\s\S]*?<\/script>/g, '$1</script>');
+  return [...markup.matchAll(TAG)].map((m) => {
+    const attrs = {};
+    for (const a of m[2].matchAll(ATTR)) attrs[a[1].toLowerCase()] = decode(a[2] ?? a[3] ?? a[4] ?? '');
+    return { name: m[1].toLowerCase(), attrs };
+  });
+}
+const cspOf = (policy) => Object.fromEntries(policy.split(';').map((d) => d.trim().split(/\s+/)).filter((d) => d[0]).map(([k, ...v]) => [k, v]));
+const IDREFS = ['aria-labelledby', 'aria-describedby', 'aria-controls', 'aria-owns', 'aria-activedescendant', 'aria-details', 'aria-errormessage', 'for', 'popovertarget', 'list', 'form'];
+const TRADEMARK = 'Pragmatic Play and game names are trademarks of their owners; we are not affiliated. Megaways is a trademark of Big Time Gaming. Nobody named here endorses this site.';
+const pragmaticJson = JSON.parse(await fs.readFile(path.join(ROOT, 'src/data/pragmatic-games.json'), 'utf8'));
+const symbolOf = new Map((pragmaticJson.games || []).map((g) => [g.slug, g.symbol]));
+const idsByPage = new Map(pages.map((p) => [p.path, new Set(tagsOf(p.html).map((t) => t.attrs.id).filter(Boolean))]));
+const pngSize = async (file) => {
+  const b = await fs.readFile(file);
+  return b.toString('ascii', 1, 4) === 'PNG' ? { w: b.readUInt32BE(16), h: b.readUInt32BE(20) } : null;
+};
+
+for (const page of pages) {
+  const s = page.html;
+  const rel = page.outFile;
+  const tags = tagsOf(s);
+  const ids = idsByPage.get(page.path);
+
+  // ids: unique, and every reference to one points at something on the page
+  const seen = new Map();
+  for (const t of tags) if ('id' in t.attrs) seen.set(t.attrs.id, (seen.get(t.attrs.id) || 0) + 1);
+  for (const [id, n] of seen) {
+    if (!id) problems.push(`${rel}: empty id attribute`);
+    else if (n > 1) problems.push(`${rel}: duplicate id "${id}" (${n} times)`);
+  }
+  for (const t of tags) {
+    for (const a of IDREFS) {
+      if (!(a in t.attrs) || (a === 'for' && t.name === 'output')) continue;
+      for (const ref of t.attrs[a].split(/\s+/).filter(Boolean)) if (!ids.has(ref)) problems.push(`${rel}: <${t.name} ${a}="${t.attrs[a]}"> points at no id "${ref}"`);
+    }
+    const href = t.name === 'a' ? t.attrs.href : undefined;
+    if (href?.includes('#') && href.length > 1) {
+      const [where, frag] = href.split('#');
+      const target = where === '' ? page.path : where.startsWith('/') ? where : null;
+      const theirs = target && idsByPage.get(target);
+      if (theirs && frag && !theirs.has(decodeURIComponent(frag))) problems.push(`${rel}: link ${href} points at no id "${frag}" on ${target}`);
+    }
+    // CSP: nothing inline
+    if ('style' in t.attrs) problems.push(`${rel}: inline style attribute on <${t.name}${t.attrs.class ? ` class="${t.attrs.class}"` : ''}> (the CSP blocks it)`);
+    for (const a of Object.keys(t.attrs)) if (/^on[a-z]+$/.test(a)) problems.push(`${rel}: inline event handler ${a} on <${t.name}> (the CSP blocks it)`);
+    if (/^\s*javascript:/i.test(t.attrs.href || '')) problems.push(`${rel}: javascript: link (the CSP blocks it)`);
+    if (t.name === 'style') problems.push(`${rel}: <style> element (the CSP blocks it; put the rules in src/styles/)`);
+    if (t.name === 'script' && !t.attrs.src && !['application/ld+json', 'speculationrules'].includes(t.attrs.type)) problems.push(`${rel}: inline <script> (the CSP blocks it)`);
+    // Nothing is fetched from another origin before the visitor asks for it.
+    const fetched = { img: 'src', script: 'src', iframe: 'src', source: 'src', video: 'src', audio: 'src', embed: 'src', object: 'data' }[t.name]
+      || (t.name === 'link' && /\b(stylesheet|preload|modulepreload|prefetch|preconnect|dns-prefetch|icon|manifest|apple-touch-icon)\b/.test(t.attrs.rel || '') ? 'href' : null);
+    if (fetched && /^(https?:)?\/\//.test(t.attrs[fetched] || '')) problems.push(`${rel}: <${t.name} ${fetched}="${t.attrs[fetched]}"> loads from another origin before interaction`);
+  }
+
+  // The age notice ribbon opens every page, with the disclaimer verbatim.
+  const ribbon = s.search(/<[a-z]+ class="age-notice"/);
+  const head = s.indexOf('<header class="masthead"');
+  if (ribbon < 0) problems.push(`${rel}: no .age-notice ribbon`);
+  else {
+    if (head >= 0 && ribbon > head) problems.push(`${rel}: the .age-notice ribbon comes after the masthead`);
+    const block = s.slice(ribbon, head > ribbon ? head : undefined);
+    if (!plainText(block).includes(ctx.disclaimer)) problems.push(`${rel}: the .age-notice ribbon doesn't carry the disclaimer verbatim`);
+  }
+
+  // Share images exist, at the size the page says.
+  const meta = (p) => tags.find((t) => t.name === 'meta' && (t.attrs.property === p || t.attrs.name === p))?.attrs.content;
+  for (const key of ['og:image', 'twitter:image']) {
+    const url = meta(key);
+    if (!url) {
+      problems.push(`${rel}: no ${key}`);
+      continue;
+    }
+    if (!url.startsWith(`${ctx.origin}/`)) {
+      problems.push(`${rel}: ${key} ${url} is not on ${ctx.origin}`);
+      continue;
+    }
+    const file = path.join(OUT, url.slice(ctx.origin.length));
+    const size = await pngSize(file).catch(() => undefined);
+    if (size === undefined) problems.push(`${rel}: ${key} ${url.slice(ctx.origin.length)} is not in the build`);
+    else if (key === 'og:image' && size && (size.w !== Number(meta('og:image:width')) || size.h !== Number(meta('og:image:height')))) {
+      problems.push(`${rel}: og:image is ${size.w}×${size.h}, the page says ${meta('og:image:width')}×${meta('og:image:height')}`);
+    }
+  }
+  for (const m of s.matchAll(/"(?:image|logo)":"(https:[^"]+)"/g)) {
+    if (m[1].startsWith(`${ctx.origin}/`)) await fs.access(path.join(OUT, m[1].slice(ctx.origin.length))).catch(() => problems.push(`${rel}: JSON-LD image ${m[1]} is not in the build`));
+  }
+
+  // frame-src names Pragmatic Play's host only while the demos are on.
+  const policy = tags.find((t) => t.name === 'meta' && t.attrs['http-equiv'] === 'Content-Security-Policy')?.attrs.content;
+  if (!policy) problems.push(`${rel}: no Content-Security-Policy meta tag`);
+  else {
+    const frames = cspOf(policy)['frame-src'] || [];
+    const hosts = ctx.pragmaticOn ? ctx.cfg.pragmatic.frameHosts || [] : ["'none'"];
+    if (frames.join(' ') !== hosts.join(' ')) problems.push(`${rel}: CSP frame-src is "${frames.join(' ')}", expected "${hosts.join(' ')}"`);
+  }
+
+  // Pragmatic Play: each demo page has one stage for its own game, with the markup pragmatic.js needs.
+  const stages = tags.filter((t) => t.attrs['data-game'] === 'pragmatic');
+  const game = ctx.games.find((g) => g.path === page.path);
+  if (!ctx.pragmaticOn) {
+    if (stages.length) problems.push(`${rel}: a Pragmatic Play stage while the demos are switched off`);
+    if (/pragmaticplay\.net/.test(s)) problems.push(`${rel}: mentions pragmaticplay.net while the demos are switched off`);
+    continue;
+  }
+  const footer = s.slice(s.indexOf('<footer class="colophon"'), s.indexOf('</footer>') + 9);
+  if (!plainText(footer).includes(TRADEMARK)) problems.push(`${rel}: the footer lacks the trademark line "${TRADEMARK.slice(0, 48)}…"`);
+  const want = game?.provider === 'pragmatic' ? game : page.path === '/' ? ctx.featured : null;
+  if (!want) {
+    if (stages.length) problems.push(`${rel}: a Pragmatic Play stage on a page that isn't a demo page`);
+    continue;
+  }
+  if (stages.length !== 1) {
+    problems.push(`${rel}: ${stages.length} Pragmatic Play stages, expected one for ${want.name}`);
+    continue;
+  }
+  const st = stages[0].attrs;
+  const symbol = symbolOf.get(want.slug);
+  if (st['data-symbol'] !== symbol) problems.push(`${rel}: stage data-symbol "${st['data-symbol']}" doesn't match pragmatic-games.json ("${symbol}" for ${want.slug})`);
+  if (st['data-name'] !== want.name) problems.push(`${rel}: stage data-name "${st['data-name']}" isn't "${want.name}"`);
+  if (st['data-state'] !== 'idle') problems.push(`${rel}: stage starts in state "${st['data-state']}", not idle`);
+  const stageHtml = s.slice(s.search(/<figure [^>]*data-game="pragmatic"/), s.indexOf('</figure>', s.search(/<figure [^>]*data-game="pragmatic"/)));
+  for (const hook of ['data-stage', 'data-action="load"', 'data-action="unload"', 'data-status', 'data-fallback', 'data-blocked']) {
+    if (!stageHtml.includes(hook)) problems.push(`${rel}: the stage has no [${hook}] (pragmatic.js needs it)`);
+  }
+  if (/<iframe\b/.test(stageHtml)) problems.push(`${rel}: the stage ships an iframe; it must be created only when Play is pressed`);
+}
+
+// frame-src in the hosting headers matches the pages, and the demo host is one of the allowed frame hosts.
+{
+  const headers = await fs.readFile(path.join(OUT, '_headers'), 'utf8');
+  const frames = cspOf(headers.match(/Content-Security-Policy: (.*)/)?.[1] || '')['frame-src'] || [];
+  const hosts = ctx.pragmaticOn ? ctx.cfg.pragmatic.frameHosts || [] : ["'none'"];
+  if (frames.join(' ') !== hosts.join(' ')) problems.push(`_headers: CSP frame-src is "${frames.join(' ')}", expected "${hosts.join(' ')}"`);
+  if (ctx.pragmaticOn) {
+    let origin = '';
+    try {
+      origin = new URL(cfg.pragmatic.demoUrl).origin;
+    } catch {}
+    if (!hosts.includes(origin)) problems.push(`site.config.json: pragmatic.demoUrl's origin "${origin}" isn't in pragmatic.frameHosts, so the CSP would block the demo`);
+  }
+}
+
+// src/data/pragmatic-games.json: checked whether or not the demos are on.
+{
+  const REL = 'src/data/pragmatic-games.json';
+  const list = Array.isArray(pragmaticJson.games) ? pragmaticJson.games : [];
+  if (!list.length) problems.push(`${REL}: no "games" list`);
+  const str = (v) => typeof v === 'string' && v.trim() !== '';
+  const strList = (v) => Array.isArray(v) && v.length > 0 && v.every(str);
+  const dupes = (key) => {
+    const counts = new Map();
+    for (const g of list) counts.set(g[key], (counts.get(g[key]) || 0) + 1);
+    for (const [v, n] of counts) if (n > 1) problems.push(`${REL}: ${key} "${v}" is used by ${n} games`);
+  };
+  list.forEach((g, i) => {
+    const at = `${REL}: games[${i}]${str(g.slug) ? ` (${g.slug})` : ''}`;
+    for (const k of ['slug', 'name', 'symbol', 'grid', 'pays', 'summary']) if (!str(g[k])) problems.push(`${at}: "${k}" is required`);
+    for (const k of ['tags', 'howItPlays']) if (!strList(g[k])) problems.push(`${at}: "${k}" must be a non-empty list of strings`);
+    if (str(g.slug) && !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(g.slug)) problems.push(`${at}: slug must be lower-case words joined by hyphens`);
+    if (str(g.symbol) && !/^[a-z0-9]+$/i.test(g.symbol)) problems.push(`${at}: symbol "${g.symbol}" isn't a Pragmatic gameSymbol`);
+    if (!['low', 'medium'].includes(g.appeal)) problems.push(`${at}: appeal must be "low" or "medium" (games with strong appeal to under-18s are left out: UK CAP)`);
+    if (g.rtp != null && !(typeof g.rtp === 'number' && g.rtp > 80 && g.rtp < 100)) problems.push(`${at}: rtp must be a percentage between 80 and 100, or null`);
+    if (g.released != null && !(Number.isInteger(g.released) && g.released >= 1990 && g.released <= 2100)) problems.push(`${at}: released must be a year, or null`);
+    if (g.topPayout != null && !(typeof g.topPayout === 'number' && g.topPayout > 0)) problems.push(`${at}: topPayout must be a positive number, or null`);
+    for (const k of ['features', 'verify']) if (g[k] != null && !(Array.isArray(g[k]) && g[k].every(str))) problems.push(`${at}: "${k}" must be a list of strings`);
+    if (str(g.slug) && !COVERS[g.slug]) problems.push(`${at}: no cover for "${g.slug}" in src/lib/art.mjs COVERS`);
+    if (ctx.houseGames.some((h) => h.slug === g.slug)) problems.push(`${at}: slug "${g.slug}" is taken by one of our own games`);
+  });
+  dupes('slug');
+  dupes('symbol');
+  dupes('name');
+}
+
 for (const [k, v] of Object.entries(cfg.operator)) {
   if (/\[.*\]/.test(v)) (strict ? problems : warnings).push(`site.config.json: operator.${k} is still a placeholder: "${v}"`);
 }
@@ -291,7 +486,7 @@ for (const m of firstView) {
 if (budget > 150 * 1024) problems.push(`home first view is ${kb(budget)} gzip, over the 150 KB budget`);
 
 // ---------- 5. report ----------
-console.log(`Built ${pages.length} pages into ${path.relative(process.cwd(), OUT) || '.'}/ (assets v${version}, sw ${swHash})`);
+console.log(`Built ${pages.length} pages into ${(path.relative(process.cwd(), OUT).startsWith('..') ? OUT : path.relative(process.cwd(), OUT)) || '.'}/ (assets v${version}, sw ${swHash})`);
 console.log(`Home first view (HTML + CSS + ${firstView.length} JS modules): ${kb(budget)} gzip of 150 KB budget`);
 for (const w of new Set(warnings.map((w) => w.replace(/^[^:]+: (missing image)/, '$1')))) console.warn(`warning: ${w}`);
 if (problems.length) {
