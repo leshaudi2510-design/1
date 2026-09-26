@@ -2,7 +2,7 @@
 import { settings } from './lib/settings.js';
 import { wallet } from './lib/wallet.js';
 import { fmt } from './lib/format.js';
-import { whenActivated, toast } from './lib/ui.js';
+import { whenActivated, toast, ask } from './lib/ui.js';
 import { startRg } from './lib/rg.js';
 import { startAgeGate } from './lib/age.js';
 import { startConsent } from './lib/consent.js';
@@ -34,10 +34,17 @@ function startSettings() {
     if (t.name === 'sound') settings.set('sound', t.checked);
     if (t.name === 'haptics') settings.set('haptics', t.checked);
   });
-  form.querySelector('[data-action="reset-balance"]')?.addEventListener('click', () => {
-    if (!window.confirm(`Reset your balance to ${fmt(config.currency.startingBalance)} ${config.currency.plural}?`)) return;
+  form.querySelector('[data-action="reset-balance"]')?.addEventListener('click', async () => {
+    const amount = `${fmt(config.currency.startingBalance)} ${config.currency.plural}`;
+    const ok = await ask({
+      title: 'Reset your balance?',
+      body: `Your balance goes back to ${amount}.`,
+      yes: `Reset to ${amount}`,
+      no: 'Keep my balance',
+    });
+    if (!ok) return;
     wallet.reset();
-    toast(`Balance reset to ${fmt(config.currency.startingBalance)} ${config.currency.plural}.`);
+    toast(`Balance reset to ${amount}.`);
   });
   document.addEventListener('click', (e) => {
     if (!e.target.closest('[data-open="settings"]')) return;

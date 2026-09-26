@@ -229,6 +229,30 @@ if (SHOTS) await fs.mkdir(SHOTS, { recursive: true });
     await pg.waitForTimeout(300);
     const open = await pg.evaluate(() => document.getElementById('settings').open);
     open && !e.length ? pass(`settings dialog opens at ${w}px`) : fail(`settings dialog at ${w}px: open=${open} ${e.join(' | ')}`);
+    // Centred on wide screens, a sheet on the bottom edge on narrow ones.
+    const gap = await pg.evaluate(() => {
+      const r = document.getElementById('settings').getBoundingClientRect();
+      const { clientWidth: vw, clientHeight: vh } = document.documentElement;
+      return { left: r.left, right: vw - r.right, bottom: vh - r.bottom };
+    });
+    const placed = w >= 640 ? gap.left > 24 && Math.abs(gap.left - gap.right) < 24 : Math.abs(gap.bottom) < 2;
+    placed ? pass(`settings dialog placed correctly at ${w}px`) : fail(`settings dialog misplaced at ${w}px: ${JSON.stringify(gap)}`);
+
+    // Confirmations use the site's own dialog, whose buttons name the action.
+    pg.on('dialog', (d) => (e.push(`native dialog: ${d.message()}`), d.dismiss()));
+    await pg.click('[data-action="reset-balance"]');
+    await pg.waitForTimeout(300);
+    const asked = await pg.evaluate(() => ({
+      open: document.getElementById('confirm').open,
+      yes: document.querySelector('#confirm [value="yes"]').textContent,
+      focus: document.activeElement.textContent,
+    }));
+    await pg.keyboard.press('Escape');
+    await pg.waitForTimeout(150);
+    const after = await pg.evaluate(() => ({ confirm: document.getElementById('confirm').open, settings: document.getElementById('settings').open }));
+    asked.open && /^Reset to /.test(asked.yes) && asked.focus === 'Keep my balance' && !after.confirm && after.settings && !e.length
+      ? pass(`reset asks first, names the action, Escape keeps the balance (${w}px)`)
+      : fail(`reset confirmation at ${w}px: ${JSON.stringify({ asked, after, e })}`);
     await c.close();
   }
   server.close();

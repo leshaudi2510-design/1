@@ -5,7 +5,7 @@ import { store } from './store.js';
 import { session } from './session.js';
 import { wallet } from './wallet.js';
 import { clock, fmt, spokenDuration, timeOfDay, dayAndDate, today } from './format.js';
-import { openDialog, toast } from './ui.js';
+import { openDialog, toast, ask } from './ui.js';
 import { sound } from './sound.js';
 
 const REMINDER_EVERY = 30 * 60; // seconds
@@ -200,12 +200,18 @@ export function startRg() {
     return `Games are paused on this device until ${timeOfDay(p.until)} on ${dayAndDate(p.until)}.`;
   };
   if (coolStatus) coolStatus.textContent = describePause();
-  document.querySelector('[data-rg="cooloff"]')?.addEventListener('click', (e) => {
+  document.querySelector('[data-rg="cooloff"]')?.addEventListener('click', async (e) => {
     const b = e.target.closest('[data-days]');
     if (!b) return;
     const days = Number(b.dataset.days);
     const label = days === 1 ? '24 hours' : `${days} days`;
-    if (!window.confirm(`Pause the games on this device for ${label}? You won't be able to undo this early.`)) return;
+    const ok = await ask({
+      title: `Pause the games for ${label}?`,
+      body: "They stay paused on this device until the time is up. You won't be able to undo this early.",
+      yes: `Pause for ${label}`,
+      no: 'Not now',
+    });
+    if (!ok) return;
     rg.startPause(days * 24 * 3600 * 1000, 'cooloff');
     coolStatus.textContent = describePause();
   });

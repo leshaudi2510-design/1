@@ -302,6 +302,17 @@ function dialogs(ctx) {
   </div>
 </dialog>
 
+<dialog id="confirm" class="sheet-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-body">
+  <form method="dialog">
+    <h2 id="confirm-title"></h2>
+    <p id="confirm-body"></p>
+    <div class="confirm__actions">
+      <button class="btn btn--primary" value="yes"></button>
+      <button class="btn btn--secondary" value="no" autofocus></button>
+    </div>
+  </form>
+</dialog>
+
 <dialog id="consent" class="sheet-dialog" aria-labelledby="consent-title">
   <form method="dialog" class="consent-manage">
     <header class="dialog__head">

@@ -32,6 +32,25 @@ export function openDialog(id) {
   return d;
 }
 
+/**
+ * Ask before an action, with buttons that name what happens (the native
+ * confirm() only offers OK and Cancel). Resolves true for `yes`; Escape
+ * or `no` resolves false.
+ */
+export function ask({ title, body = '', yes, no }) {
+  const d = document.getElementById('confirm');
+  if (!d) return Promise.resolve(false);
+  d.querySelector('#confirm-title').textContent = title;
+  const p = d.querySelector('#confirm-body');
+  p.textContent = body;
+  p.hidden = !body;
+  d.querySelector('[value="yes"]').textContent = yes;
+  d.querySelector('[value="no"]').textContent = no;
+  d.returnValue = '';
+  d.showModal();
+  return new Promise((resolve) => d.addEventListener('close', () => resolve(d.returnValue === 'yes'), { once: true }));
+}
+
 /** Run fn once the page is actually visible to the player (not prerendering). */
 export function whenActivated(fn) {
   if (document.prerendering) document.addEventListener('prerenderingchange', () => fn(), { once: true });

@@ -575,6 +575,8 @@
 
   /* Dialogs */
   dialog {
+    /* The reset's margin: 0 would pin modals to the top-left corner. */
+    margin: auto;
     color: var(--ink); background: var(--paper);
     border: 1.5px solid var(--ink); border-radius: var(--radius);
     padding: clamp(1.25rem, 4vw, 2rem);
@@ -589,7 +591,7 @@
   .settings, .consent-manage { display: grid; gap: 1.1rem; }
   .settings__note, .settings__more { font-size: var(--step--1); color: var(--ink-2); }
   .settings__carats { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; padding-block: 0.75rem; border-block: var(--hair); }
-  .age__actions, .rc__actions, .consent__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-block-start: 1.25rem; & .btn { flex: 1 1 10rem; } }
+  .age__actions, .rc__actions, .consent__actions, .confirm__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-block-start: 1.25rem; & .btn { flex: 1 1 10rem; } }
   .age__under { margin-block-start: 1.25rem; padding: 1rem; background: var(--paper-2); border-inline-start: 3px solid var(--red); }
   .age__fine, .fine { font-size: var(--step--1); color: var(--ink-2); }
   .age h2 { font-size: var(--step-4); }

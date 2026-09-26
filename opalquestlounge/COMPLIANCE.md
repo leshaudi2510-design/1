@@ -73,8 +73,8 @@
 | Фокус не теряется во время раунда | кнопки используют `aria-disabled`, а не `disabled` (`games/common.js:13`) | ✅ |
 | Результаты через `aria-live` (4.1.3) | `.game__result` с `aria-live="polite"`; canvas с `role="img"` и описанием каждой клетки, карманов и карт | ✅ |
 | Цели ≥ 24×24 (2.5.8) | кнопки ≥ 44 px, ячейки стола ≥ 44×44 px (на телефоне 40 px); axe `target-size` проходит | ✅ |
-| `prefers-reduced-motion` | `site.css:1057` отключает переходы и view transitions; игры показывают результат без анимации; опал неподвижен | ✅ |
-| `prefers-contrast: more` и forced colors | `site.css:1061`: без полупрозрачности, линии цвета текста, толще рамки; `forced-colors` | ✅ |
+| `prefers-reduced-motion` | `site.css:1063` отключает переходы и view transitions; игры показывают результат без анимации; опал неподвижен | ✅ |
+| `prefers-contrast: more` и forced colors | `site.css:1067`: без полупрозрачности, линии цвета текста, толще рамки; `forced-colors` | ✅ |
 | Диалоги | нативный `<dialog>`, фокус внутри, подписи через `aria-labelledby` | ✅ |
 | Прокручиваемые таблицы | `role="region"`, `tabindex="0"`, имя из `<caption>` (добавляет `build.mjs`) | ✅ |
 | Ничего не мигает чаще 3 раз в секунду (2.3.1) | вспышка опала — затухающая пульсация ≈ 2.2 Гц за 1.6 s, на небольшой площади; при reduced motion — одно ровное свечение | ✅ |
@@ -89,7 +89,7 @@
 | HTML + CSS + JS < 150 KB gzip | считает `build.mjs:278` | ~49 KB |
 | Шрифты: свои woff2, subset, swap, preload 1–2 | `src/public/assets/fonts/`, `tools/subset-fonts.py`, `font-display: swap` | ✅ |
 | Картинки AVIF/WebP с `width`/`height`, lazy ниже первого экрана | `<picture>` в `gameList()` (`src/lib/games-ui.mjs`) | ✅ |
-| Speculation Rules | `src/lib/layout.mjs:398`: prerender `/games/*` (moderate), prefetch остального; таймеры и age gate ждут `prerenderingchange` (`whenActivated` в `lib/ui.js`) | ✅ |
+| Speculation Rules | `src/lib/layout.mjs:409`: prerender `/games/*` (moderate), prefetch остального; таймеры и age gate ждут `prerenderingchange` (`whenActivated` в `lib/ui.js`) | ✅ |
 
 ## 6. Дизайн: что сделано из списка «конец 2026»
 
@@ -99,8 +99,8 @@
 | `light-dark()`, две отдельно продуманные темы | `site.css:107` и далее: «Daylight label» и «Velvet tray»; в тёмной теме кристаллы рисуются мелом, опал становится чёрным |
 | Вариативные оси `wght`, `wdth`, `opsz` (+ `SHRP`) | Bodoni `opsz`, Martian Mono `font-stretch`, Geologica `SHRP` на кнопках |
 | Живая играбельная сцена в hero | слот в первом экране (`src/pages/home.mjs`) |
-| Асимметричная сетка, subgrid, `text-wrap: balance`/`pretty` | hero на 12 колонках; ящики игр — `grid-template-columns: subgrid` (`site.css:681`) |
-| Cross-document View Transitions | `site.css:1010`: превью игры в ящике «перетекает» в сцену на странице игры |
+| Асимметричная сетка, subgrid, `text-wrap: balance`/`pretty` | hero на 12 колонках; ящики игр — `grid-template-columns: subgrid` (`site.css:676`) |
+| Cross-document View Transitions | `site.css:1016`: превью игры в ящике «перетекает» в сцену на странице игры |
 | Scroll-driven animations | ящики «выдвигаются» (`animation-timeline: view()`), прогресс чтения на юридических страницах (`scroll()`) |
 | `@starting-style`, `interpolate-size`, Popover API + anchor positioning, `<dialog>` | `site.css`: появление поповеров и диалогов; плавные `<details>`; меню игр и таблица выплат привязаны к кнопкам |
 | Container и style queries, `:has()`, `@scope`, nesting | `@container game`, `@container table` (стол рулетки встаёт вертикально), `@container style(--variant: hero)`, `@scope (.prose)` |
