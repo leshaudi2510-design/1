@@ -1,7 +1,7 @@
 import { html, esc } from '../lib/html.mjs';
 import { storageTable } from './cookies.mjs';
 import { pageHero, updatedPill, legalBody, ext, pageIcons } from './misc.mjs';
-import { PRAGMATIC_TERMS } from './terms.mjs';
+import { PRAGMATIC_TERMS, PRAGMATIC_PRIVACY } from './terms.mjs';
 
 export default function privacy(ctx) {
   const { op } = ctx;
@@ -46,7 +46,7 @@ export default function privacy(ctx) {
       <li>Pragmatic Play, and Google Analytics running inside the demo, may set cookies or read and write storage on your device under Pragmatic Play’s domain. The <a href="/cookies/#third-party">cookies page</a> explains this.</li>
       <li>The demo’s address carries only the game’s code and display settings, such as language. We don’t send Pragmatic Play your balance, your settings or anything else about you, and we don’t receive anything from inside the demo.</li>
     </ul>
-    <p>Pragmatic Play decides what its demos collect and how it uses that information. Its ${ext(PRAGMATIC_TERMS, 'terms of use')} apply inside the demo.</p>
+    <p>Pragmatic Play decides what its demos collect and how it uses that information, including through the Google Analytics it runs inside the demo. Its ${ext(PRAGMATIC_PRIVACY, 'privacy policy')} explains what it does with that information, and its ${ext(PRAGMATIC_TERMS, 'terms of use')} apply inside the demo.</p>
     <p>If you’d rather not connect to Pragmatic Play at all, don’t press Play. Our own tables, ${tables.join(' and ')}, work without it.</p>
     ${ctx.analyticsOn ? '<p>If you’ve allowed analytics, we also record that a demo was opened and which game it was. That record doesn’t include anything from inside the demo.</p>' : ''}`,
     },
@@ -77,7 +77,7 @@ export default function privacy(ctx) {
     {
       id: 'rights',
       title: 'Your rights',
-      body: html`<p>Under UK data protection law you have the right to access your personal data, have it corrected or deleted, restrict or object to how we use it, and receive a copy in a portable form. Where we rely on consent, you can take it back at any time. Email us and we’ll reply within one month.${pp ? ' For anything a demo collected, contact Pragmatic Play, because we don’t hold it.' : ''}</p>
+      body: html`<p>Under UK data protection law you have the right to access your personal data, have it corrected or deleted, restrict or object to how we use it, and receive a copy in a portable form. Where we rely on consent, you can take it back at any time. Email us and we’ll reply within one month.${pp ? ` For anything a demo collected, contact Pragmatic Play as set out in its ${ext(PRAGMATIC_PRIVACY, 'privacy policy')}, because we don’t hold it.` : ''}</p>
     <p>If you’re unhappy with how we’ve handled your data, you can complain to the Information Commissioner’s Office at ${ext('https://ico.org.uk/make-a-complaint/', 'ico.org.uk')} or on <a href="tel:+443031231113" class="nobr">0303 123 1113</a>. We’d appreciate the chance to put it right first.</p>`,
     },
     {
@@ -105,7 +105,7 @@ ${legalBody(sections, {
     'There are no accounts, and we never know your balance.',
     'Game data stays in your browser and isn’t sent to us.',
     ctx.analyticsOn ? 'Analytics only run if you say yes.' : 'We don’t run analytics or advertising trackers.',
-    pp ? 'Pressing Play on a demo connects you to Pragmatic Play, whose own terms then apply.' : 'Nothing loads from another company’s servers.',
+    pp ? 'Pressing Play on a demo connects you to Pragmatic Play, whose own terms and privacy policy then apply.' : 'Nothing loads from another company’s servers.',
   ],
 })}`;
   return page;
