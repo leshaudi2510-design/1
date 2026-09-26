@@ -1,0 +1,181 @@
+/* ---------- 11. Cover system ---------- */
+.cover{
+  position:relative;overflow:hidden;container-type:inline-size;isolation:isolate;
+  background:
+    radial-gradient(circle at 50% 36%, rgb(255 255 255 / .38), transparent 58%),
+    repeating-conic-gradient(from 4deg at 50% 36%, rgb(255 255 255 / .15) 0 7deg, transparent 7deg 20deg),
+    linear-gradient(170deg, var(--c1, #5B2BD6), var(--c2, #E0288F));
+}
+.cover::after{ /* Ben-Day shading under the title */
+  content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background-image:radial-gradient(circle, rgb(24 18 43 / .36) 34%, transparent 36%);background-size:7px 7px;
+  -webkit-mask-image:linear-gradient(to bottom, transparent 42%, #000 96%);
+          mask-image:linear-gradient(to bottom, transparent 42%, #000 96%)}
+.cover__art{position:absolute;z-index:0;left:0;top:1%;width:100%;height:auto;aspect-ratio:4/3}
+.cover__art .ink,.stage__art .ink,.tbl-art .ink{stroke:var(--k);stroke-width:4;stroke-linejoin:round;stroke-linecap:round}
+.cover__art .ink-t,.stage__art .ink-t,.tbl-art .ink-t{stroke:var(--k);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.ct{position:absolute;z-index:2;left:4%;right:4%;bottom:6%;margin:0;text-align:center;
+  font-family:var(--f-ui);font-weight:900;font-stretch:125%;text-transform:uppercase;font-size:var(--ct-size, 12.5cqi);line-height:.92;letter-spacing:-.01em;color:var(--k)}
+.ct small{display:block;font-size:.5em;font-stretch:112%;line-height:1;margin-bottom:.16em;color:var(--cream);-webkit-text-stroke:.26em var(--k);paint-order:stroke fill;letter-spacing:.02em;text-shadow:.06em .08em 0 var(--k)}
+.ct .rib{display:inline-block;margin-top:.34em;font-size:.36em;font-weight:800;font-stretch:115%;letter-spacing:.14em;line-height:1;
+  padding:.42em .7em .36em .84em;background:var(--k);color:var(--rib, var(--y));border-radius:3px;transform:rotate(-3deg)}
+/* "toon" lettering: ink stroke + extrusion underneath, gradient fill layered on top */
+.toon{position:relative;display:inline-block;max-width:100%;color:var(--k);-webkit-text-stroke:.15em var(--k);paint-order:stroke fill;
+  text-shadow:.04em .06em 0 var(--k), .07em .1em 0 var(--k)}
+.toon::after{content:attr(data-text) / "";position:absolute;inset:0;-webkit-text-stroke:0;text-shadow:none;color:transparent;
+  background:var(--tf, var(--tf-gold)) 0 0/100% 1lh repeat-y;-webkit-background-clip:text;background-clip:text;pointer-events:none}
+.badge{position:absolute;z-index:3;top:9px;left:9px;font:800 12px/1 var(--f-ui);font-stretch:110%;text-transform:uppercase;letter-spacing:.08em;
+  background:var(--cream);color:var(--k);border:2px solid var(--k);border-radius:var(--r-pill);padding:5px 9px 4px;transform:rotate(-4deg)}
+.badge--ours{background:var(--y)}
+/* numerals drawn inside a cover (the "1000" plaque) */
+.cover__num{font-family:var(--f-display);font-weight:900;font-stretch:112%;letter-spacing:-.02em}
+
+
+/* ---------- 13. Lobby ---------- */
+.lobby{padding:clamp(40px, 5vw, 72px) 0 var(--section)}
+.filters{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:28px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 16px;border:var(--bw-ctl) solid var(--ctl-line);border-radius:var(--r-pill);background:var(--surface);color:var(--text);
+  font:700 16px/1 var(--f-ui);font-stretch:104%;cursor:pointer;transition:transform .12s, box-shadow .12s}
+.chip .n{font:800 12px/1 var(--f-ui);min-width:22px;padding:4px 6px;border-radius:var(--r-pill);background:var(--text);color:var(--surface);text-align:center}
+.chip:hover{box-shadow:3px 3px 0 var(--pop);transform:translate(-1px,-1px)}
+.chip:active{transform:translate(1px,1px);box-shadow:0 0 0 var(--pop)}
+.chip[aria-pressed="true"]{background:var(--chip-on-bg);color:var(--chip-on-text);border-color:var(--k);box-shadow:3px 3px 0 var(--pop)}
+.chip[aria-pressed="true"] .n{background:var(--chip-on-text);color:var(--chip-on-bg)}
+.filters__count{margin-left:auto;font:700 15px/1.2 var(--f-ui);color:var(--text-2)}
+.grid{display:grid;grid-template-columns:repeat(5, minmax(0,1fr));gap:28px 22px}
+.tile{position:relative;display:flex;flex-direction:column;background:var(--surface);color:var(--text);
+  border:var(--bw) solid var(--line);border-radius:var(--r-tile);box-shadow:6px 6px 0 var(--tile-pop, var(--pop));transition:transform .15s ease, box-shadow .15s ease}
+.tile[hidden]{display:none}
+.tile .cover{aspect-ratio:5/6;border-bottom:var(--bw) solid var(--line);border-radius:calc(var(--r-tile) - 3px) calc(var(--r-tile) - 3px) 0 0}
+.tile__body{display:flex;flex-direction:column;gap:5px;padding:12px 14px 14px;flex:1}
+.tile__title{font:800 18px/1.15 var(--f-ui);font-stretch:100%}
+.tile__title a{color:inherit;text-decoration:none}
+.tile__title a::after{content:"";position:absolute;inset:calc(-1 * var(--bw));z-index:5;border-radius:var(--r-tile)}
+.tile:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 var(--tile-pop, var(--pop))}
+.tile:hover .tile__title a{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+.tile:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--tile-pop, var(--pop))}
+@supports selector(:has(a)){
+  .tile__title a:focus-visible{outline:none}
+  .tile:has(a:focus-visible){outline:4px solid var(--focus);outline-offset:5px}
+}
+.tile__prov{display:flex;align-items:center;gap:7px;font:600 14px/1.2 var(--f-body);color:var(--text-2)}
+.dot{width:11px;height:11px;border-radius:50%;border:2px solid var(--text);flex:none;display:inline-block}
+.dot--pp{background:var(--c)} .dot--oq{background:var(--m)}
+/* Two tags on one row. A tag that doesn't fit drops to a second row whole;
+   the ellipsis is a last resort for a single tag wider than the tile. */
+.tile__facts{display:flex;flex-wrap:wrap;gap:5px;margin-top:auto;padding-top:6px;min-width:0}
+.tile__facts span{font:700 12.5px/1 var(--f-ui);font-stretch:102%;padding:5px 8px;border:2px solid var(--ctl-line);border-radius:var(--r-pill);white-space:nowrap;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.tile__facts span:first-child{flex:none}
+.tile__short{display:none;color:var(--text-2);font-size:15.5px;line-height:1.5;margin-top:4px}
+
+/* The link to every game, under the home lobby */
+.lobby__more{display:flex;justify-content:center;margin-top:clamp(32px, 4vw, 48px)}
+
+/* Games index: titled groups (#slots, #tables) under one filter bar */
+.lobby--index{padding-top:clamp(28px, 3.4vw, 44px)}
+.lobby__group{scroll-margin-top:16px}
+.lobby__group + .lobby__group{margin-top:clamp(48px, 5vw, 72px)}
+.lobby__group .sechead{margin-bottom:22px}
+.lobby__group h2{font-size:clamp(28px, 1.8vw + 14px, 42px)}
+
+/* ---------- the side-by-side table (games index) ---------- */
+.rtp{padding:0 0 var(--section)}
+.rtp .table-wrap{margin-top:4px}
+.paytable--index{min-width:760px}
+.paytable--index tbody th{width:auto;color:var(--text);font-size:16.5px}
+.paytable--index tbody th a{color:inherit;text-decoration-color:var(--m);text-decoration-thickness:2px;text-underline-offset:4px;display:inline-block;padding:2px 0}
+.paytable--index tbody th a:hover{text-decoration-thickness:3px}
+.paytable--index td{font-size:16px;white-space:normal}
+.paytable--index td:last-child,.paytable--index td:nth-last-child(2){white-space:nowrap}
+.paytable--index td small{white-space:normal;max-width:16em}
+.paytable--index .rtp__prov{font:600 15px/1.3 var(--f-body);color:var(--text-2);white-space:nowrap}
+.rtp__prov .dot{display:inline-block;vertical-align:-1px;margin-right:7px}
+.rtp__none{font:500 15px/1.3 var(--f-body);color:var(--text-2)}
+.rtp__note{margin-top:16px;max-width:60em;color:var(--text-2);font-size:15.5px}
+
+
+/* ---------- responsive ---------- */
+/* Wide card: cover on the left, body beside it. Used by our tables at
+   600–1239px (so the lobby rows close), by the table pair on the games index
+   from 1240px, by the first slot on the games index when the slots are an odd
+   number (.grid--lead, from games-index.mjs), and by an odd first tile in a
+   short grid on phones. */
+@media (max-width: 1239px) and (min-width: 600px){
+  .grid{grid-template-columns:repeat(4, minmax(0,1fr))}
+  /* our two tables become wide cards so the grid closes on a full row */
+  .tile--table,.grid--lead > .tile:first-child{grid-column:span 2;flex-direction:row}
+  .tile--table .cover,.grid--lead > .tile:first-child .cover{width:46%;flex:none;border-bottom:0;border-right:var(--bw) solid var(--line);border-radius:calc(var(--r-tile) - 3px) 0 0 calc(var(--r-tile) - 3px)}
+  .tile--table .tile__body,.grid--lead > .tile:first-child .tile__body{padding:18px;justify-content:center;min-width:0}
+  .tile--table .tile__title,.grid--lead > .tile:first-child .tile__title{font-size:21px}
+  .tile--table .tile__facts,.grid--lead > .tile:first-child .tile__facts{margin-top:10px}
+  .grid--more .tile:nth-child(5){display:none}
+  .tile__facts{gap:4px}
+  .tile__body{padding-inline:12px}
+  .tile__facts span{padding:5px 7px;letter-spacing:-.005em}
+}
+/* Four columns at 721–819px are the narrowest tiles: the phone tag metrics
+   keep both tags on one row there. */
+@media (min-width: 721px) and (max-width: 819px){
+  .tile__body{padding-inline:10px}
+  .tile__facts span{font-size:11.5px;font-stretch:100%;letter-spacing:-.01em;padding:4px 5px}
+}
+/* the wide cards' one-line descriptions, wherever the card has room */
+@media (min-width: 1000px), (min-width: 600px) and (max-width: 720px){
+  .grid--pair .tile__short,.grid--lead > .tile:first-child .tile__short{display:block}
+}
+@media (min-width: 1240px){
+  .grid.grid--pair{grid-template-columns:repeat(2, minmax(0,1fr));gap:28px 32px}
+  /* a group whose rows close on four columns but not on five (games-index.mjs) */
+  .grid.grid--four{grid-template-columns:repeat(4, minmax(0,1fr))}
+  .grid--lead > .tile:first-child{grid-column:span 2}
+  .grid--pair .tile,.grid--lead > .tile:first-child{flex-direction:row}
+  .grid--pair .tile .cover,.grid--lead > .tile:first-child .cover{width:40%;flex:none;border-bottom:0;border-right:var(--bw) solid var(--line);border-radius:calc(var(--r-tile) - 3px) 0 0 calc(var(--r-tile) - 3px)}
+  .grid--pair .tile__body,.grid--lead > .tile:first-child .tile__body{padding:22px 24px;justify-content:center;gap:6px;min-width:0}
+  .grid--pair .tile__title,.grid--lead > .tile:first-child .tile__title{font-size:22px}
+  .grid--pair .tile__facts,.grid--lead > .tile:first-child .tile__facts{margin-top:14px}
+}
+/* Three games in all (the demos switched off): three columns, so the row
+   closes. On the games index the slot and the tables sit side by side on the
+   same three tracks. */
+@media (min-width: 721px){
+  .grid.grid--n3:not(.grid--more){grid-template-columns:repeat(3, minmax(0,1fr))}
+  .lobby__groups--split{display:grid;grid-template-columns:repeat(3, minmax(0,1fr));grid-template-rows:auto auto;gap:0 22px}
+  .lobby__groups--split > .lobby__group{display:grid;grid-row:span 2;grid-template-rows:subgrid;grid-template-columns:subgrid;grid-column:span 2}
+  .lobby__groups--split > .lobby__group:first-child{grid-column:span 1}
+  .lobby__groups--split > .lobby__group + .lobby__group{margin-top:0}
+  .lobby__groups--split .sechead{grid-column:1 / -1;display:block;align-self:start}
+  .lobby__groups--split h2{font-size:clamp(26px, 1.2vw + 14px, 34px)}
+  .lobby__groups--split .sechead p{margin-top:10px}
+  .lobby__groups--split .grid{grid-column:1 / -1;grid-template-columns:subgrid}
+}
+@media (max-width: 720px){
+  .filters{gap:8px}
+  .chip{min-height:42px;font-size:15px;padding:7px 12px}
+  .filters__count{width:100%;margin-left:0;font-size:14px}
+  .grid{grid-template-columns:repeat(2, minmax(0,1fr));gap:18px 14px}
+  .tile{border-radius:14px;box-shadow:4px 4px 0 var(--tile-pop, var(--pop))}
+  .tile .cover{border-radius:11px 11px 0 0}
+  .tile:hover{box-shadow:6px 6px 0 var(--tile-pop, var(--pop))}
+  .tile__title a::after{border-radius:14px}
+  .tile__body{padding:10px 8px 12px;gap:4px}
+  .tile__title{font-size:16px}
+  .tile__prov{font-size:13px;gap:6px}
+  .tile__facts{gap:4px}
+  .tile__facts span{font-size:11.5px;font-stretch:100%;letter-spacing:-.01em;padding:4px 5px}
+  .badge{font-size:10.5px;top:7px;left:7px;padding:4px 7px 3px}
+  .grid--more .tile:nth-child(5){display:none}
+  /* a grid with an odd tile out: the first one becomes a wide card */
+  :is(.grid--n1, .grid--n3, .grid--lead) > .tile:first-child{grid-column:1 / -1;flex-direction:row}
+  :is(.grid--n1, .grid--n3, .grid--lead) > .tile:first-child .cover{width:46%;flex:none;border-bottom:0;border-right:var(--bw) solid var(--line);border-radius:11px 0 0 11px}
+  :is(.grid--n1, .grid--n3, .grid--lead) > .tile:first-child .tile__body{padding:14px;justify-content:center;min-width:0}
+  :is(.grid--n1, .grid--n3, .grid--lead) > .tile:first-child .tile__title{font-size:18px}
+  :is(.grid--n1, .grid--n3, .grid--lead) > .tile:first-child .tile__facts{margin-top:8px}
+  .lobby__group .sechead{margin-bottom:16px}
+  .paytable--index{min-width:660px}
+  .paytable--index tbody th{font-size:15.5px}
+  .paytable--index td{font-size:15px}
+  .rtp__note{font-size:15px}
+}
+@media (max-width: 599px){
+  .grid{grid-template-columns:repeat(2, minmax(0,1fr))}
+}

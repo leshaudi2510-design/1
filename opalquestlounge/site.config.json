@@ -1,0 +1,51 @@
+{
+  "brand": "Opal Quest Lounge",
+  "shortName": "Opal Lounge",
+  "domain": "opalquestlounge.com",
+  "concept": "Ben-Day Brights: a pop-art print that plays like a slot lobby. Process yellow, cyan, magenta and red with ink outlines, halftone dots, starbursts and extruded lettering. Artwork shows objects and places only.",
+  "currency": {
+    "singular": "Carat",
+    "plural": "Carats",
+    "abbr": "ct",
+    "startingBalance": 1000,
+    "topUpAmount": 1000,
+    "topUpBelow": 100
+  },
+  "operator": {
+    "companyName": "[Operator company name] Ltd",
+    "companyNumber": "[Companies House number]",
+    "registeredIn": "England and Wales",
+    "address": "[Registered office address], United Kingdom",
+    "email": "hello@opalquestlounge.com"
+  },
+  "purchases": false,
+  "analytics": {
+    "ga4": "",
+    "adsConversionId": ""
+  },
+  "contactEndpoint": "",
+  "lastUpdated": "2026-09-26",
+  "legalUpdated": {
+    "terms": "2026-09-26",
+    "privacy": "2026-09-26",
+    "cookies": "2026-09-26"
+  },
+  "themeColor": {
+    "light": "#18122B",
+    "dark": "#0B0816"
+  },
+  "pragmatic": {
+    "enabled": true,
+    "writtenConsent": "",
+    "demoUrl": "https://demogamesfree.pragmaticplay.net/gs2c/openGame.do",
+    "params": {
+      "lang": "en",
+      "cur": "FUN",
+      "jurisdiction": "UK",
+      "websiteUrl": "https://demogamesfree.pragmaticplay.net"
+    },
+    "frameHosts": [
+      "https://demogamesfree.pragmaticplay.net"
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+/* ---------- 24. Preferences (last, so they win) ---------- */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+  .btn:hover,.btn:active,.tile:hover,.tile:active,.tool:hover,.tool:active,.chip:hover,.chip:active,.icon-btn:active,.segmented.chips label:hover,.segmented.chips label:has(input:checked){transform:none}
+}
+@media (prefers-contrast: more){
+  /* :root:root:root outranks the Night selectors, so it applies in both themes */
+  :root:root:root{--text-2:var(--text);--foot-text-2:var(--foot-text)}
+  .cover::after,.hero::after,.hero::before,.game-hero::before,.game-hero::after,.band::before,.twentyone__stage::after{display:none}
+  .settings__state{border-color:currentColor}
+}
+@media (forced-colors: active){
+  .btn,.chip,.tile,.status__balance,.status__session,.icon-btn,.step,.qa,.tool,.helpline,.stage,.paytable,.segmented,
+  .masthead,.sheet-dialog,.dialog__head,.toast,.consent-banner,.callout,.page-hero,.dock,.field select,.segmented label{border-color:CanvasText}
+  .chip[aria-pressed="true"],.segmented label:has(input:checked){forced-color-adjust:none;background:Highlight;color:HighlightText}
+  .cover,.stage__screen{forced-color-adjust:none}
+  .display,.prose h2,.dialog__head h2{text-shadow:none}
+  .cmyk{forced-color-adjust:none}
+  .age-mark{border-color:CanvasText;box-shadow:none}
+  /* the yellow marker under the current nav item and dock item becomes a system highlight */
+  .nav a[aria-current]{text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:6px}
+  .dock [aria-current] svg{forced-color-adjust:none;background:Highlight;color:HighlightText;border-color:HighlightText}
+  /* switches draw their own track and knob */
+  .switch > input{forced-color-adjust:none;border-color:CanvasText;background:Canvas}
+  .switch > input::after{background:CanvasText}
+  .switch > input:checked{background:Highlight;border-color:Highlight}
+  .switch > input:checked::after{background:HighlightText}
+  .toast svg{forced-color-adjust:none;background:CanvasText;color:Canvas}
+  :focus-visible{outline-color:Highlight}
+}

@@ -1,0 +1,23 @@
+{
+  "name": "opalquestlounge",
+  "private": true,
+  "description": "Opal Quest Lounge: a free-to-play social casino site. Static HTML, CSS and JS.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "build:strict": "node build.mjs --strict",
+    "build:off": "node build.mjs --no-pragmatic",
+    "serve": "node tools/serve.mjs dist 8080",
+    "images": "node tools/make-images.mjs",
+    "check": "node tools/check.mjs",
+    "simulate:21": "node tools/simulate-21.mjs 20000000"
+  },
+  "devDependencies": {
+    "axe-core": "^4.13.0",
+    "playwright": "1.56.1",
+    "sharp": "^0.34.4"
+  }
+}
