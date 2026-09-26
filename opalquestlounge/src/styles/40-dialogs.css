@@ -30,3 +30,10 @@
   padding:12px 18px 12px 12px;background:var(--y);color:var(--k);border:var(--bw) solid var(--k);border-radius:12px;box-shadow:6px 6px 0 var(--pop);font:700 16px/1.35 var(--f-ui)}
 .toast svg{width:26px;height:26px;flex:none;padding:3px;border-radius:50%;background:var(--k);color:var(--y)}
 .toast--static{position:static;transform:none;display:inline-flex}
+
+
+/* ---------- responsive ---------- */
+@media (max-width: 720px){
+  .sheet-dialog{box-shadow:6px 6px 0 var(--pop)}
+  .toast{bottom:calc(86px + env(safe-area-inset-bottom))}
+}

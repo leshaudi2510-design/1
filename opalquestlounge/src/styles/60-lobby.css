@@ -62,3 +62,34 @@
 .tile__facts{display:flex;flex-wrap:nowrap;gap:5px;margin-top:auto;padding-top:6px;min-width:0}
 .tile__facts span{font:700 12.5px/1 var(--f-ui);font-stretch:102%;padding:5px 8px;border:2px solid var(--ctl-line);border-radius:var(--r-pill);white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .tile__facts span:first-child{flex:none}
+
+
+/* ---------- responsive ---------- */
+@media (max-width: 1239px) and (min-width: 600px){
+  .grid{grid-template-columns:repeat(4, minmax(0,1fr))}
+  /* our two tables become wide cards so the grid closes on a full row */
+  .tile--table{grid-column:span 2;flex-direction:row}
+  .tile--table .cover{width:46%;flex:none;border-bottom:0;border-right:var(--bw) solid var(--line);border-radius:calc(var(--r-tile) - 3px) 0 0 calc(var(--r-tile) - 3px)}
+  .tile--table .tile__body{padding:18px;justify-content:center}
+  .tile--table .tile__title{font-size:21px}
+  .tile--table .tile__facts{margin-top:10px}
+  .grid--more .tile:nth-child(5){display:none}
+}
+@media (max-width: 720px){
+  .filters{gap:8px}
+  .chip{min-height:42px;font-size:15px;padding:7px 12px}
+  .filters__count{width:100%;margin-left:0;font-size:14px}
+  .grid{grid-template-columns:repeat(2, minmax(0,1fr));gap:18px 14px}
+  .tile{border-radius:14px;box-shadow:4px 4px 0 var(--tile-pop, var(--pop))}
+  .tile .cover{border-radius:11px 11px 0 0}
+  .tile:hover{box-shadow:6px 6px 0 var(--tile-pop, var(--pop))}
+  .tile__title a::after{border-radius:14px}
+  .tile__body{padding:10px 10px 12px;gap:4px}
+  .tile__title{font-size:16px}
+  .tile__prov{font-size:13px;gap:6px}
+  .tile__facts span{font-size:11.5px;padding:4px 6px}
+  .badge{font-size:10.5px;top:7px;left:7px;padding:4px 7px 3px}
+}
+@media (max-width: 599px){
+  .grid{grid-template-columns:repeat(2, minmax(0,1fr))}
+}

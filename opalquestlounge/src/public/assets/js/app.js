@@ -83,21 +83,8 @@ whenActivated(() => {
   startAgeGate();
 });
 
-// The opal is decoration. It wakes on the visitor's first move (pointer,
-// touch, key or scroll) and until then a still drawing stands in, so the
-// WebGL start-up never competes with loading the page.
-const WAKE = ['pointermove', 'pointerdown', 'keydown', 'scroll', 'touchstart'];
-let awake = false;
-async function wakeOpals() {
-  if (awake) return;
-  awake = true;
-  WAKE.forEach((t) => removeEventListener(t, wakeOpals, { capture: true }));
-  document.dispatchEvent(new Event('oql:opal'));
-  if (!document.querySelector('canvas[data-opal]')) return;
-  const { startOpals } = await import('./lib/opal.js');
-  startOpals();
-}
-whenActivated(() => WAKE.forEach((t) => addEventListener(t, wakeOpals, { capture: true, passive: true })));
+// ---------- lobby filters ----------
+if (document.querySelector('[data-filters]')) import('./lib/lobby.js').then((m) => m.startLobby());
 
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
