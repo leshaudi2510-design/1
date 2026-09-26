@@ -133,6 +133,9 @@ function fillStats(root = document) {
   root.querySelectorAll('[data-playtime]').forEach((el) => (el.textContent = spokenDuration(playtime().seconds)));
 }
 
+// The game (a [data-game] root) that had focus when the reality check opened.
+let rcFrom = null;
+
 function showReminder() {
   const d = document.getElementById('reality-check-dialog');
   if (!d) return;
@@ -140,6 +143,7 @@ function showReminder() {
   fillStats(d);
   d.querySelectorAll('[data-balance]').forEach((el) => (el.textContent = fmt(wallet.settled)));
   sound.soft();
+  if (!d.open) rcFrom = document.activeElement?.closest?.('[data-game]') || null;
   openDialog('reality-check-dialog');
 }
 
@@ -202,9 +206,20 @@ export function startRg() {
   rc?.addEventListener('click', (e) => {
     const b = e.target.closest('[data-rc]');
     if (!b) return;
-    // Close first, so the confirmation lands on the page, not in the closing dialog.
+    // Close first: focus goes back to the control that had it while that is
+    // still shown, so a demo stage the break is about to block can move it on.
     rc.close();
     if (b.dataset.rc === 'break') shortBreak();
+  });
+  // The browser can't give focus back into a game's frame, or to a control
+  // the break has hidden; it would fall to <body>. Then the game the check
+  // interrupted puts it somewhere visible. (This runs for Escape too.)
+  rc?.addEventListener('close', () => {
+    const game = rcFrom;
+    rcFrom = null;
+    const a = document.activeElement;
+    if (a && a !== document.body && !rc.contains(a) && a.checkVisibility?.() !== false) return;
+    game?.dispatchEvent(new CustomEvent('oql:refocus'));
   });
   document.addEventListener('click', (e) => {
     const b = e.target.closest('[data-action="break-5"]');

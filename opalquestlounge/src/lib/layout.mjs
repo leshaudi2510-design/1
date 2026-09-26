@@ -32,6 +32,11 @@ export function csp(ctx) {
   try {
     if (ctx.cfg.contactEndpoint) endpoint = ' ' + new URL(ctx.cfg.contactEndpoint).origin;
   } catch {}
+  // While the demos are on, pragmatic.js checks that the demo's address can be
+  // reached (a no-cors request, after Play) alongside the frame, so connect-src
+  // lists the same hosts as frame-src.
+  const frameHosts = ctx.pragmaticOn ? ctx.cfg.pragmatic.frameHosts || [] : [];
+  const demoConnect = frameHosts.length ? ' ' + frameHosts.join(' ') : '';
   return [
     "default-src 'self'",
     // The two inline scripts by hash: with a hash in script-src, Chromium
@@ -40,11 +45,11 @@ export function csp(ctx) {
     "style-src 'self'",
     `img-src 'self' data: blob:${gImg}`,
     "font-src 'self'",
-    `connect-src 'self'${gConnect}${endpoint}`,
+    `connect-src 'self'${gConnect}${endpoint}${demoConnect}`,
     "manifest-src 'self'",
     "worker-src 'self'",
     // Pragmatic Play demos, loaded only when the visitor presses "Play demo".
-    `frame-src ${(ctx.pragmaticOn && ctx.cfg.pragmatic.frameHosts?.join(' ')) || "'none'"}`,
+    `frame-src ${frameHosts.join(' ') || "'none'"}`,
     "object-src 'none'",
     "base-uri 'self'",
     `form-action 'self' mailto:${endpoint}`,
@@ -427,12 +432,15 @@ function dialogs(ctx) {
       ${close('Close cookie settings')}
     </header>
     <div class="dialog__body">
-      <p>We use storage on your device to run the games. That’s always on, because the site can’t work without it. Anything else is off until you switch it on.</p>
+      <p>We use storage on your device to run the games. That’s always on, because the site can’t work without it. Anything else is off until you switch it on.${ctx.pragmaticOn ? ' Slot demos are the exception: they load from Pragmatic Play only when you press Play, and Pragmatic Play and Google Analytics inside them may then set cookies under pragmaticplay.net.' : ''}</p>
       <div class="settings__switches">
         <label class="switch is-locked"><input type="checkbox" role="switch" checked disabled><span>Strictly necessary</span><small>Your balance, age answer, settings, limits and this choice. Kept on your device.</small></label>
         ${ctx.cfg.analytics?.ga4
-          ? '<label class="switch"><input type="checkbox" role="switch" name="analytics"><span>Analytics</span><small>Google Analytics 4 counts visits and which games are played. Sets _ga cookies.</small></label>'
-          : '<p class="switch is-off"><span>Analytics</span><small>Not in use. We don’t run any analytics at the moment.</small></p>'}
+          ? `<label class="switch"><input type="checkbox" role="switch" name="analytics"><span>Analytics</span><small>Google Analytics 4 counts visits and which games are played. Sets _ga cookies.${ctx.pragmaticOn ? ' This doesn’t cover the analytics inside Pragmatic Play demos.' : ''}</small></label>`
+          : `<p class="switch is-off"><span>Analytics</span><small>Not in use. We don’t run any analytics${ctx.pragmaticOn ? ' of our own' : ''} at the moment.</small></p>`}
+        ${ctx.pragmaticOn
+          ? '<p class="switch is-off"><span>Pragmatic Play demos</span><small>Load only when you press Play on a slot. Pragmatic Play, and Google Analytics inside the demo, may then set cookies. If you choose Reject all, each Play button asks first.</small></p>'
+          : ''}
         ${ctx.cfg.analytics?.adsConversionId
           ? '<label class="switch"><input type="checkbox" role="switch" name="ads"><span>Advertising measurement</span><small>Google Ads tells us whether an advert led to a visit. Sets Google Ads cookies.</small></label>'
           : ''}

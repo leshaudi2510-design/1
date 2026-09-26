@@ -127,7 +127,7 @@ ${pageHero(page, {
       </section>
       <section aria-labelledby="ed-title">
         <h2 id="ed-title">How we write this site</h2>
-        <p>${pp ? 'We write the slot descriptions ourselves from Pragmatic Play’s published game information. ' : ''}The rules and figures for our own games are checked against the code that runs them. We review the content whenever a game changes. This page was last updated on <time datetime="${ctx.updatedIso}">${ctx.updated}</time>.</p>
+        <p>${pp ? 'We write the slot descriptions ourselves from Pragmatic Play’s announcements and independent reviews. ' : ''}The rules and figures for our own games are checked against the code that runs them. We review the content whenever a game changes. This page was last updated on <time datetime="${ctx.updatedIso}">${ctx.updated}</time>.</p>
       </section>
     </div>
   </div>

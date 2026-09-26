@@ -21,6 +21,10 @@ function disclaimer(ctx) {
   return `<p class="game__disclaimer"><span>${esc(ctx.disclaimer)}</span> <span class="game__purchases">${note}</span></p>`;
 }
 
+// Asks the age question again if it was closed without an answer; common.js
+// shows it only while that is why the game is locked.
+const AGE_ASK = '<p data-age-ask hidden><button type="button" class="btn btn--secondary btn--sm" data-open="age-gate" aria-haspopup="dialog">Confirm my age</button></p>';
+
 function stakeField(name, stakes, cur) {
   return html`<fieldset class="segmented stake">
     <legend>Stake <span class="visually-hidden">in ${esc(cur.plural)}</span></legend>
@@ -101,6 +105,7 @@ export function slotPanel(ctx, { variant = 'page', headingId = 'play-slot', head
     <div class="slot__side">
       <div class="game__controls">
         <p class="game__result" data-result aria-live="polite" aria-atomic="true">Choose a stake and spin. Opal stands in for any mineral.</p>
+        ${AGE_ASK}
         <div class="game__buttons">
           <button type="button" class="btn btn--primary btn--play" data-action="spin" aria-disabled="true">${playLabel('Spin', STAKES[0], ctx.cur)}</button>
           ${topUp(ctx)}
@@ -148,6 +153,7 @@ export function wheelPanel(ctx, { headingId = 'play-wheel', headingLevel = 2 } =
     </div>
     <div class="wheel__table">
       <p class="game__result" data-result aria-live="polite" aria-atomic="true">Pick a chip, place it on the table, then spin.</p>
+      ${AGE_ASK}
       <fieldset class="segmented chips">
         <legend>Chip value <span class="visually-hidden">in ${esc(ctx.cur.plural)}</span></legend>
         ${CHIPS.map((c, i) => `<label class="chip-${c}"><input type="radio" name="lw-chip" value="${c}"${i === 0 ? ' checked' : ''}><span class="num">${c}</span></label>`)}
@@ -208,6 +214,7 @@ export function twentyOnePanel(ctx, { headingId = 'play-21', headingLevel = 2 } 
     <div class="twentyone__side">
       <div class="game__controls">
         <p class="game__result" data-result aria-live="polite" aria-atomic="true">Choose a stake, then deal.</p>
+        ${AGE_ASK}
         <p class="twentyone__hint" data-hint-text aria-live="polite" hidden></p>
         <div class="game__buttons twentyone__moves" role="group" aria-label="Your move">
           <button type="button" class="btn btn--secondary" data-action="hit" aria-disabled="true">Hit</button>

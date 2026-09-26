@@ -2,7 +2,9 @@
 // Static site build. No dependencies: Node 20 or later.
 //
 //   node build.mjs                  build into dist/
-//   node build.mjs --strict         also fail on placeholder operator details
+//   node build.mjs --strict         also fail on placeholder operator details and,
+//                                   with the demos on, on an empty
+//                                   pragmatic.writtenConsent or a Google Ads ID
 //   node build.mjs --no-pragmatic   build with the Pragmatic Play demos switched
 //                                   off (our own slot, Seven Systems, instead)
 //
@@ -64,9 +66,18 @@ const write = async (rel, data) => {
 const gz = (buf) => zlib.gzipSync(buf, { level: 9 }).length;
 const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
 
+const pragmaticJson = JSON.parse(await fs.readFile(path.join(ROOT, 'src/data/pragmatic-games.json'), 'utf8'));
+
 // ---------- 1. copy public files ----------
 await fs.rm(OUT, { recursive: true, force: true });
 await fs.cp(PUBLIC, OUT, { recursive: true });
+// With the demos switched off, nothing of theirs ships: not the demo script,
+// not the address builder, and no share card that shows their games (the
+// home page then uses og-home-house.png).
+if (!ctx.pragmaticOn) {
+  const theirs = ['assets/js/games/pragmatic.js', 'assets/js/lib/pragmatic-url.js', 'assets/img/og-home.png', ...(pragmaticJson.games || []).map((g) => `assets/img/og-${g.slug}.png`)];
+  for (const rel of theirs) await fs.rm(path.join(OUT, rel), { force: true });
+}
 
 /**
  * A safe, dependency-free CSS minifier: drops comments, collapses runs of
@@ -129,7 +140,7 @@ await write(
       currency: cfg.currency,
       analytics: cfg.analytics,
       contactEndpoint: cfg.contactEndpoint,
-      pragmatic: { demoUrl: cfg.pragmatic?.demoUrl, params: cfg.pragmatic?.params },
+      pragmatic: ctx.pragmaticOn ? { enabled: true, demoUrl: cfg.pragmatic.demoUrl, params: cfg.pragmatic.params } : { enabled: false },
       version,
     },
     null,
@@ -252,7 +263,10 @@ const visibleText = (s) =>
     .replace(/<[^>]+>/g, ' ')
     .replace(/&[a-z#0-9]+;/gi, ' ');
 
-const FORBIDDEN = [/\bdeposit/i, /\bwithdraw/i, /cash[\s-]?out/i, /bonus code/i, /real[\s-]money wins?/i, /win big/i, /jackpot/i, /\bhurry\b/i, /don[’']t miss out/i];
+// The last one: no ranking the games against each other ("the highest of the
+// games here"). It draws attention to the biggest payout, and the line-up changes.
+const FORBIDDEN = [/\bdeposit/i, /\bwithdraw/i, /cash[\s-]?out/i, /bonus code/i, /real[\s-]money wins?/i, /win big/i, /jackpot/i, /\bhurry\b/i, /don[’']t miss out/i,
+  /\b(highest|biggest|largest|best)\b[^.]{0,40}\b(of the games|on the site|here)\b/i];
 const AMERICAN = [/\bcolor\b/i, /\bfavor/i, /\bcenter\b/i, /\bbehavior/i, /\bgray\b/i, /\borganization\b/i, /\bcatalog\b/i, /\blicense\b/i, /\banalyz/i, /\bcustomiz/i, /\boptimiz/i, /\bjewelry\b/i];
 
 // Apostrophes: the copy uses ’ (U+2019); a straight ' beside it looks
@@ -287,7 +301,12 @@ for (const f of files) {
   const rel = path.relative(OUT, f);
   const src = await fs.readFile(f, 'utf8');
   const text = /\.html$/.test(f) ? visibleText(src) : src;
-  for (const re of FORBIDDEN) if (re.test(text)) problems.push(`${rel}: forbidden wording ${re}`);
+  for (const re of FORBIDDEN) if (re.test(text)) problems.push(`${rel}: forbidden wording ${re} ("${text.match(re)[0].replace(/\s+/g, ' ')}")`);
+  // With the demos off, no script or data file points at Pragmatic Play's servers (pages: see 4b).
+  if (!ctx.pragmaticOn && !/\.html$/.test(f) && /pragmaticplay\.net/.test(src)) problems.push(`${rel}: mentions pragmaticplay.net while the demos are switched off`);
+  // With them on, the pages still carry no playable demo address: a demo opened
+  // outside our page would escape the session clock, reality checks and limits.
+  if (/\.html$/.test(f) && /openGame\.do/.test(src)) problems.push(`${rel}: contains a playable Pragmatic Play demo address (openGame.do); only pragmatic.js builds it, after Play`);
   if (/\.html$/.test(f)) for (const re of AMERICAN) if (re.test(text)) problems.push(`${rel}: American spelling ${re}`);
   // U+2011 (non-breaking hyphen) is missing from the subset fonts and reads oddly aloud; keep words together with .nobr instead.
   const nbh = src.split('\u2011').length - 1;
@@ -374,9 +393,25 @@ function tagsOf(s) {
   });
 }
 const cspOf = (policy) => Object.fromEntries(policy.split(';').map((d) => d.trim().split(/\s+/)).filter((d) => d[0]).map(([k, ...v]) => [k, v]));
+/**
+ * The demo hosts in a CSP: frame-src is exactly the frame hosts while the
+ * demos are on ('none' while they're off), and connect-src lists them too
+ * (pragmatic.js checks the demo can be reached) only while they're on.
+ */
+function demoCspProblems(policy, where) {
+  const out = [];
+  const csp = cspOf(policy);
+  const hosts = ctx.pragmaticOn ? ctx.cfg.pragmatic.frameHosts || [] : [];
+  const frames = csp['frame-src'] || [];
+  const wantFrames = hosts.length ? hosts : ["'none'"];
+  if (frames.join(' ') !== wantFrames.join(' ')) out.push(`${where}: CSP frame-src is "${frames.join(' ')}", expected "${wantFrames.join(' ')}"`);
+  const connect = csp['connect-src'] || [];
+  for (const h of hosts) if (!connect.includes(h)) out.push(`${where}: CSP connect-src lacks the demo host ${h}, so the demo's reachability check would fail`);
+  for (const h of ctx.cfg.pragmatic?.frameHosts || []) if (!ctx.pragmaticOn && connect.includes(h)) out.push(`${where}: CSP connect-src names the demo host ${h} while the demos are switched off`);
+  return out;
+}
 const IDREFS = ['aria-labelledby', 'aria-describedby', 'aria-controls', 'aria-owns', 'aria-activedescendant', 'aria-details', 'aria-errormessage', 'for', 'popovertarget', 'list', 'form'];
 const TRADEMARK = 'Pragmatic Play and game names are trademarks of their owners; we are not affiliated. Megaways is a trademark of Big Time Gaming. Nobody named here endorses this site.';
-const pragmaticJson = JSON.parse(await fs.readFile(path.join(ROOT, 'src/data/pragmatic-games.json'), 'utf8'));
 const symbolOf = new Map((pragmaticJson.games || []).map((g) => [g.slug, g.symbol]));
 const idsByPage = new Map(pages.map((p) => [p.path, new Set(tagsOf(p.html).map((t) => t.attrs.id).filter(Boolean))]));
 const pngSize = async (file) => {
@@ -453,7 +488,7 @@ for (const page of pages) {
     if (m[1].startsWith(`${ctx.origin}/`)) await fs.access(path.join(OUT, m[1].slice(ctx.origin.length))).catch(() => problems.push(`${rel}: JSON-LD image ${m[1]} is not in the build`));
   }
 
-  // frame-src names Pragmatic Play's host only while the demos are on.
+  // frame-src and connect-src name Pragmatic Play's host only while the demos are on.
   const policy = tags.find((t) => t.name === 'meta' && t.attrs['http-equiv'] === 'Content-Security-Policy')?.attrs.content;
   // An inline script runs only if the CSP names the hash of its exact text (JSON-LD is data and isn't run).
   const scriptSrc = policy ? cspOf(policy)['script-src'] || [] : [];
@@ -463,11 +498,7 @@ for (const page of pages) {
     if (!scriptSrc.includes(hash)) problems.push(`${rel}: inline <script${m[1]}> whose hash isn't in the CSP's script-src (the CSP blocks it)`);
   }
   if (!policy) problems.push(`${rel}: no Content-Security-Policy meta tag`);
-  else {
-    const frames = cspOf(policy)['frame-src'] || [];
-    const hosts = ctx.pragmaticOn ? ctx.cfg.pragmatic.frameHosts || [] : ["'none'"];
-    if (frames.join(' ') !== hosts.join(' ')) problems.push(`${rel}: CSP frame-src is "${frames.join(' ')}", expected "${hosts.join(' ')}"`);
-  }
+  else problems.push(...demoCspProblems(policy, rel));
 
   // Pragmatic Play: each demo page has one stage for its own game, with the markup pragmatic.js needs.
   const stages = tags.filter((t) => t.attrs['data-game'] === 'pragmatic');
@@ -494,24 +525,22 @@ for (const page of pages) {
   if (st['data-name'] !== want.name) problems.push(`${rel}: stage data-name "${st['data-name']}" isn't "${want.name}"`);
   if (st['data-state'] !== 'idle') problems.push(`${rel}: stage starts in state "${st['data-state']}", not idle`);
   const stageHtml = s.slice(s.search(/<figure [^>]*data-game="pragmatic"/), s.indexOf('</figure>', s.search(/<figure [^>]*data-game="pragmatic"/)));
-  for (const hook of ['data-stage', 'data-action="load"', 'data-action="unload"', 'data-status', 'data-fallback', 'data-blocked']) {
+  for (const hook of ['data-stage', 'data-action="load"', 'data-action="unload"', 'data-status', 'data-blocked']) {
     if (!stageHtml.includes(hook)) problems.push(`${rel}: the stage has no [${hook}] (pragmatic.js needs it)`);
   }
   if (/<iframe\b/.test(stageHtml)) problems.push(`${rel}: the stage ships an iframe; it must be created only when Play is pressed`);
 }
 
-// frame-src in the hosting headers matches the pages, and the demo host is one of the allowed frame hosts.
+// frame-src and connect-src in the hosting headers match the pages, and the demo host is one of the allowed frame hosts.
 {
   const headers = await fs.readFile(path.join(OUT, '_headers'), 'utf8');
-  const frames = cspOf(headers.match(/Content-Security-Policy: (.*)/)?.[1] || '')['frame-src'] || [];
-  const hosts = ctx.pragmaticOn ? ctx.cfg.pragmatic.frameHosts || [] : ["'none'"];
-  if (frames.join(' ') !== hosts.join(' ')) problems.push(`_headers: CSP frame-src is "${frames.join(' ')}", expected "${hosts.join(' ')}"`);
+  problems.push(...demoCspProblems(headers.match(/Content-Security-Policy: (.*)/)?.[1] || '', '_headers'));
   if (ctx.pragmaticOn) {
     let origin = '';
     try {
       origin = new URL(cfg.pragmatic.demoUrl).origin;
     } catch {}
-    if (!hosts.includes(origin)) problems.push(`site.config.json: pragmatic.demoUrl's origin "${origin}" isn't in pragmatic.frameHosts, so the CSP would block the demo`);
+    if (!(ctx.cfg.pragmatic.frameHosts || []).includes(origin)) problems.push(`site.config.json: pragmatic.demoUrl's origin "${origin}" isn't in pragmatic.frameHosts, so the CSP would block the demo`);
   }
 }
 
@@ -548,6 +577,23 @@ for (const page of pages) {
 
 for (const [k, v] of Object.entries(cfg.operator)) {
   if (/\[.*\]/.test(v)) (strict ? problems : warnings).push(`site.config.json: operator.${k} is still a placeholder: "${v}"`);
+}
+
+// The Pragmatic Play demos: open decisions and unchecked facts (COMPLIANCE.md, section "Режим Pragmatic").
+if (ctx.pragmaticOn) {
+  // Pragmatic's terms allow its games only with its express written consent.
+  if (!String(cfg.pragmatic.writtenConsent || '').trim()) {
+    (strict ? problems : warnings).push('site.config.json: pragmatic.writtenConsent is empty. Record Pragmatic Play\'s written consent (reference and date) before launch, or build with --no-pragmatic');
+  }
+  // Google's social casino policy bars names associated with real-money gambling brands.
+  if (cfg.analytics?.adsConversionId) {
+    (strict ? problems : warnings).push('site.config.json: Google Ads measurement is set while the Pragmatic Play demos are on. Advertise a --no-pragmatic build instead (COMPLIANCE.md, section "Режим Pragmatic")');
+  }
+  // Facts in "verify" must be checked in each demo's i screen before launch.
+  const unchecked = (pragmaticJson.games || []).filter((g) => g.verify?.length);
+  if (unchecked.length) {
+    warnings.push(`src/data/pragmatic-games.json: facts still marked "verify" in ${unchecked.length} of ${pragmaticJson.games.length} games. Check each in the demo's i screen before launch, then remove it from "verify":\n${unchecked.map((g) => `           ${g.name}: ${g.verify.join(', ')}`).join('\n')}`);
+  }
 }
 
 // First-view budget on the home page: HTML + CSS + every JS module it loads.

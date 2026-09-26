@@ -114,7 +114,70 @@ const star = (x, y, s, fill, cls = '') => {
   return `<path${cls ? ` class="${cls}"` : ''} d="M${x} ${y - s}l${k} ${m} ${m} ${k}-${m} ${k}-${k} ${m}-${k}-${m}-${m}-${k} ${m}-${k}z" fill="${fill}"/>`;
 };
 
-// One entry per game: gradient pair (c1, c2), lettering fill (tf), tile shadow accent at night (acc)
+// Motifs drawn twice: once for the 4:3 tile, whose lettering sits at the
+// bottom, and once for the 16:10 stage, whose lettering sits at the top and
+// whose Play button covers the lower middle (src/lib/ui/stage.mjs).
+const BONANZA_FLOAT = (sun) => `<circle class="ink" ${sun} fill="#FFE11A"/>
+      <path d="M100 0v56" stroke="#18122B" stroke-width="2.5"/>
+      <rect class="ink" x="95" y="40" width="10" height="20" rx="3" fill="#FFF5E1"/>
+      <path class="ink" d="M68 90a32 32 0 0 1 64 0z" fill="#FF4A3D"/>
+      <path class="ink" d="M68 90a32 32 0 0 0 64 0z" fill="#FFF5E1"/>
+      <rect class="ink-t" x="66" y="85" width="68" height="10" rx="3" fill="#FFE11A"/>
+      <path class="ink" d="M-4 108q13-9 26 0t26 0 26 0 26 0 26 0 26 0 26 0 26 0V150H-4z" fill="#0A4FA0"/>
+      <path d="M48 118q26 8 52 0t52 0" fill="none" stroke="#FFF5E1" stroke-width="3" stroke-linecap="round"/>
+      <g fill="none" stroke="#FFF5E1" stroke-width="2.5"><circle cx="160" cy="70" r="6"/><circle cx="172" cy="50" r="4"/><circle cx="150" cy="44" r="3"/></g>`;
+
+const SHERIFF_STAR = (place) => {
+  const badge = `<polygon class="ink" points="100,24 112,52 144,50 124,76 144,102 112,100 100,128 88,100 56,102 76,76 56,50 88,52" fill="#FFE11A"/>
+      <g class="ink-t" fill="#FFE11A"><circle cx="100" cy="22" r="6"/><circle cx="146" cy="49" r="6"/><circle cx="146" cy="103" r="6"/><circle cx="100" cy="130" r="6"/><circle cx="54" cy="103" r="6"/><circle cx="54" cy="49" r="6"/></g>
+      <circle class="ink-t" cx="100" cy="76" r="18" fill="#FFC21A"/>
+      <circle cx="100" cy="76" r="9" fill="none" stroke="#18122B" stroke-width="2.5" stroke-dasharray="3 3"/>`;
+  return `<circle class="ink" cx="170" cy="26" r="14" fill="#FFE11A"/>
+      <path class="ink" d="M26 146V120H18a8 8 0 0 1-8-8V100a5 5 0 0 1 10 0v10h6V92a7 7 0 0 1 14 0v14h4v-8a5 5 0 0 1 10 0v12a8 8 0 0 1-8 8h-6V146z" fill="#2BB673"/>
+      <path class="ink" transform="translate(200 0) scale(-1 1)" d="M26 146V120H18a8 8 0 0 1-8-8V100a5 5 0 0 1 10 0v10h6V92a7 7 0 0 1 14 0v14h4v-8a5 5 0 0 1 10 0v12a8 8 0 0 1-8 8h-6V146z" fill="#2BB673"/>
+      ${place ? `<g transform="${place}">${badge}</g>` : badge}`;
+};
+
+const BUFFALO_CROWN = (sun) => `<circle class="ink" ${sun} fill="#FFE11A"/>
+      ${star(30, 24, 9, '#FFF5E1')}<circle cx="54" cy="52" r="2.5" fill="#FFF5E1"/><circle cx="136" cy="16" r="2" fill="#FFF5E1"/>
+      <path class="ink" d="M-4 116q30-18 64-8t70-6 74 8V152H-4z" fill="#7A1650"/>
+      <path class="ink" d="M-4 132q40-12 80-2t80-2 48 2V152H-4z" fill="#4A0B33"/>
+      <path class="ink" d="M58 94L50 46l26 22 24-34 24 34 26-22-8 48z" fill="#FFE11A"/>
+      <rect class="ink" x="55" y="92" width="90" height="16" rx="3" fill="#FFB21A"/>
+      <g class="ink-t"><circle cx="50" cy="44" r="6" fill="#3DD6FF"/><circle cx="100" cy="32" r="7" fill="#FF4FB0"/><circle cx="150" cy="44" r="6" fill="#3DD6FF"/></g>
+      <path class="ink-t" d="M100 94l7 6-7 6-7-6z" fill="#13C08B"/><circle class="ink-t" cx="76" cy="100" r="3.5" fill="#FF4A3D"/><circle class="ink-t" cx="124" cy="100" r="3.5" fill="#FF4A3D"/>`;
+
+const OLYMPUS_1000 = (plaque) => `<g class="ink" fill="#FFF5E1"><rect x="10" y="30" width="16" height="84"/><rect x="174" y="30" width="16" height="84"/><rect x="4" y="22" width="28" height="9" rx="2"/><rect x="168" y="22" width="28" height="9" rx="2"/></g>
+      <path class="ink-t" d="M16 36v72M20 36v72M180 36v72M184 36v72" fill="none"/>
+      <polygon class="ink" points="112,0 70,70 96,70 76,142 138,52 110,52 132,0" fill="#FFE11A"/>
+      <g transform="${plaque}">
+        <rect class="ink" x="34" y="64" width="132" height="46" rx="7" fill="#18122B"/>
+        <text class="cover__num" x="103" y="104" text-anchor="middle" font-size="44" fill="#FF2E93">1000</text>
+        <text class="cover__num" x="100" y="101" text-anchor="middle" font-size="44" fill="#FFE11A">1000</text>
+      </g>
+      <g class="ink-t"><path d="M40 30l6-7h11l6 7-12 14z" fill="#3DD6FF"/><path d="M144 30l6-7h11l6 7-12 14z" fill="#13C08B"/></g>
+      ${star(64, 16, 7, '#FFF5E1')}${star(158, 128, 7, '#FFF5E1')}`;
+
+const SPLASH_FLOAT = (sun) => `<circle class="ink" ${sun} fill="#FFE11A"/>
+      ${star(30, 26, 8, '#FFF5E1')}<circle cx="62" cy="16" r="2.4" fill="#FFF5E1"/>
+      <path class="ink" d="M-4 96q13-8 26 0t26 0 26 0 26 0 26 0 26 0 26 0 26 0V150H-4z" fill="#0A4FA0"/>
+      <g fill="none" stroke="#FFF5E1" stroke-linecap="round"><ellipse cx="100" cy="106" rx="76" ry="13" stroke-width="3"/><ellipse cx="100" cy="104" rx="52" ry="9" stroke-width="3.5"/><ellipse cx="100" cy="102" rx="30" ry="6" stroke-width="4"/></g>
+      <g class="ink-t" fill="#FFF5E1">
+        <path d="M62 66q-8-10-4-18q8 6 4 18z"/><path d="M138 66q8-10 4-18q-8 6-4 18z"/>
+        <path d="M48 84q-12-4-14-12q10 0 14 12z"/><path d="M152 84q12-4 14-12q-10 0-14 12z"/>
+      </g>
+      <g transform="rotate(10 100 80)">
+        <rect class="ink" x="95" y="34" width="10" height="22" rx="3" fill="#FFF5E1"/>
+        <path class="ink" d="M78 80a22 22 0 0 1 44 0z" fill="#FF4A3D"/>
+        <path class="ink" d="M78 80a22 22 0 0 0 44 0z" fill="#FFF5E1"/>
+        <rect class="ink-t" x="76" y="76" width="48" height="9" rx="3" fill="#FFE11A"/>
+        <path d="M86 68a14 14 0 0 1 8-6" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+      </g>`;
+
+// One entry per game: gradient pair (c1, c2), lettering fill (tf), tile shadow
+// accent at night (acc), and optionally a stage variant of the motif:
+// stage: { dy, art }, where dy moves the motif down (SVG units of the 200 × 150
+// drawing) and art replaces it. Only the stage reads it; tiles use `art`.
 export const COVERS = {
   'gates-of-olympus': {
     c1: '#5B2BD6', c2: '#E0288F', tf: 'gold', acc: '#FF4FB0',
@@ -127,15 +190,9 @@ export const COVERS = {
   },
   'big-bass-bonanza': {
     c1: '#26C6F5', c2: '#0A62C4', tf: 'gold', acc: '#3DD6FF',
-    art: `<circle class="ink" cx="36" cy="32" r="16" fill="#FFE11A"/>
-      <path d="M100 0v56" stroke="#18122B" stroke-width="2.5"/>
-      <rect class="ink" x="95" y="40" width="10" height="20" rx="3" fill="#FFF5E1"/>
-      <path class="ink" d="M68 90a32 32 0 0 1 64 0z" fill="#FF4A3D"/>
-      <path class="ink" d="M68 90a32 32 0 0 0 64 0z" fill="#FFF5E1"/>
-      <rect class="ink-t" x="66" y="85" width="68" height="10" rx="3" fill="#FFE11A"/>
-      <path class="ink" d="M-4 108q13-9 26 0t26 0 26 0 26 0 26 0 26 0 26 0 26 0V150H-4z" fill="#0A4FA0"/>
-      <path d="M48 118q26 8 52 0t52 0" fill="none" stroke="#FFF5E1" stroke-width="3" stroke-linecap="round"/>
-      <g fill="none" stroke="#FFF5E1" stroke-width="2.5"><circle cx="160" cy="70" r="6"/><circle cx="172" cy="50" r="4"/><circle cx="150" cy="44" r="3"/></g>`,
+    art: BONANZA_FLOAT('cx="36" cy="32" r="16"'),
+    // the float's top clears BONANZA, and the sun moves out from behind its B
+    stage: { dy: 6, art: BONANZA_FLOAT('cx="16" cy="24" r="12"') },
     title: `<small>Big Bass</small><span class="toon" data-text="Bonanza">Bonanza</span>`,
   },
   'wolf-gold': {
@@ -185,41 +242,25 @@ export const COVERS = {
   },
   'wild-west-gold': {
     c1: '#FFB347', c2: '#D2561B', tf: 'cream', acc: '#FFB347',
-    art: `<circle class="ink" cx="170" cy="26" r="14" fill="#FFE11A"/>
-      <path class="ink" d="M26 146V120H18a8 8 0 0 1-8-8V100a5 5 0 0 1 10 0v10h6V92a7 7 0 0 1 14 0v14h4v-8a5 5 0 0 1 10 0v12a8 8 0 0 1-8 8h-6V146z" fill="#2BB673"/>
-      <path class="ink" transform="translate(200 0) scale(-1 1)" d="M26 146V120H18a8 8 0 0 1-8-8V100a5 5 0 0 1 10 0v10h6V92a7 7 0 0 1 14 0v14h4v-8a5 5 0 0 1 10 0v12a8 8 0 0 1-8 8h-6V146z" fill="#2BB673"/>
-      <polygon class="ink" points="100,24 112,52 144,50 124,76 144,102 112,100 100,128 88,100 56,102 76,76 56,50 88,52" fill="#FFE11A"/>
-      <g class="ink-t" fill="#FFE11A"><circle cx="100" cy="22" r="6"/><circle cx="146" cy="49" r="6"/><circle cx="146" cy="103" r="6"/><circle cx="100" cy="130" r="6"/><circle cx="54" cy="103" r="6"/><circle cx="54" cy="49" r="6"/></g>
-      <circle class="ink-t" cx="100" cy="76" r="18" fill="#FFC21A"/>
-      <circle cx="100" cy="76" r="9" fill="none" stroke="#18122B" stroke-width="2.5" stroke-dasharray="3 3"/>`,
+    art: SHERIFF_STAR(),
+    // a smaller star, lower down, so its top point clears GOLD
+    stage: { art: SHERIFF_STAR('translate(100 94) scale(.8) translate(-100 -76)') },
     title: `<small>Wild West</small><span class="toon" data-text="Gold">Gold</span>`,
   },
   'buffalo-king-megaways': {
     c1: '#E8364F', c2: '#6A1248', tf: 'gold', acc: '#FF6A4D', rib: '#FFE11A',
-    art: `<circle class="ink" cx="164" cy="30" r="16" fill="#FFE11A"/>
-      ${star(30, 24, 9, '#FFF5E1')}<circle cx="54" cy="52" r="2.5" fill="#FFF5E1"/><circle cx="136" cy="16" r="2" fill="#FFF5E1"/>
-      <path class="ink" d="M-4 116q30-18 64-8t70-6 74 8V152H-4z" fill="#7A1650"/>
-      <path class="ink" d="M-4 132q40-12 80-2t80-2 48 2V152H-4z" fill="#4A0B33"/>
-      <path class="ink" d="M58 94L50 46l26 22 24-34 24 34 26-22-8 48z" fill="#FFE11A"/>
-      <rect class="ink" x="55" y="92" width="90" height="16" rx="3" fill="#FFB21A"/>
-      <g class="ink-t"><circle cx="50" cy="44" r="6" fill="#3DD6FF"/><circle cx="100" cy="32" r="7" fill="#FF4FB0"/><circle cx="150" cy="44" r="6" fill="#3DD6FF"/></g>
-      <path class="ink-t" d="M100 94l7 6-7 6-7-6z" fill="#13C08B"/><circle class="ink-t" cx="76" cy="100" r="3.5" fill="#FF4A3D"/><circle class="ink-t" cx="124" cy="100" r="3.5" fill="#FF4A3D"/>`,
+    art: BUFFALO_CROWN('cx="164" cy="30" r="16"'),
+    // the crown's top jewel clears the lettering, and the sun moves out from under KING
+    stage: { dy: 14, art: BUFFALO_CROWN('cx="180" cy="30" r="14"') },
     title: `<span class="toon" data-text="Buffalo King">Buffalo King</span><br><span class="rib">Megaways</span>`,
     size: '11.5cqi',
   },
   // The bolt again, struck through a plaque that reads 1000.
   'gates-of-olympus-1000': {
     c1: '#FF3FA4', c2: '#6B21C8', tf: 'gold', acc: '#FF6FC0',
-    art: `<g class="ink" fill="#FFF5E1"><rect x="10" y="30" width="16" height="84"/><rect x="174" y="30" width="16" height="84"/><rect x="4" y="22" width="28" height="9" rx="2"/><rect x="168" y="22" width="28" height="9" rx="2"/></g>
-      <path class="ink-t" d="M16 36v72M20 36v72M180 36v72M184 36v72" fill="none"/>
-      <polygon class="ink" points="112,0 70,70 96,70 76,142 138,52 110,52 132,0" fill="#FFE11A"/>
-      <g transform="rotate(-5 100 86)">
-        <rect class="ink" x="34" y="64" width="132" height="46" rx="7" fill="#18122B"/>
-        <text class="cover__num" x="103" y="104" text-anchor="middle" font-size="44" fill="#FF2E93">1000</text>
-        <text class="cover__num" x="100" y="101" text-anchor="middle" font-size="44" fill="#FFE11A">1000</text>
-      </g>
-      <g class="ink-t"><path d="M40 30l6-7h11l6 7-12 14z" fill="#3DD6FF"/><path d="M144 30l6-7h11l6 7-12 14z" fill="#13C08B"/></g>
-      ${star(64, 16, 7, '#FFF5E1')}${star(158, 128, 7, '#FFF5E1')}`,
+    art: OLYMPUS_1000('rotate(-5 100 86)'),
+    // the plaque lifted, so "1000" (what tells this game from Gates of Olympus) clears the phone Play button
+    stage: { art: OLYMPUS_1000('translate(0 -18) rotate(-5 100 86)') },
     title: `<small>Gates of</small><span class="toon" data-text="Olympus">Olympus</span>`,
   },
   // A slice of watermelon and a cherry pair. No faces.
@@ -243,21 +284,9 @@ export const COVERS = {
   // A float bobbing in rings of splash ripples.
   'big-bass-splash': {
     c1: '#8A5CFF', c2: '#0E6CC4', tf: 'gold', acc: '#A487FF',
-    art: `<circle class="ink" cx="164" cy="30" r="15" fill="#FFE11A"/>
-      ${star(30, 26, 8, '#FFF5E1')}<circle cx="62" cy="16" r="2.4" fill="#FFF5E1"/>
-      <path class="ink" d="M-4 96q13-8 26 0t26 0 26 0 26 0 26 0 26 0 26 0 26 0V150H-4z" fill="#0A4FA0"/>
-      <g fill="none" stroke="#FFF5E1" stroke-linecap="round"><ellipse cx="100" cy="106" rx="76" ry="13" stroke-width="3"/><ellipse cx="100" cy="104" rx="52" ry="9" stroke-width="3.5"/><ellipse cx="100" cy="102" rx="30" ry="6" stroke-width="4"/></g>
-      <g class="ink-t" fill="#FFF5E1">
-        <path d="M62 66q-8-10-4-18q8 6 4 18z"/><path d="M138 66q8-10 4-18q-8 6-4 18z"/>
-        <path d="M48 84q-12-4-14-12q10 0 14 12z"/><path d="M152 84q12-4 14-12q-10 0-14 12z"/>
-      </g>
-      <g transform="rotate(10 100 80)">
-        <rect class="ink" x="95" y="34" width="10" height="22" rx="3" fill="#FFF5E1"/>
-        <path class="ink" d="M78 80a22 22 0 0 1 44 0z" fill="#FF4A3D"/>
-        <path class="ink" d="M78 80a22 22 0 0 0 44 0z" fill="#FFF5E1"/>
-        <rect class="ink-t" x="76" y="76" width="48" height="9" rx="3" fill="#FFE11A"/>
-        <path d="M86 68a14 14 0 0 1 8-6" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
-      </g>`,
+    art: SPLASH_FLOAT('cx="164" cy="30" r="15"'),
+    // the float's stem clears SPLASH, and the sun moves off its H
+    stage: { dy: 6, art: SPLASH_FLOAT('cx="178" cy="40" r="12"') },
     title: `<small>Big Bass</small><span class="toon" data-text="Splash">Splash</span>`,
   },
   // Our own slot (shown only when the Pragmatic demos are switched off): a

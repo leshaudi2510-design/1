@@ -173,7 +173,7 @@ ${pageHero(page, {
       </section>
       <section aria-labelledby="cover-title">
         <h2 id="cover-title">What these tools cover</h2>
-        <p>They work on this site, in this browser, on this device. If you also gamble for money, <strong>GAMSTOP</strong> lets you exclude yourself from every online gambling company licensed in Great Britain, for free: ${ext('https://www.gamstop.co.uk/', 'gamstop.co.uk')}.</p>
+        <p>They work on this site, in this browser, on this device.${pp ? ' They don’t apply to games you open on other websites, including Pragmatic Play’s own.' : ''} If you also gamble for money, <strong>GAMSTOP</strong> lets you exclude yourself from every online gambling company licensed in Great Britain, for free: ${ext('https://www.gamstop.co.uk/', 'gamstop.co.uk')}.</p>
       </section>
       <section aria-labelledby="reset-title">
         <h2 id="reset-title">Start again</h2>

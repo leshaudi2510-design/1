@@ -15,8 +15,16 @@ export function startAgeGate() {
   if (saved && !expired) return;
   if (expired) store.remove('age');
 
-  // The question needs an answer: Escape doesn't dismiss it.
+  // The question needs an answer, so Escape doesn't dismiss it. Browsers can
+  // still close it without one (Chromium lets a second Escape through, and so
+  // does Android's Back gesture). Nothing is stored then and the games stay
+  // locked, and a "Confirm my age" button on a locked game asks again.
   dialog.addEventListener('cancel', (e) => e.preventDefault());
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('[data-open="age-gate"]') || dialog.open) return;
+    if (store.get('age', null)) return; // an answer stands; a "no" keeps its 30-day lock
+    dialog.showModal();
+  });
   dialog.addEventListener('click', (e) => {
     const b = e.target.closest('[data-age]');
     if (!b) return;

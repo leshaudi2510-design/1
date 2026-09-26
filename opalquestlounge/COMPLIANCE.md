@@ -7,12 +7,12 @@
 
 | # | Требование | Где | Статус |
 |---|---|---|---|
-| 1.1 | Минимум 3 настоящие игры прямо на сайте, без iframe | `src/public/assets/js/games/seven-systems.js`, `lapidary-wheel.js`, `brilliant-21.js` (canvas); в HTML нет ни одного `<iframe>` | ✅ |
+| 1.1 | Минимум 3 настоящие игры прямо на сайте, без iframe | **Без Pragmatic** (`node build.mjs --no-pragmatic`): `src/public/assets/js/games/seven-systems.js`, `lapidary-wheel.js`, `brilliant-21.js` (canvas); в HTML нет ни одного `<iframe>`. **Режим Pragmatic** (по умолчанию): свои Lapidary Wheel и Brilliant Twenty-One плюс 12 демо Pragmatic Play в `<iframe>`, который создаётся только после нажатия Play (`games/pragmatic.js`) | ✅ без Pragmatic · ⚠️ Pragmatic: iframe, см. «Режим Pragmatic» |
 | 1.2 | Только виртуальная валюта, без обмена на ценности, не sweepstakes | `src/public/assets/js/lib/wallet.js` (баланс только в localStorage); `src/pages/terms.mjs`, раздел 4; `src/pages/home.mjs`, блок «How Carats work» | ✅ |
 | 1.3 | Дисклеймер в первом экране, у каждой игры, в подвале и в Terms | текст — `src/lib/context.mjs:6`; hero — `src/pages/home.mjs:33`; у игры — `src/lib/games-ui.mjs` (`.game__disclaimer` во всех трёх панелях); подвал — `src/lib/layout.mjs:174`; Terms — `src/pages/terms.mjs` (под заголовком и в разделе 3). Сборка падает, если дисклеймера нет хоть на одной странице (`build.mjs`, lint) | ✅ |
-| 1.4 | Никаких реальных казино и букмекеров; запрещённые слова | нет ни одной ссылки на операторов; `build.mjs:202` проверяет каждую страницу и каждый JS-файл на deposit / withdraw / cash out / bonus code / real money wins / win big / jackpot / hurry / don't miss out | ✅ |
-| 1.5 | 18+: подтверждение при первом входе | `<dialog id="age-gate">` — `src/lib/layout.mjs:239`; логика — `src/public/assets/js/lib/age.js` (Escape не закрывает; ответ «нет» блокирует игры на 30 дней); `rg.canPlay()` не даёт ставить без «yes» | ✅ |
-| 1.5 | Не привлекать несовершеннолетних (CAP/ASA) | нет персонажей: карты с буквами вместо портретов (`brilliant-21.js`, `drawCardFace`), символы — научные рисунки кристаллов (`lib/crystals.js`); взрослая типографика; без сленга и мемов | ✅ |
+| 1.4 | Никаких реальных казино и букмекеров; запрещённые слова | В обоих режимах нет ни одной ссылки на операторов; список `FORBIDDEN` в `build.mjs` проверяет каждую страницу и каждый JS-файл на deposit / withdraw / cash out / bonus code / real money wins / win big / jackpot / hurry / don't miss out, а также на сравнения игр между собой («the highest of the games here»). **Режим Pragmatic:** названия слотов Pragmatic Play — бренды игр реальных казино — стоят в title и H1 двенадцати страниц, на главной, в подвале и в meta description. Это конфликт с правилом Google о «names or marks associated with real-money gambling brands», см. «Режим Pragmatic», решение P2 | ✅ без Pragmatic · ⚠️ Pragmatic |
+| 1.5 | 18+: подтверждение при первом входе | `<dialog id="age-gate">` — `src/lib/layout.mjs:239`; логика — `src/public/assets/js/lib/age.js` (Escape не закрывает; если браузер всё же закроет вопрос без ответа — второй Escape в Chromium, жест «Назад» на Android, — ничего не сохраняется, игры остаются закрыты, а кнопка «Confirm my age» на игре спрашивает снова; ответ «нет» блокирует игры на 30 дней); `rg.canPlay()` не даёт ставить без «yes» | ✅ |
+| 1.5 | Не привлекать несовершеннолетних (CAP/ASA) | Наша графика в обоих режимах — только предметы и места, без персонажей: карты с буквами вместо портретов (`brilliant-21.js`, `drawCardFace`), обложки — `src/lib/art.mjs`; взрослая типографика; без сленга и мемов. **Режим Pragmatic:** внутри демо — графика Pragmatic Play, и в ней есть персонажи (Зевс, Аид, мадам Дестини). Игры с сильной привлекательностью для детей (The Dog House, Sugar Rush, Starlight Princess) не взяты: поле `appeal` в `src/data/pragmatic-games.json` проверяет сборка | ✅ без Pragmatic · ⚠️ Pragmatic: персонажи внутри демо |
 | 1.6 | Responsible gaming: 0808 8020 133 (GamCare), GamCare, NHS | `src/pages/responsible-gaming.mjs`; номер и ссылки есть в подвале каждой страницы (`src/lib/layout.mjs`, «Need to talk?»). GambleAware (BeGambleAware.org) закрылась 31 марта 2026 г., её работу приняли NHS England, OHID и UKRI; поэтому вместо неё — GamCare (его самооценка) и страница NHS о помощи при игровой зависимости. Линию 0808 8020 133 по-прежнему ведёт GamCare. Сборка падает на ссылке на (be)gambleaware.org (`build.mjs`, lint). Это отход от п. 6 брифа, где назван BeGambleAware: нужно согласие владельца | ✅ / ⚠️ согласовать с владельцем |
 | 1.6 | Таймер сессии | `[data-session]` в шапке; `src/public/assets/js/lib/rg.js` (`tick`), `lib/session.js` | ✅ |
 | 1.6 | Напоминание о перерыве каждые 30 минут | `rg.js:11` `REMINDER_EVERY`; `<dialog id="reality-check">` показывает время, ставки и возврат за сессию; кнопка «Take a 5-minute break» | ✅ |
@@ -34,17 +34,37 @@
 - Нет «проигрышей под видом выигрышей». Если возврат меньше ставки, текст пишет «N down», опал не вспыхивает, звука нет (`games/common.js`, `settled` и `celebrate`).
 - Бесплатное пополнение без таймеров и давления: «Claim 1,000 Carats» при балансе ниже 100.
 
+## Режим Pragmatic: открытые решения
+
+Сборка по умолчанию (`"pragmatic.enabled": true` в `site.config.json`) показывает 12 демо слотов Pragmatic Play. `node build.mjs --no-pragmatic` (или `"enabled": false`) собирает сайт без них: вместо демо — наш слот Seven Systems, и в сборке нет ни страниц Pragmatic, ни их скриптов (`pragmatic.js`, `pragmatic-url.js`), ни их OG-картинок, ни адреса `pragmaticplay.net`. Это проверяет lint сборки.
+
+| # | Решение владельца | Статус | Дата и ответ |
+|---|---|---|---|
+| P1 | **Письменное согласие Pragmatic Play** (или B2B-лицензия, как у социальных казино-партнёров Pragmatic). Их Terms of Use дают лицензию только «for your own non-commercial entertainment purposes» и запрещают использовать игры или их названия «in conjunction with any other games, products, services or software without Pragmatic Play's express written consent». Номер и дату согласия впишите в `pragmatic.writtenConsent`: пока поле пустое, сборка предупреждает, а `--strict` (деплой) падает | ⚠️ открыто | — |
+| P2 | **Google Ads или названия Pragmatic: выбрать одно.** Правило Google для social casino: «Ads, sites, or apps must not use logos, names, or marks associated with real-money gambling brands», а продвижение агрегаторов запрещено. Названия слотов Pragmatic — это игры реальных казино; они в title и H1 12 страниц, на главной, в подвале и в meta description. Это вывод из цитаты, а не решение Google; цитату надо проверить на живой странице https://support.google.com/adspolicy/answer/15132179 | ⚠️ открыто | — |
+| P3 | **Факты из `verify`** в `src/data/pragmatic-games.json` (RTP, максимальная выплата, волатильность, сетка, дата выхода, бонус — у всех 12 игр) сверить с экраном «i» в каждом демо. Данные собраны из пресс-релизов и обзоров, сайт pragmaticplay.com из среды сборки недоступен. Пока RTP игры в `verify`, страница называет его «Default reported at launch and in reviews», а не цифрой Pragmatic. Сборка печатает список непроверенных полей | ⚠️ до запуска | — |
+
+**Если реклама в Google Ads будет:**
+
+- рекламируйте домен, который **всем** посетителям отдаёт сборку `node build.mjs --no-pragmatic` (не старый `config-nopragmatic.json` из черновиков: там прежняя концепция и цвета);
+- не показывайте проверяющим другую сборку по User-Agent, гео или рефереру: это клоакинг (пункт 1.9);
+- не ставьте с этого домена ссылок на сайт в режиме Pragmatic;
+- иначе получите письменное подтверждение Google при сертификации (она обязательна с 14 сентября 2026).
+
+Сборка предупреждает, а `--strict` падает, если при включённых демо задан `analytics.adsConversionId`.
+
 ## 2. UK GDPR и PECR
 
 | Требование | Где | Статус |
 |---|---|---|
 | До согласия нет необязательных cookies и сторонних скриптов | `lib/consent.js`: `gtag.js` вставляется только в `loadTag()` после согласия. Проверено `tools/check.mjs`: 0 сторонних запросов и 0 cookies до выбора | ✅ |
+| Режим Pragmatic: демо ставит свои cookies (Pragmatic Play и Google Analytics внутри демо) | Ничего не грузится до нажатия Play. Подпись у кнопки (`src/lib/ui/stage.mjs`, она же `aria-describedby` кнопки) говорит, что демо и Google Analytics в нём могут поставить cookies, со ссылкой на `/cookies/#third-party`. Cookie settings описывают демо отдельной строкой. После «Reject all» каждая кнопка Play сначала спрашивает («Load demo and allow its cookies» / «Don't load it»). Проверено `tools/check.mjs` | ✅ |
 | «Reject all» и «Accept all» одинаково заметны, есть «Manage» | баннер и диалог — `src/lib/layout.mjs` (обе кнопки `btn--secondary`, одинакового размера); `check.mjs` сравнивает их стили | ✅ |
 | Google Consent Mode v2, все сигналы по умолчанию `denied` | `lib/consent.js:22`: `ad_storage`, `ad_user_data`, `ad_personalization`, `analytics_storage`, `functionality_storage`, `personalization_storage`, `security_storage` = `denied`; плюс `ads_data_redaction` | ✅ |
 | Политики перечисляют всё хранилище, включая localStorage | единый список `STORAGE` в `src/pages/cookies.mjs` выводится и в Cookies, и в Privacy; ключи совпадают с кодом (`lib/store.js`, префикс `oql.`) | ✅ |
 | Отзыв согласия так же прост | «Cookie settings» в подвале каждой страницы; при отказе cookies `_ga*` и `_gcl_*` удаляются | ✅ |
 | Согласие не вечное | повторный запрос через 12 месяцев (`MAX_AGE` в `consent.js`) | ✅ |
-| Без аналитики — без баннера | если `ga4` и `adsConversionId` пусты, баннер не рендерится и страницы не обращаются ни к одному внешнему домену. CSP тоже закрывает Google (`csp()` в `src/lib/layout.mjs:7`) | ✅ |
+| Без аналитики — без баннера | если `ga4` и `adsConversionId` пусты, баннер не рендерится и страницы не обращаются ни к одному внешнему домену (в режиме Pragmatic — до нажатия Play). CSP тоже закрывает Google (`csp()` в `src/lib/layout.mjs`) | ✅ |
 | Контактная форма без стороннего обработчика | по умолчанию `mailto:`, данные на сайте не хранятся (`assets/js/contact.js`) | ✅ |
 | ICO и права субъекта | `src/pages/privacy.mjs`, раздел «Your rights» | ✅ |
 
@@ -134,7 +154,9 @@
 1. **Домен:** `opalquestlounge.com` (все страницы доступны без входа).
 2. **Страна:** United Kingdom.
 3. **Юрлицо:** название, номер Companies House и адрес — точно как в подвале сайта (`site.config.json`).
-4. **Описание продукта:** «Free-to-play social casino games (slot, European roulette, blackjack) played with a virtual currency (Carats) that has no monetary value, cannot be purchased, and cannot be exchanged for money, prizes or anything of value. Adults 18+ only. No sweepstakes or prize draws.»
+4. **Описание продукта** зависит от сборки на рекламируемом домене:
+   - **без Pragmatic** (`--no-pragmatic`, рекомендуемый вариант для рекламы): «Free-to-play social casino games (slot, European roulette, blackjack) played with a virtual currency (Carats) that has no monetary value, cannot be purchased, and cannot be exchanged for money, prizes or anything of value. Adults 18+ only. No sweepstakes or prize draws.»
+   - **режим Pragmatic** (только после решений P1 и P2 выше): «Free-to-play social casino site: our own European roulette and blackjack, played with a virtual currency (Carats) that has no monetary value, cannot be purchased, and cannot be exchanged for money, prizes or anything of value, plus free demos of third-party slot games by Pragmatic Play. The demos load from pragmaticplay.net in a frame only when the visitor presses Play, and play with demo credits that have no value. Adults 18+ only. No sweepstakes or prize draws.»
 5. **Где это видно проверяющему:** дисклеймер в первом экране главной; раздел «How Carats work»; Terms, раздел 4; каждая страница игры.
 6. **18+:** age gate при первом визите; Responsible gaming — `/responsible-gaming/`.
 7. **Покупки:** нет (при `purchases: true` тексты на сайте изменятся автоматически, это нужно отразить и в форме).

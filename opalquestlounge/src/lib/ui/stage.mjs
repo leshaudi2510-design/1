@@ -2,29 +2,35 @@
 // assets/js/games/pragmatic.js reads:
 //
 //   figure.stage[data-game="pragmatic"][data-symbol][data-name][data-state]
-//     .stage__bar      label, name, then the provider (home) or the tools (game pages)
+//     .stage__bar      label, name, then the tools (Close demo and fullscreen);
+//                      on home the provider shows instead until Play is pressed
 //     .stage__screen   our cover art, the lettering and the Play button
 //       [data-stage]   the box the iframe goes into, after a click on Play
 //       .stage__msg--loading / --failed / --blocked
-//     figcaption       required in every state
+//     figcaption       required in every state; it describes the Play button
 //     [data-status]    polite live region
 //
-// Nothing here contacts Pragmatic Play. The only address of theirs on the
-// page is the fallback link, and that is a plain link opened in a new tab.
+// Nothing here contacts Pragmatic Play, and the page holds no address of
+// theirs: pragmatic.js builds the demo's address and sets the iframe's src
+// only after Play is pressed.
 import { html, esc } from '../html.mjs';
 import { icon } from '../icons.mjs';
 import { STAGE_OLYMPUS, COVERS } from '../art.mjs';
-import { demoUrl } from '../../public/assets/js/lib/pragmatic-url.js';
 
 // Games with artwork drawn for the 16:10 stage. Every other game uses its
-// lobby cover motif, stretched across the stage.
+// lobby cover motif across the stage, or the stage variant in its COVERS
+// entry (`stage: { dy, art }`) where the lobby motif would run into the
+// lettering at the top or hide behind the Play button.
 const STAGE_ART = { 'gates-of-olympus': STAGE_OLYMPUS };
 
 function stageArt(g) {
   if (STAGE_ART[g.slug]) return STAGE_ART[g.slug];
-  const art = COVERS[g.slug]?.art;
+  const c = COVERS[g.slug];
+  const art = c?.stage?.art ?? c?.art;
   if (!art) return ''; // no cover yet: the screen shows the cover gradient on its own
-  return `<svg class="stage__art stage__art--cover" viewBox="0 0 200 150" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">${art}</svg>`;
+  // An SVG transform, not a style attribute: the CSP (style-src 'self') blocks inline styles.
+  const body = c.stage?.dy ? `<g transform="translate(0 ${c.stage.dy})">${art}</g>` : art;
+  return `<svg class="stage__art stage__art--cover" viewBox="0 0 200 150" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">${body}</svg>`;
 }
 
 /**
@@ -40,15 +46,16 @@ function stageTitle(g) {
 }
 
 /**
- * "Play Gates of Olympus demo". A short name never breaks. A long one may
- * wrap, but only at its dash ("Zeus vs Hades – / Gods of War demo") or
- * before its last word, so "demo" never sits on a line of its own.
+ * "Play Gates of Olympus demo". The label wraps at most once, and "demo"
+ * never sits on a line of its own. A short name stays whole, together with
+ * "demo" ("Play / Gates of Olympus demo"); a long one may break at its dash
+ * ("Zeus vs Hades – / Gods of War demo") or before its last word.
  */
 function playLabel(name) {
   const nb = (s) => `<span class="nobr">${esc(s)}</span>`;
-  if (name.length <= 20) return `Play ${nb(name)} demo`;
   const dash = name.split(/ (?=[–-] )/);
   if (dash.length === 2) return `Play ${nb(`${dash[0]} ${dash[1][0]}`)} ${nb(`${dash[1].slice(2)} demo`)}`;
+  if (name.length <= 16) return `Play ${nb(`${name} demo`)}`;
   const words = name.split(' ');
   return `Play ${esc(words.slice(0, -1).join(' '))} ${nb(`${words.at(-1)} demo`)}`;
 }
@@ -60,18 +67,19 @@ function playLabel(name) {
  */
 export function pragmaticStage(ctx, g, { featured = false } = {}) {
   const id = `demo-${g.slug}`;
-  const href = demoUrl(ctx.cfg.pragmatic, g.symbol);
   const name = esc(g.name);
   const close = `<button class="btn btn--secondary btn--sm when-ready" type="button" data-action="unload">${icon('i-close')}Close demo</button>`;
+  const fullscreen = `<button class="icon-btn" type="button" data-action="fullscreen" aria-label="Fullscreen" aria-pressed="false" aria-disabled="true">${icon('i-full')}</button>`;
+  // Home shows the provider until Play is pressed, then the same tools as a game page.
   const right = featured
     ? `<span class="stage__prov when-idle"><i class="dot dot--pp" aria-hidden="true"></i>Pragmatic Play</span>
-      ${close}`
+      <div class="stage__tools when-ready">${close}${fullscreen}</div>`
     : `<div class="stage__tools">
         ${close}
-        <button class="icon-btn" type="button" data-action="fullscreen" aria-label="Fullscreen" aria-pressed="false" aria-disabled="true">${icon('i-full')}</button>
+        ${fullscreen}
       </div>`;
 
-  return html`<figure class="stage${featured ? ' stage--featured' : ''}" id="${id}" data-game="pragmatic" data-symbol="${esc(g.symbol)}" data-name="${name}" data-state="idle" aria-labelledby="${id}-name ${id}-cap">
+  return html`<figure class="stage${featured ? ' stage--featured' : ''}" id="${id}" data-game="pragmatic" data-symbol="${esc(g.symbol)}" data-name="${name}" data-state="idle" aria-labelledby="${id}-name" aria-describedby="${id}-cap">
     <div class="stage__bar">
       <span class="stage__label">${featured ? 'Featured demo' : 'Free demo'}</span>
       <span class="stage__name" id="${id}-name">${name}</span>
@@ -81,7 +89,7 @@ export function pragmaticStage(ctx, g, { featured = false } = {}) {
       ${stageArt(g)}
       <div class="stage__over">
         ${stageTitle(g)}
-        <button class="btn btn--primary btn--play" type="button" data-action="load">
+        <button class="btn btn--primary btn--play" type="button" data-action="load" aria-describedby="${id}-cap">
           <span class="play-ico" aria-hidden="true">${icon('i-play')}</span>
           <span>${playLabel(g.name)}</span>
         </button>
@@ -95,22 +103,21 @@ export function pragmaticStage(ctx, g, { featured = false } = {}) {
       <div class="stage__msg stage__msg--failed"><div>
         <span class="ico" aria-hidden="true">${icon('i-alert')}</span>
         <strong>The demo didn't load</strong>
-        <p>Pragmatic Play's server didn't answer. You can try again, or open the demo on their site.</p>
-        <p class="stage__msg-actions">
-          <button class="btn btn--secondary btn--sm" type="button" data-action="load">Try again</button>
-          <a class="btn btn--secondary btn--sm" data-fallback href="${esc(href)}" target="_blank" rel="noopener">Open on Pragmatic Play's site${icon('i-ext')}<span class="visually-hidden"> (opens in a new tab)</span></a>
-        </p>
+        <p>Pragmatic Play's server didn't answer. You can try again in a minute.</p>
+        <p class="stage__msg-actions"><button class="btn btn--secondary btn--sm" type="button" data-action="load" aria-describedby="${id}-cap">Try again</button></p>
+        <a href="/contact/">Report a problem</a>
       </div></div>
       <div class="stage__msg stage__msg--blocked"><div>
         <span class="ico" aria-hidden="true">${icon('i-pause')}</span>
         <strong data-blocked-title>You're on a break</strong>
         <p data-blocked>Games are paused for now. The rules and pages still work.</p>
+        <button class="btn btn--secondary btn--sm" type="button" data-open="age-gate" aria-haspopup="dialog" hidden>Confirm my age</button>
         <a href="/responsible-gaming/#break">About breaks and limits</a>
       </div></div>
     </div>
     <figcaption class="stage__foot" id="${id}-cap">
       ${icon('i-info')}
-      <p>Loads the free demo from Pragmatic Play's servers. <span>Demo credits are not ${esc(ctx.cur.plural)} and have no value.</span></p>
+      <p>Pressing Play loads the free demo from Pragmatic Play's servers. Pragmatic Play, and Google Analytics inside the demo, may then set cookies on your device (<a href="/cookies/#third-party">about these cookies</a>). <span>Demo credits are not ${esc(ctx.cur.plural)} and have no value.</span></p>
     </figcaption>
     <p class="visually-hidden" data-status aria-live="polite"></p>
   </figure>`;

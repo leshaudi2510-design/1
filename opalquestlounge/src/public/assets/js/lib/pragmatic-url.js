@@ -1,6 +1,6 @@
 // Builds the address of a Pragmatic Play demo from site.config.json's
-// "pragmatic" block. No DOM here: the build imports it too, for the
-// fallback link printed on each game page.
+// "pragmatic" block (assets/js/config.js). Only games/pragmatic.js uses it,
+// after Play is pressed: no page carries a demo's address (build.mjs checks).
 
 /**
  * @param {{ demoUrl: string, params: Record<string, string> }} settings

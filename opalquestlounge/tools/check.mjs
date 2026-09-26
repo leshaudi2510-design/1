@@ -51,7 +51,7 @@ const withPragmatic = (on) => (c) => ({ ...c, pragmatic: { ...c.pragmatic, enabl
 const builds = {};
 const needed = [
   ['pragmatic', withPragmatic(true), SECTIONS.filter((s) => s !== 'consent')],
-  ['fallback', withPragmatic(false), ['pages', 'keyboard', 'lobby', 'prefs', 'chrome', 'axe']],
+  ['fallback', withPragmatic(false), ['pages', 'keyboard', 'lobby', 'dialogs', 'prefs', 'chrome', 'axe']],
   ['ga', (c) => ({ ...withPragmatic(true)(c), analytics: { ga4: 'G-TEST000000', adsConversionId: '' } }), ['consent', 'axe']],
 ];
 for (const [name, edit, uses] of needed) {
@@ -119,6 +119,7 @@ const stageInfo = (page) =>
     return {
       state: root.dataset.state,
       symbol: root.dataset.symbol,
+      stageH: Math.round(root.getBoundingClientRect().height),
       framesInStage: root.querySelectorAll('iframe').length,
       framesOnPage: document.querySelectorAll('iframe').length,
       origin: url?.origin || '',
@@ -303,7 +304,8 @@ if (want('stage') && PP)
       expect(Boolean(r.title), `${T}: iframe has a title`);
       expect(r.focusClose, `${T}: ready: focus is on Close demo`, await focused(page));
       if (hasFs) expect(r.fs === 'false', `${T}: fullscreen is enabled once ready`, `aria-disabled=${r.fs}`);
-      expect(/loaded/.test(r.status), `${T}: the status region says the demo loaded`, `"${r.status}"`);
+      expect(/opened/.test(r.status), `${T}: the status region says the demo opened`, `"${r.status}"`);
+      expect(idle.stageH === l.stageH && l.stageH === r.stageH, `${T}: the stage keeps its height from idle through loading to ready`, `${idle.stageH} → ${l.stageH} → ${r.stageH}px`);
 
       // Close demo, from the keyboard.
       await pressOn(page, `${STAGE} [data-action="unload"]`);
@@ -389,7 +391,260 @@ if (want('stage') && PP)
       expect(!w.errors.length, `no console or page errors ${label}`, w.errors.join(' | '));
       await ctx.close();
     }
+
+    await stageExtras();
   });
+
+/**
+ * More stage checks: the caption as the Play button's description, a demo that
+ * can't be reached, "Reject all", the expanded stage's Tab order, the reality
+ * check over a demo, and the bar's layout and colours.
+ */
+async function stageExtras() {
+  const GAME = '/games/gates-of-olympus/';
+  const toPragmatic = (u) => PRAGMATIC_HOST.test(u.hostname);
+  const playFromKeyboard = (page) => pressOn(page, `${STAGE} .stage__over [data-action="load"]`);
+  // A stand-in game with something to focus, for the Tab and reality-check checks.
+  const GAME_STUB = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Stub demo</title></head><body><button type="button">Spin</button><button type="button">Info</button></body></html>`;
+  const stubGame = (ctx) => ctx.route(toPragmatic, (r) => r.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body: GAME_STUB }));
+  // Where focus is, relative to the stage: an action name, "frame", "body" or "outside".
+  const focusAt = (page) =>
+    page.evaluate((S) => {
+      const a = document.activeElement;
+      const root = document.querySelector(S);
+      if (!a || a === document.body) return 'body';
+      if (a.tagName === 'IFRAME' && root.contains(a)) return 'frame';
+      if (root.contains(a)) return a.dataset.action || a.dataset.open || a.textContent.trim().slice(0, 40);
+      return `outside: ${a.tagName.toLowerCase()} "${(a.textContent || '').trim().slice(0, 30)}"`;
+    }, STAGE);
+
+  // The caption beside Play says what loading a demo does, and describes the button.
+  {
+    const ctx = await context(browser);
+    await refuseOthers(ctx, PP.base);
+    const page = await ctx.newPage();
+    for (const p of ['/', GAME]) {
+      await page.goto(PP.base + p, { waitUntil: 'networkidle' });
+      const cap = await page.evaluate((S) => {
+        const root = document.querySelector(S);
+        const play = root.querySelector('.stage__over [data-action="load"]');
+        const id = play.getAttribute('aria-describedby');
+        const el = id && document.getElementById(id);
+        return {
+          text: (el?.textContent || '').replace(/\s+/g, ' ').trim(),
+          link: el?.querySelector('a')?.getAttribute('href') || '',
+          isCaption: el?.tagName === 'FIGCAPTION' && root.contains(el),
+          figure: root.getAttribute('aria-describedby') === id,
+          named: document.getElementById(root.getAttribute('aria-labelledby'))?.textContent === root.dataset.name,
+          fallback: root.querySelectorAll('[data-fallback], a[href*="pragmaticplay"]').length,
+        };
+      }, STAGE);
+      expect(cap.isCaption && cap.figure && cap.named && /Pragmatic Play/.test(cap.text) && /Google Analytics/.test(cap.text) && /cookies/.test(cap.text) && cap.link === '/cookies/#third-party',
+        `${p}: the stage is named by the game and described by its caption, which describes Play too: the demo and Google Analytics inside it may set cookies (linked to /cookies/#third-party)`, JSON.stringify(cap));
+      expect(!cap.fallback, `${p}: the stage links nowhere on Pragmatic Play's site (a demo there would escape the limits and breaks)`, `${cap.fallback} link(s)`);
+    }
+    await ctx.close();
+  }
+
+  // A demo that can't be reached ends in "failed", not "loaded" over a browser error page.
+  for (const [how, setup] of [
+    ['the connection is refused', (ctx) => ctx.route(toPragmatic, (r) => r.abort('connectionrefused'))],
+    ['a filter blocks the host', (ctx) => ctx.route(toPragmatic, (r) => r.abort('blockedbyclient'))],
+    ['the host redirects somewhere the CSP does not allow', (ctx) => ctx.route(toPragmatic, (r) => r.fulfill({ status: 302, headers: { location: 'https://elsewhere.example/game.html' }, body: '' }))],
+    ['the browser is offline', null],
+  ]) {
+    const ctx = await context(browser);
+    await refuseOthers(ctx, PP.base);
+    if (setup) await setup(ctx);
+    const page = await ctx.newPage();
+    await page.goto(PP.base + GAME, { waitUntil: 'networkidle' });
+    await mounted(page, STAGE);
+    if (!setup) await ctx.setOffline(true); // no stub: a stub would still answer
+    await playFromKeyboard(page);
+    const failed = await stageIs(page, 'failed', 10000);
+    const f = await stageInfo(page);
+    const retry = await page.evaluate((S) => {
+      const b = document.querySelector(`${S} .stage__msg--failed [data-action="load"]`);
+      return { shown: Boolean(b?.getClientRects().length), focused: document.activeElement === b };
+    }, STAGE);
+    expect(failed && f.framesOnPage === 0 && retry.shown && retry.focused && /didn't load/.test(f.status),
+      `failed when ${how}: no iframe, "Try again" shown with focus, and the status says so`, JSON.stringify({ state: f.state, frames: f.framesOnPage, retry, status: f.status }));
+    if (!setup) await ctx.setOffline(false);
+    await ctx.close();
+  }
+
+  // After "Reject all" in Cookie settings, Play asks first and nothing reaches Pragmatic Play until the visitor agrees.
+  {
+    const ctx = await context(browser);
+    await refuseOthers(ctx, PP.base);
+    const stub = await stubPragmatic(ctx);
+    const page = await ctx.newPage();
+    const w = watch(page, PP.base);
+    await page.goto(PP.base + '/cookies/', { waitUntil: 'networkidle' });
+    await page.click('main [data-open="consent"]');
+    await until(page, () => document.getElementById('consent').open);
+    const said = await page.evaluate(() => document.getElementById('consent').textContent.replace(/\s+/g, ' '));
+    expect(/Pragmatic Play demos/.test(said) && /Google Analytics/.test(said) && /each Play button asks first/.test(said),
+      'Cookie settings say what the demos may set and what "Reject all" does to them', said.slice(0, 200));
+    await page.click('#consent [data-consent="reject"]');
+    const stored = await until(page, () => JSON.parse(localStorage.getItem('oql.consent') || '{}').demos === false);
+    const toast = await until(page, () => document.querySelector('#toast .toast__msg')?.textContent === 'Saved.');
+    expect(stored && toast, '"Reject all" is kept (demos: false) and confirmed with "Saved."');
+    await page.goto(PP.base + '/games/wolf-gold/', { waitUntil: 'networkidle' });
+    await mounted(page, STAGE);
+    const readConfirm = () => page.evaluate(() => {
+      const d = document.getElementById('confirm');
+      return { open: d.open, title: d.querySelector('#confirm-title').textContent, yes: d.querySelector('[value="yes"]').textContent, no: d.querySelector('[value="no"]').textContent, focus: document.activeElement?.textContent };
+    });
+    await playFromKeyboard(page);
+    await until(page, () => document.getElementById('confirm').open);
+    const q = await readConfirm();
+    expect(q.open && /Load this demo/.test(q.title) && q.yes === 'Load demo and allow its cookies' && q.no === 'Don’t load it' && q.focus === q.no && !stub.hits.length,
+      'after "Reject all", Play asks first (focus on "Don’t load it") and nothing has been asked of Pragmatic Play', JSON.stringify({ ...q, hits: stub.hits.length }));
+    await page.keyboard.press('Enter');
+    await until(page, () => !document.getElementById('confirm').open);
+    const no = await stageInfo(page);
+    expect(no.state === 'idle' && no.focusPlay && !stub.hits.length, '"Don’t load it" leaves the stage idle, with focus back on Play and no request made', JSON.stringify({ state: no.state, focus: await focused(page), hits: stub.hits.length }));
+    await playFromKeyboard(page);
+    await until(page, () => document.getElementById('confirm').open);
+    await page.click('#confirm [value="yes"]');
+    const ready = await stageIs(page, 'ready', 15000);
+    expect(ready && stub.hits.length > 0 && (await stageInfo(page)).focusClose, '"Load demo and allow its cookies" loads it, with focus on Close demo', JSON.stringify({ state: (await stageInfo(page)).state, hits: stub.hits.length }));
+    expect(!w.errors.length, 'no console or page errors around "Reject all" and the demo', w.errors.join(' | '));
+    await ctx.close();
+  }
+
+  // The expanded stage (no element fullscreen, as on an iPhone): Tab and Shift+Tab
+  // go round Close demo, fullscreen and the game; the button keeps its name.
+  {
+    const ctx = await context(browser, { viewport: { width: 390, height: 844 } });
+    await ctx.addInitScript(() => {
+      if (window.top === window) delete Element.prototype.requestFullscreen;
+    });
+    await refuseOthers(ctx, PP.base);
+    await stubGame(ctx);
+    const page = await ctx.newPage();
+    const w = watch(page, PP.base);
+    await page.goto(PP.base + GAME, { waitUntil: 'networkidle' });
+    await mounted(page, STAGE);
+    await playFromKeyboard(page);
+    await stageIs(page, 'ready', 15000);
+    const FS = `${STAGE} [data-action="fullscreen"]`;
+    await pressOn(page, FS);
+    const expanded = await until(page, (S) => document.querySelector(S).hasAttribute('data-expanded'), STAGE);
+    const btn = () => page.evaluate((FS) => ({ label: document.querySelector(FS).getAttribute('aria-label'), pressed: document.querySelector(FS).getAttribute('aria-pressed') }), FS);
+    const on = await btn();
+    expect(expanded && on.label === 'Fullscreen' && on.pressed === 'true', 'expanded stage: the fullscreen button keeps the name "Fullscreen" and is pressed', JSON.stringify(on));
+    const walk = async (key, n) => {
+      const seen = [];
+      for (let i = 0; i < n; i++) {
+        await page.keyboard.press(key);
+        seen.push(await focusAt(page));
+      }
+      return seen;
+    };
+    await page.focus(FS);
+    const forward = await walk('Tab', 6);
+    await page.focus(`${STAGE} [data-action="unload"]`);
+    const back = await walk('Shift+Tab', 1);
+    const inside = forward.every((s) => ['unload', 'fullscreen', 'frame'].includes(s));
+    expect(inside && forward.slice(0, 4).includes('unload') && forward.includes('frame'),
+      'expanded stage: Tab from fullscreen goes through the game and back round to Close demo, never leaving the stage', forward.join(' → '));
+    expect(back[0] === 'frame', 'expanded stage: Shift+Tab from Close demo wraps to the game', back.join(' → '));
+    await page.focus(FS);
+    await page.keyboard.press('Escape');
+    const off = await btn();
+    const left = await page.evaluate((S) => !document.querySelector(S).hasAttribute('data-expanded'), STAGE);
+    expect(left && off.pressed === 'false' && off.label === 'Fullscreen' && (await focusAt(page)) === 'fullscreen', 'expanded stage: Escape on our controls leaves it, with focus on the fullscreen button', JSON.stringify({ left, ...off, focus: await focusAt(page) }));
+    expect(!w.errors.length, 'no console or page errors in the expanded stage', w.errors.join(' | '));
+    await ctx.close();
+  }
+
+  // The reality check over a demo: whichever way it's answered, focus ends on
+  // something visible (the game, or the break message), never on <body>.
+  // The page's clock is Playwright's, so the check comes exactly when asked for.
+  for (const [answer, fromGame, want] of [
+    ['break', false, 'About breaks and limits'],
+    ['break', true, 'About breaks and limits'],
+    ['continue', true, 'frame'],
+    ['Escape', true, 'frame'],
+  ]) {
+    const ctx = await context(browser);
+    await refuseOthers(ctx, PP.base);
+    await stubGame(ctx);
+    // A session 20 seconds short of the 30-minute reality check.
+    await ctx.addInitScript(() => {
+      if (window.top !== window) return;
+      const now = Date.now();
+      sessionStorage.setItem('oql.session', JSON.stringify({ start: now - (30 * 60 - 20) * 1000, seen: now, staked: 0, returned: 0, reminders: 0, remindedAt: 0 }));
+    });
+    const page = await ctx.newPage();
+    await page.clock.install();
+    await page.goto(PP.base + GAME, { waitUntil: 'networkidle' });
+    await page.clock.runFor(1000); // lets the game mount (it waits for a frame)
+    await mounted(page, STAGE);
+    await playFromKeyboard(page);
+    await stageIs(page, 'ready', 15000);
+    if (fromGame) {
+      const game = page.frames().find((f) => f !== page.mainFrame());
+      await game?.focus('button');
+    }
+    const before = await focusAt(page);
+    await page.clock.runFor(30000);
+    const shown = await until(page, () => document.getElementById('reality-check-dialog').open);
+    // The close event comes a frame after the dialog closes; rg.js's own close
+    // handler was added first, so it has run once this one has.
+    await page.evaluate(() => {
+      window.__oqlRcClosed = false;
+      document.getElementById('reality-check-dialog').addEventListener('close', () => (window.__oqlRcClosed = true), { once: true });
+    });
+    if (answer === 'Escape') await page.keyboard.press('Escape');
+    else await pressOn(page, `#reality-check-dialog [data-rc="${answer}"]`);
+    await until(page, () => window.__oqlRcClosed);
+    await page.clock.runFor(200); // the focus hooks' timers (the page's clock is paused)
+    const after = await focusAt(page);
+    const state = (await stageInfo(page)).state;
+    const lost = await lostFocus(page);
+    const where = `${answer === 'Escape' ? 'Escape' : `"${answer}"`} with focus ${fromGame ? 'in the game' : 'on Close demo'}`;
+    expect(shown && before === (fromGame ? 'frame' : 'unload') && after === want && state === (answer === 'break' ? 'blocked' : 'ready') && !lost.length,
+      `reality check over a demo, ${where}: focus ends on ${want === 'frame' ? 'the game' : `"${want}"`}`, JSON.stringify({ shown, before, after, state, lost }));
+    await ctx.close();
+  }
+
+  // The bar keeps its rows from idle to ready at phone and desktop widths, and
+  // "Close demo" looks the same on home as on a game page, by night too.
+  {
+    const look = {};
+    for (const [width, scheme] of [[390, 'light'], [1024, 'dark']]) {
+      const ctx = await context(browser, { viewport: { width, height: 900 }, colorScheme: scheme });
+      await refuseOthers(ctx, PP.base);
+      const stub = await stubPragmatic(ctx);
+      const page = await ctx.newPage();
+      for (const p of ['/', '/games/zeus-vs-hades-gods-of-war/']) {
+        await page.goto(PP.base + p, { waitUntil: 'networkidle' });
+        await mounted(page, STAGE);
+        const h0 = (await stageInfo(page)).stageH;
+        const release = stub.holdNext();
+        await playFromKeyboard(page);
+        await stageIs(page, 'loading');
+        const h1 = (await stageInfo(page)).stageH;
+        release();
+        await stageIs(page, 'ready', 15000);
+        const h2 = (await stageInfo(page)).stageH;
+        expect(h0 === h1 && h1 === h2, `${p} at ${width}px: the stage doesn't jump when Play is pressed`, `${h0} → ${h1} → ${h2}px`);
+        if (scheme === 'dark') {
+          look[p] = await page.evaluate((S) => {
+            const s = getComputedStyle(document.querySelector(`${S} [data-action="unload"]`));
+            return `${s.borderTopColor} ${s.boxShadow}`;
+          }, STAGE);
+        }
+      }
+      await ctx.close();
+    }
+    const [home, game] = Object.values(look);
+    expect(home && home === game, 'Night: "Close demo" on the home stage has the same border and shadow as on a game page', JSON.stringify(look));
+  }
+}
 
 // ---------- d. keyboard-only play ----------
 if (want('keyboard'))
@@ -1035,14 +1290,72 @@ if (want('dialogs') && PP)
     await page.keyboard.press('Escape');
     const cancelled = await until(page, () => window.__oqlCancel);
     expect(cancelled && (await page.evaluate(() => document.getElementById('age-gate').open)), 'Escape does not skip the age question', cancelled ? 'the dialog closed' : 'Escape never reached the dialog');
+    // Closed without an answer all the same (Chromium lets a second Escape
+    // through, and so does Android's Back): nothing is stored, the games stay
+    // locked, and a "Confirm my age" button on the stage asks again.
+    await page.keyboard.press('Escape');
+    await page.evaluate(() => document.getElementById('age-gate').open && document.getElementById('age-gate').close());
+    await mounted(page, STAGE);
+    const locked = await page.evaluate((S) => {
+      const b = document.querySelector(`${S} [data-open="age-gate"]`);
+      return { age: localStorage.getItem('oql.age'), state: document.querySelector(S).dataset.state, ask: Boolean(b?.getClientRects().length) };
+    }, STAGE);
+    expect(locked.age === null && locked.state === 'blocked' && locked.ask, 'closed without an answer: nothing is stored, the stage stays locked and offers "Confirm my age"', JSON.stringify(locked));
+    await pressOn(page, `${STAGE} [data-open="age-gate"]`);
+    const again = await until(page, () => document.getElementById('age-gate').open && document.getElementById('age-gate').contains(document.activeElement));
+    expect(again, '"Confirm my age" asks the question again, with focus inside it');
     await page.click('[data-age="yes"]');
     await until(page, () => !document.getElementById('age-gate').open);
+    const opened = await stageIs(page, 'idle');
+    expect(opened && (await stageInfo(page)).focusPlay, 'answering "Yes" then opens the stage, with focus on Play', await focused(page));
     await page.reload({ waitUntil: 'networkidle' });
     // The stage mounts after app.js has run startAgeGate(), so by then the question would be open.
     await mounted(page, STAGE);
     expect(!(await page.evaluate(() => document.getElementById('age-gate').open)), 'once answered, the age question is not asked again');
     expect(!w.errors.length, 'no console or page errors around the age question', w.errors.join(' | '));
     await ctx.close();
+
+    // A "no" keeps its 30-day lock: no "Confirm my age", and the question can't be reopened.
+    {
+      const c = await context(browser, { age: false });
+      await c.addInitScript(() => {
+        if (window.top === window) localStorage.setItem('oql.age', JSON.stringify({ answer: 'no', at: Date.now() }));
+      });
+      await refuseOthers(c, PP.base);
+      const p = await c.newPage();
+      await p.goto(PP.base + '/games/gates-of-olympus/', { waitUntil: 'networkidle' });
+      await mounted(p, STAGE);
+      await stageIs(p, 'blocked');
+      const r = await p.evaluate((S) => {
+        const b = document.querySelector(`${S} [data-open="age-gate"]`);
+        const shown = Boolean(b?.getClientRects().length);
+        b?.click();
+        return { shown, reopened: document.getElementById('age-gate').open };
+      }, STAGE);
+      expect(!r.shown && !r.reopened, 'after "No", no "Confirm my age" is shown, and even a scripted click on it doesn\'t reopen the question', JSON.stringify(r));
+      await c.close();
+    }
+
+    // Our own tables, in both modes: closed unanswered, a table offers "Confirm my age" too.
+    for (const [site, p, G] of [[PP, '/games/lapidary-wheel/', '[data-game="lapidary-wheel"]'], ...(FB ? [[FB, '/', '[data-game="seven-systems"]']] : [])]) {
+      const c = await context(browser, { age: false });
+      await refuseOthers(c, site.base);
+      const pg = await c.newPage();
+      const pw = watch(pg, site.base);
+      await pg.goto(site.base + p, { waitUntil: 'networkidle' });
+      await until(pg, () => document.getElementById('age-gate')?.open);
+      await mounted(pg, G);
+      await pg.evaluate(() => document.getElementById('age-gate').close()); // as a second Escape or Android's Back does
+      const offered = await until(pg, (G) => document.querySelector(`${G} [data-age-ask]`)?.hidden === false, G);
+      await pressOn(pg, `${G} [data-open="age-gate"]`);
+      const asked = await until(pg, () => document.getElementById('age-gate').open);
+      await pg.click('[data-age="yes"]');
+      const gone = await until(pg, (G) => document.querySelector(`${G} [data-age-ask]`).hidden && !document.getElementById('age-gate').open, G);
+      const f = await focused(pg);
+      expect(offered && asked && gone && f !== 'body' && !pw.errors.length,
+        `${site.name} ${p}: closed unanswered, the table offers "Confirm my age", which asks again; once answered it goes, and focus stays in the game`, JSON.stringify({ offered, asked, gone, focus: f, errors: pw.errors }));
+      await c.close();
+    }
   });
 
 // ---------- h. preferences ----------
