@@ -34,7 +34,9 @@ export function makeContext(cfg) {
       rtpHow: 'Exact: every one of the 39,304 reel-stop combinations, counted',
       glyph: 'crystal',
       tileFacts: ['3 reels', '5 lines'],
-      tags: ['freespins'],
+      // Lobby filter tags only for features a game really has: Seven Systems has
+      // no free spins, tumbles or Megaways (build.mjs checks this).
+      tags: [],
     },
     {
       slug: 'lapidary-wheel',

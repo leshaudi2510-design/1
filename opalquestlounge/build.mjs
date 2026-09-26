@@ -2,7 +2,11 @@
 // Static site build. No dependencies: Node 20 or later.
 //
 //   node build.mjs                  build into dist/
-//   node build.mjs --strict         also fail on placeholder operator details
+//   node build.mjs --strict         the launch build: also fail on placeholder
+//                                   operator details and, while the Pragmatic
+//                                   Play demos are on, on any demo whose facts
+//                                   nobody has checked ("checked" in
+//                                   src/data/pragmatic-games.json)
 //   node build.mjs --no-pragmatic   build with the Pragmatic Play demos switched
 //                                   off (our own slot, Seven Systems, instead)
 //
@@ -13,15 +17,28 @@
 // src/public, and writes sitemap, robots, manifest, service worker and
 // hosting headers. Then it lints the output against the site's rules and
 // ends with "Lint: no problems found." or exits 1.
+//
+// Caching: scripts and the stylesheet are published under
+// /assets/v<version>/, where the version is a hash of every script, the
+// stylesheet and the client config, and fonts get content-hashed names. A
+// changed file therefore always has a new URL, so those URLs can be cached
+// for a year, and a returning visitor never runs old scripts against new
+// pages. Source files keep plain paths (/assets/js/app.js); the build
+// rewrites them in the pages it writes.
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import zlib from 'node:zlib';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 import { makeContext } from './src/lib/context.mjs';
+import { longDate } from './src/lib/html.mjs';
+import { FILTERS } from './src/lib/ui/tiles.mjs';
 import { layout, setAssetVersion, csp } from './src/lib/layout.mjs';
+import { parseHeaders, cacheControlFor } from './tools/lib/headers.mjs';
+import { pageText, scriptStrings, styleText, uncovered, describe, unknownEntities } from './tools/lib/glyphs.mjs';
 import home from './src/pages/home.mjs';
 import gamesIndex from './src/pages/games-index.mjs';
 import sevenSystems from './src/pages/seven-systems.mjs';
@@ -61,12 +78,49 @@ const write = async (rel, data) => {
   await fs.mkdir(path.dirname(p), { recursive: true });
   await fs.writeFile(p, data);
 };
+/** A script and every module it imports statically, as paths relative to OUT. */
+async function moduleGraph(entries) {
+  const seen = new Set();
+  const queue = [...entries];
+  while (queue.length) {
+    const rel = queue.shift();
+    if (seen.has(rel)) continue;
+    seen.add(rel);
+    let src;
+    try { src = await fs.readFile(path.join(OUT, rel), 'utf8'); } catch { continue; }
+    for (const m of src.matchAll(/(?:import|export)\s[^'"]*?from\s*['"](\.[^'"]+)['"]|import\s*['"](\.[^'"]+)['"]/g)) {
+      queue.push(path.posix.join(path.posix.dirname(rel), m[1] || m[2]));
+    }
+  }
+  return [...seen];
+}
 const gz = (buf) => zlib.gzipSync(buf, { level: 9 }).length;
 const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
+const hash = (...parts) => {
+  const h = crypto.createHash('sha256');
+  for (const p of parts) h.update(p);
+  return h.digest('hex').slice(0, 10);
+};
+const ISO_DATE = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+// What the service worker may download on a first visit, in KB gzip (the home first view is about 60).
+const PRECACHE_BUDGET = 220;
+const today = new Date().toISOString().slice(0, 10);
+// The facts a Pragmatic Play page can mark with data-verify (src/pages/pragmatic-game.mjs).
+const VERIFIABLE = ['grid', 'pays', 'volatility', 'topPayout', 'rtp', 'released', 'bonus'];
 
 // ---------- 1. copy public files ----------
 await fs.rm(OUT, { recursive: true, force: true });
 await fs.cp(PUBLIC, OUT, { recursive: true });
+
+// Fonts get content-hashed names (archivo.<hash>.woff2). /assets/fonts/* is
+// cached for a year as immutable, so a regenerated font must have a new URL.
+const FONTS = path.join(OUT, 'assets/fonts');
+const fontUrls = new Map();
+for (const f of (await fs.readdir(FONTS).catch(() => [])).filter((f) => f.endsWith('.woff2')).sort()) {
+  const hashed = f.replace(/\.woff2$/, `.${hash(await fs.readFile(path.join(FONTS, f)))}.woff2`);
+  await fs.rename(path.join(FONTS, f), path.join(FONTS, hashed));
+  fontUrls.set(`/assets/fonts/${f}`, `/assets/fonts/${hashed}`);
+}
 
 // The stylesheet is written as partials in src/styles/, joined in file-name
 // order (00-tokens.css, 10-base.css, …) into one file for the browser.
@@ -76,15 +130,8 @@ if (partials.length) {
   const parts = await Promise.all(partials.map(async (f) => `/* ---- ${f} ---- */\n${(await fs.readFile(path.join(STYLES, f), 'utf8')).trim()}\n`));
   // Per-game cover colours, generated as rules because the CSP blocks inline styles.
   parts.push(`/* ---- generated: cover colours (src/lib/art.mjs) ---- */\n${coverCss()}\n`);
-  await write('assets/css/site.css', parts.join('\n'));
+  await write('assets/css/site.css', parts.join('\n').replace(/\/assets\/fonts\/[\w.-]+\.woff2/g, (u) => fontUrls.get(u) || u));
 }
-
-// Asset version: a hash of every CSS and JS file, for cache busting.
-const assetFiles = (await walk(path.join(OUT, 'assets'))).filter((f) => /\.(css|js)$/.test(f)).sort();
-const h = crypto.createHash('sha256');
-for (const f of assetFiles) h.update(await fs.readFile(f));
-const version = h.digest('hex').slice(0, 10);
-setAssetVersion(version);
 
 // Client config, generated from site.config.json so the browser code has
 // the same brand, currency and analytics settings as the pages.
@@ -97,14 +144,39 @@ await write(
       analytics: cfg.analytics,
       contactEndpoint: cfg.contactEndpoint,
       pragmatic: { demoUrl: cfg.pragmatic?.demoUrl, params: cfg.pragmatic?.params },
-      version,
     },
     null,
     2,
   )};\n`,
 );
 
+// Asset version: a hash of every script, the stylesheet and the client
+// config written just above, so a change to any of them (a new analytics ID
+// or contact endpoint included) gives every script and style a new URL.
+const assetFiles = (await walk(path.join(OUT, 'assets'))).filter((f) => /\.(css|js)$/.test(f)).sort();
+const version = hash(...(await Promise.all(assetFiles.map((f) => fs.readFile(f)))));
+setAssetVersion(version);
+const VERSIONED = `assets/v${version}`;
+await fs.mkdir(path.join(OUT, VERSIONED), { recursive: true });
+for (const dir of ['js', 'css']) await fs.rename(path.join(OUT, 'assets', dir), path.join(OUT, VERSIONED, dir));
+
+/**
+ * The URLs the build publishes. Pages and page modules name scripts and
+ * styles by their source paths (/assets/js/app.js, perhaps with ?v=); the
+ * files live under /assets/v<version>/. Fonts get their hashed names.
+ */
+const assetUrl = (s) =>
+  s
+    .replace(/\/assets\/(js|css)\/([\w./-]+?\.(?:js|css))(?:\?v=\w+)?(?![\w./-])/g, `/${VERSIONED}/$1/$2`)
+    .replace(/\/assets\/fonts\/[\w.-]+\.woff2/g, (u) => fontUrls.get(u) || u);
+
 // ---------- 2. pages ----------
+// Legal pages carry their own "Updated" date (site.config.json "legalUpdated",
+// by page), falling back to "lastUpdated" like every other page.
+const LEGAL = ['terms', 'privacy', 'cookies'];
+const dateOf = (key) => cfg.legalUpdated?.[key] || cfg.lastUpdated;
+const datedCtx = (key) => (dateOf(key) === ctx.updatedIso ? ctx : { ...ctx, updatedIso: dateOf(key), updated: longDate(dateOf(key)) });
+
 const HOUSE_PAGES = { 'seven-systems': sevenSystems, 'lapidary-wheel': lapidaryWheel, 'brilliant-twenty-one': brilliant21 };
 const pages = [
   home(ctx),
@@ -112,9 +184,9 @@ const pages = [
   ...ctx.games.map((g) => (g.provider === 'pragmatic' ? pragmaticGame(ctx, g) : HOUSE_PAGES[g.slug](ctx))),
   about(ctx),
   responsibleGaming(ctx),
-  terms(ctx),
-  privacy(ctx),
-  cookies(ctx),
+  { ...terms(datedCtx('terms')), legal: 'terms' },
+  { ...privacy(datedCtx('privacy')), legal: 'privacy' },
+  { ...cookies(datedCtx('cookies')), legal: 'cookies' },
   contact(ctx),
   notFound(ctx),
   offline(ctx),
@@ -123,10 +195,13 @@ const pages = [
 for (const page of pages) {
   const file = page.file || path.join(page.path, 'index.html');
   page.outFile = file;
-  page.html = layout(ctx, page)
-    // Wide tables scroll sideways on phones; make each scroll box reachable by keyboard and named after its caption.
-    .replace(/<div class="table-wrap">(\s*<table[^>]*>\s*<caption[^>]*>([\s\S]*?)<\/caption>)/g, (m, rest, cap) =>
-      `<div class="table-wrap" tabindex="0" role="region" aria-label="${cap.replace(/<[^>]+>/g, '').replace(/"/g, '&quot;').trim()}">${rest}`);
+  page.lastmod = page.legal ? dateOf(page.legal) : cfg.lastUpdated;
+  page.html = assetUrl(
+    layout(page.legal ? datedCtx(page.legal) : ctx, page)
+      // Wide tables scroll sideways on phones; make each scroll box reachable by keyboard and named after its caption.
+      .replace(/<div class="table-wrap">(\s*<table[^>]*>\s*<caption[^>]*>([\s\S]*?)<\/caption>)/g, (m, rest, cap) =>
+        `<div class="table-wrap" tabindex="0" role="region" aria-label="${cap.replace(/<[^>]+>/g, '').replace(/"/g, '&quot;').trim()}">${rest}`),
+  );
   await write(file, page.html);
 }
 
@@ -135,7 +210,7 @@ const indexed = pages.filter((p) => p.sitemap !== false);
 await write(
   'sitemap.xml',
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${indexed
-    .map((p) => `  <url><loc>${ctx.origin}${p.path}</loc><lastmod>${cfg.lastUpdated}</lastmod></url>`)
+    .map((p) => `  <url><loc>${ctx.origin}${p.path}</loc><lastmod>${p.lastmod}</lastmod></url>`)
     .join('\n')}\n</urlset>\n`,
 );
 await write('robots.txt', `User-agent: *\nAllow: /\n\nSitemap: ${ctx.origin}/sitemap.xml\n`);
@@ -172,6 +247,11 @@ await write(
 
 // Cloudflare Pages headers. GitHub Pages ignores this file; the pages
 // carry the same Content-Security-Policy in a meta tag.
+//
+// Cloudflare applies every rule whose path matches, in file order, and joins
+// a header that is set twice with a comma. So the broad /assets/* rule comes
+// first, and each narrower rule removes Cache-Control ("! Cache-Control")
+// before setting its own. The lint below keeps it that way.
 await write(
   '_headers',
   `/*
@@ -183,29 +263,59 @@ await write(
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()
   Cross-Origin-Opener-Policy: same-origin
 
-/assets/fonts/*
+/assets/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=604800
+
+/assets/v*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/fonts/*.woff2
+  ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 
 /assets/img/*
+  ! Cache-Control
   Cache-Control: public, max-age=2592000
-
-/assets/*
-  Cache-Control: public, max-age=3600, stale-while-revalidate=604800
 
 /sw.js
   Cache-Control: no-cache
 `,
 );
 
-// Service worker: precache everything the site needs to run offline.
-const allFiles = (await walk(OUT)).map((f) => '/' + path.relative(OUT, f).split(path.sep).join('/'));
-const precache = allFiles
-  .filter((f) => !/^\/(_headers|CNAME|robots\.txt|sitemap\.xml|sw\.js)$/.test(f))
-  .filter((f) => !/\/og-[^/]+\.png$/.test(f))
-  .map((f) => f.replace(/index\.html$/, ''))
-  .sort();
+// Service worker. It precaches what the offline page promises works without
+// a connection: the home page, our own games, the safer-play tools and the
+// offline page itself, with every script, style and font they use. Other
+// pages are saved as they're visited. The Pragmatic Play demo pages stay
+// out: their demos need a connection anyway.
+const OFFLINE_PAGES = ['/', '/offline/', '/responsible-gaming/', ...ctx.houseGames.map((g) => g.path)];
+// data-game="…" → the module app.js loads for it, read from app.js's GAMES table.
+const appJs = await fs.readFile(path.join(OUT, VERSIONED, 'js/app.js'), 'utf8');
+const gameModules = new Map(
+  [...appJs.matchAll(/['"]?([\w-]+)['"]?\s*:\s*\(\)\s*=>\s*import\(\s*['"]\.\/([^'"]+)['"]\s*\)/g)].map((m) => [m[1], `${VERSIONED}/js/${m[2]}`]),
+);
+const precacheEntries = new Set(['/favicon.svg', '/manifest.webmanifest', '/assets/icons/icon-192.png']);
+const offlineModules = [];
+for (const p of OFFLINE_PAGES) {
+  const page = pages.find((x) => x.path === p);
+  if (!page) continue;
+  precacheEntries.add(p);
+  // The stylesheet, fonts, theme-boot.js, app.js and the page's modulepreloads…
+  for (const m of page.html.matchAll(/(?:href|src)="\/((?:assets\/v[^/"]+|assets\/fonts)\/[^"#?]+)"/g)) {
+    if (m[1].endsWith('.js')) offlineModules.push(m[1]);
+    else precacheEntries.add(`/${m[1]}`);
+  }
+  // …the game modules app.js loads for the page's data-game roots, and the lobby.
+  for (const m of page.html.matchAll(/\sdata-game="([\w-]+)"/g)) if (gameModules.has(m[1])) offlineModules.push(gameModules.get(m[1]));
+  for (const m of page.budgetModules || []) offlineModules.push(assetUrl(m).slice(1));
+}
+// …and everything those modules import.
+for (const m of await moduleGraph(offlineModules)) precacheEntries.add(`/${m}`);
+const precache = [...precacheEntries].sort();
+const fileOf = (u) => path.join(OUT, u.endsWith('/') ? `${u}index.html` : u);
 const swTemplate = await fs.readFile(path.join(ROOT, 'src/sw.template.js'), 'utf8');
-const swHash = crypto.createHash('sha256').update(version + precache.join()).digest('hex').slice(0, 10);
+// The worker's version covers the bytes of everything it precaches, so any change to them installs a new worker.
+const swHash = hash(swTemplate, ...(await Promise.all(precache.map((u) => fs.readFile(fileOf(u)).catch(() => `missing ${u}`)))));
 await write('sw.js', swTemplate.replace('__VERSION__', swHash).replace('__PRECACHE__', JSON.stringify(precache, null, 2)));
 
 // ---------- 4. lint ----------
@@ -222,6 +332,19 @@ const visibleText = (s) =>
 const FORBIDDEN = [/\bdeposit/i, /\bwithdraw/i, /cash[\s-]?out/i, /bonus code/i, /real[\s-]money wins?/i, /win big/i, /jackpot/i, /\bhurry\b/i, /don[’']t miss out/i];
 const AMERICAN = [/\bcolor\b/i, /\bfavor/i, /\bcenter\b/i, /\bbehavior/i, /\bgray\b/i, /\borganization\b/i, /\bcatalog\b/i, /\blicense\b/i, /\banalyz/i, /\bcustomiz/i, /\boptimiz/i, /\bjewelry\b/i];
 
+// Glyph coverage: every character above U+007E that a page shows, a script
+// puts on screen or the stylesheet draws must be in both self-hosted fonts
+// (src/data/font-coverage.json, written by tools/subset-fonts.py).
+// Otherwise the browser draws it in a fallback face.
+const coverageFile = path.join(ROOT, 'src/data/font-coverage.json');
+const coverage = JSON.parse(await fs.readFile(coverageFile, 'utf8').catch(() => '{}'));
+const covered = new Set((coverage.codepoints || []).map((u) => parseInt(String(u).replace(/^U\+/i, ''), 16)));
+if (!covered.size) problems.push(`${path.relative(ROOT, coverageFile)}: missing or empty (run tools/subset-fonts.py)`);
+const GLYPH_HINTS = {
+  0x2011: 'use a plain hyphen inside <span class="nobr">',
+  0x2009: 'use a normal or no-break space',
+};
+
 const files = await walk(OUT);
 for (const f of files) {
   if (!/\.(html|js|json|webmanifest|css|txt|xml)$/.test(f)) continue;
@@ -230,9 +353,13 @@ for (const f of files) {
   const text = /\.html$/.test(f) ? visibleText(src) : src;
   for (const re of FORBIDDEN) if (re.test(text)) problems.push(`${rel}: forbidden wording ${re}`);
   if (/\.html$/.test(f)) for (const re of AMERICAN) if (re.test(text)) problems.push(`${rel}: American spelling ${re}`);
-  // U+2011 (non-breaking hyphen) is missing from the subset fonts and reads oddly aloud; keep words together with .nobr instead.
-  const nbh = src.split('\u2011').length - 1;
-  if (nbh) problems.push(`${rel}: ${nbh} U+2011 non-breaking hyphen${nbh === 1 ? '' : 's'} (use a plain hyphen inside <span class="nobr">)`);
+  const drawn = /\.html$/.test(f) ? pageText(src) : /\.js$/.test(f) && rel !== 'sw.js' ? scriptStrings(src) : /\.css$/.test(f) ? styleText(src) : '';
+  if (/\.html$/.test(f)) for (const e of unknownEntities(src)) problems.push(`${rel}: the entity &${e}; (write the character itself, so the glyph check can see it)`);
+  if (covered.size) {
+    for (const [cp, n] of uncovered(drawn, covered)) {
+      problems.push(`${rel}: ${describe(cp)} (${n}\u00d7) isn't in the self-hosted fonts, so it would be drawn in a fallback face${GLYPH_HINTS[cp] ? `; ${GLYPH_HINTS[cp]}` : '; reword, or add it to tools/subset-fonts.py and regenerate the fonts'}`);
+    }
+  }
 }
 
 for (const page of pages) {
@@ -449,45 +576,137 @@ for (const page of pages) {
     if (g.released != null && !(Number.isInteger(g.released) && g.released >= 1990 && g.released <= 2100)) problems.push(`${at}: released must be a year, or null`);
     if (g.topPayout != null && !(typeof g.topPayout === 'number' && g.topPayout > 0)) problems.push(`${at}: topPayout must be a positive number, or null`);
     for (const k of ['features', 'verify']) if (g[k] != null && !(Array.isArray(g[k]) && g[k].every(str))) problems.push(`${at}: "${k}" must be a list of strings`);
+    for (const k of Array.isArray(g.verify) ? g.verify : []) {
+      if (str(k) && !VERIFIABLE.includes(k)) problems.push(`${at}: verify lists "${k}", which the page can't mark (use ${VERIFIABLE.join(', ')})`);
+    }
+    if (g.checked != null && !(typeof g.checked === 'string' && ISO_DATE.test(g.checked))) problems.push(`${at}: "checked" must be a date like "2026-10-01", or left out`);
+    else if (g.checked > today) problems.push(`${at}: "checked" (${g.checked}) is in the future`);
     if (str(g.slug) && !COVERS[g.slug]) problems.push(`${at}: no cover for "${g.slug}" in src/lib/art.mjs COVERS`);
     if (ctx.houseGames.some((h) => h.slug === g.slug)) problems.push(`${at}: slug "${g.slug}" is taken by one of our own games`);
   });
   dupes('slug');
   dupes('symbol');
   dupes('name');
+
+  // Sign-off. "verify" lists the facts the research couldn't confirm, and the
+  // page only marks them with an invisible data-verify. So while the demos
+  // are on, the launch build (--strict) needs every game's "checked" date:
+  // the day someone opened that demo from a UK browser, saw it load and
+  // compared the page's figures with the game's own information screen.
+  const unchecked = list.filter((g) => !g.checked);
+  if (ctx.pragmaticOn && unchecked.length) {
+    const WAYS_OUT = `open each demo from a UK browser, see it load and compare its facts with the game's information screen (the i button), then set "checked": "YYYY-MM-DD"; or set any figure you can't confirm to null; or build with "pragmatic.enabled": false`;
+    if (strict) {
+      for (const g of unchecked) problems.push(`${REL}: ${g.slug} has no "checked" date${g.verify?.length ? ` (unconfirmed: ${g.verify.join(', ')})` : ''}`);
+      problems.push(`${REL}: before launch, ${WAYS_OUT}`);
+    } else {
+      warnings.push(`${REL}: ${unchecked.length} of ${list.length} demos have no "checked" date, so the launch build (--strict) fails: ${unchecked.map((g) => g.slug).join(', ')}. Before launch, ${WAYS_OUT}`);
+    }
+  }
 }
 
 for (const [k, v] of Object.entries(cfg.operator)) {
   if (/\[.*\]/.test(v)) (strict ? problems : warnings).push(`site.config.json: operator.${k} is still a placeholder: "${v}"`);
 }
 
-// First-view budget on the home page: HTML + CSS + every JS module it loads.
-async function moduleGraph(entries) {
-  const seen = new Set();
-  const queue = [...entries];
-  while (queue.length) {
-    const rel = queue.shift();
-    if (seen.has(rel)) continue;
-    seen.add(rel);
-    let src;
-    try { src = await fs.readFile(path.join(OUT, rel), 'utf8'); } catch { continue; }
-    for (const m of src.matchAll(/(?:import|export)\s[^'"]*?from\s*['"](\.[^'"]+)['"]|import\s*['"](\.[^'"]+)['"]/g)) {
-      queue.push(path.posix.join(path.posix.dirname(rel), m[1] || m[2]));
+// Lobby filter tags on our own games: real filters only, and none of the slot
+// features (free spins, tumbles, Megaways) that only the Pragmatic Play demos have.
+{
+  const keys = FILTERS.map((f) => f.key).filter((k) => k !== 'all');
+  const SLOT_FEATURES = ['freespins', 'tumble', 'megaways'];
+  for (const g of ctx.houseGames) {
+    for (const t of g.tags) {
+      if (!keys.includes(t)) problems.push(`src/lib/context.mjs: ${g.slug} has the tag "${t}", which isn't a lobby filter (${keys.join(', ')})`);
+      else if (SLOT_FEATURES.includes(t)) problems.push(`src/lib/context.mjs: ${g.slug} has the tag "${t}", but our own games have no free spins, tumbles or Megaways`);
     }
   }
-  return [...seen];
 }
+
+// Dates. Legal pages may carry their own ("legalUpdated"); a legal page whose
+// source or whose deciding config (the demos, analytics) changed after its
+// date gets a warning, from git history when it's there.
+{
+  const REL = 'site.config.json';
+  if (!ISO_DATE.test(cfg.lastUpdated || '')) problems.push(`${REL}: lastUpdated must be a date like "2026-09-26"`);
+  else if (cfg.lastUpdated > today) problems.push(`${REL}: lastUpdated (${cfg.lastUpdated}) is in the future`);
+  for (const [k, v] of Object.entries(cfg.legalUpdated || {})) {
+    if (!LEGAL.includes(k)) problems.push(`${REL}: legalUpdated.${k} isn't a legal page (${LEGAL.join(', ')})`);
+    else if (!ISO_DATE.test(v)) problems.push(`${REL}: legalUpdated.${k} must be a date like "2026-09-26"`);
+    else if (v > today) problems.push(`${REL}: legalUpdated.${k} (${v}) is in the future`);
+  }
+  const git = (...args) => {
+    const r = spawnSync('git', args, { cwd: ROOT, encoding: 'utf8' });
+    return r.status === 0 ? r.stdout.trim() : null;
+  };
+  // A shallow clone (as in CI) has no history to go by.
+  if (git('rev-parse', '--is-shallow-repository') === 'false') {
+    const DECIDING = /^[+-].*"(enabled|ga4|adsConversionId)"/m;
+    const configChanged = DECIDING.test(git('diff', '-U0', 'HEAD', '--', 'site.config.json') || '') ? today : git('log', '-1', '--format=%as', '-G', '"(enabled|ga4|adsConversionId)"', '--', 'site.config.json');
+    for (const key of LEGAL) {
+      const file = `src/pages/${key}.mjs`;
+      const pageChanged = git('status', '--porcelain', '--', file) ? today : git('log', '-1', '--format=%as', '--', file);
+      const changed = [pageChanged, configChanged].filter(Boolean).sort().at(-1);
+      if (changed && changed > dateOf(key)) {
+        warnings.push(`${file}: the ${key} page changed on ${changed}, after its "Updated" date (${dateOf(key)}). Set ${REL} "legalUpdated": { "${key}": "${changed}" } or "lastUpdated", and rebuild.`);
+      }
+    }
+  }
+}
+
+// Asset URLs: every script and style a page names is under /assets/v<version>/,
+// and no script builds an unversioned one itself.
+for (const page of pages) {
+  for (const m of page.html.matchAll(/["'(=]((?:https?:\/\/[^/"']+)?\/assets\/(?:js|css)\/[^"')\s]*|\/[^"')\s]*\?v=[^"')\s]*)/g)) {
+    problems.push(`${page.outFile}: unversioned script or style URL ${m[1]} (the build moves /assets/js/ and /assets/css/ to /${VERSIONED}/)`);
+  }
+}
+for (const f of files.filter((f) => f.endsWith('.js'))) {
+  for (const m of (await fs.readFile(f, 'utf8')).matchAll(/['"`](\/assets\/(?:js|css)\/[^'"`]*)/g)) {
+    problems.push(`${path.relative(OUT, f)}: names ${m[1]}, which doesn't exist in the build (import it relatively, e.g. './lib/x.js')`);
+  }
+}
+
+// Hosting headers: exactly one max-age for every file (Cloudflare would join
+// two rules' values with a comma), and year-long immutable caching only
+// where the URL changes with the content.
+{
+  const rules = parseHeaders(await fs.readFile(path.join(OUT, '_headers'), 'utf8'));
+  const urls = files.map((f) => `/${path.relative(OUT, f).split(path.sep).join('/')}`);
+  for (const u of new Set([...urls, ...rules.map((r) => r.path.replace(/\*/g, 'x'))])) {
+    const cc = cacheControlFor(rules, u);
+    if ((cc.match(/max-age=/g) || []).length > 1) problems.push(`_headers: ${u} would be sent "Cache-Control: ${cc}". Put the broad rule first and start the narrower one with "! Cache-Control".`);
+  }
+  for (const u of urls) {
+    const fingerprinted = u.startsWith(`/${VERSIONED}/`) || [...fontUrls.values()].includes(u);
+    if (/immutable/.test(cacheControlFor(rules, u)) && !fingerprinted) problems.push(`_headers: ${u} is cached for a year as immutable, but its URL doesn't change with its content`);
+  }
+}
+
+// First-view budget on the home page: HTML + CSS + every JS module it loads.
 const homePage = pages[0];
-const firstView = await moduleGraph(['assets/js/app.js', ...[...(homePage.modules || []), ...(homePage.budgetModules || [])].map((m) => m.slice(1))]);
-let budget = gz(Buffer.from(homePage.html)) + gz(await fs.readFile(path.join(OUT, 'assets/css/site.css')));
+const firstView = await moduleGraph([`${VERSIONED}/js/app.js`, ...[...(homePage.modules || []), ...(homePage.budgetModules || [])].map((m) => assetUrl(m).slice(1))]);
+let budget = gz(Buffer.from(homePage.html)) + gz(await fs.readFile(path.join(OUT, VERSIONED, 'css/site.css')));
 for (const m of firstView) {
   try { budget += gz(await fs.readFile(path.join(OUT, m))); } catch {}
 }
 if (budget > 150 * 1024) problems.push(`home first view is ${kb(budget)} gzip, over the 150 KB budget`);
 
+// The service worker's precache: every file exists, and a first visit
+// doesn't download much more than it looked at.
+let precacheBytes = 0;
+for (const u of precache) {
+  try {
+    precacheBytes += gz(await fs.readFile(fileOf(u)));
+  } catch {
+    problems.push(`sw.js: precaches ${u}, which isn't in the build`);
+  }
+}
+if (precacheBytes > PRECACHE_BUDGET * 1024) problems.push(`sw.js: the precache is ${kb(precacheBytes)} gzip, over its ${PRECACHE_BUDGET} KB budget (${precache.length} files)`);
+
 // ---------- 5. report ----------
 console.log(`Built ${pages.length} pages into ${(path.relative(process.cwd(), OUT).startsWith('..') ? OUT : path.relative(process.cwd(), OUT)) || '.'}/ (assets v${version}, sw ${swHash})`);
 console.log(`Home first view (HTML + CSS + ${firstView.length} JS modules): ${kb(budget)} gzip of 150 KB budget`);
+console.log(`Service worker precache (${precache.length} files for offline use): ${kb(precacheBytes)} gzip of ${PRECACHE_BUDGET} KB budget`);
 for (const w of new Set(warnings.map((w) => w.replace(/^[^:]+: (missing image)/, '$1')))) console.warn(`warning: ${w}`);
 if (problems.length) {
   for (const p of problems) console.error(`error: ${p}`);

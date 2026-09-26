@@ -30,7 +30,9 @@ jobs:
       # broken links and fragments, duplicate ids, inline styles or scripts,
       # a missing age notice or disclaimer, banned wording, American spelling,
       # SEO limits, invalid JSON-LD, missing share images, the Pragmatic Play
-      # data and stages, the CSP frame-src and the page budget.
+      # data and stages, the CSP frame-src, characters the fonts don't have,
+      # unversioned script or style URLs, clashing Cache-Control rules in
+      # _headers, and the page and service worker budgets.
       # The browser checks (npm run check) need Playwright and run locally.
       - name: Build and lint (site.config.json as it is)
         run: node build.mjs
