@@ -6,10 +6,9 @@ import {
 } from './brilliant-21.math.js';
 import { shuffle } from '../lib/rng.js';
 import { wallet } from '../lib/wallet.js';
-import { settings } from '../lib/settings.js';
 import { sound } from '../lib/sound.js';
 import { buzz } from '../lib/haptics.js';
-import { reducedMotion, cssColours, spring } from '../lib/ui.js';
+import { reducedMotion, spring } from '../lib/ui.js';
 import { fmt, carats } from '../lib/format.js';
 import { shell, shortcuts, fitCanvas, setOff, isOff } from './common.js';
 
@@ -17,6 +16,17 @@ const RATIO = 420 / 720;
 const RESHUFFLE_AT = Math.round(DECKS * 52 * CUT_AT);
 const RED = new Set(['hearts', 'diamonds']);
 const wait = (ms) => new Promise((r) => setTimeout(r, reducedMotion() ? 0 : ms));
+
+// Print colours (spec 3.1 and 7.20), the same by day and by night.
+const INK = '#18122B';
+const SHADOW = 'rgb(5 3 12 / 0.55)';
+const GARNET = '#C8102E';
+const RED_SUIT = '#FF4A3D';
+const BLACK_SUIT = '#3DD6FF';
+const VIOLET = '#5B2BD6';
+const YELLOW = '#FFE11A';
+const MAGENTA = '#FF2E93';
+const CREAM = '#FFF5E1';
 
 // ---------- suit shapes, drawn rather than typed ----------
 function suitPath(ctx, suit, x, y, s) {
@@ -67,35 +77,48 @@ export function mount(root) {
   let shoe = shuffle(freshShoe());
   let round = null;
   let sprites = []; // cards on the table, with positions for animation
-  let colours = null;
-
-  function readColours() {
-    colours = { ...cssColours(['--ink', '--paper', '--paper-2', '--rule', '--garnet', '--jet', '--label'], root), dark: settings.isDark() };
-  }
 
   // ---------- layout ----------
+  // Wide tables are 720 × 420. Narrow ones (phones) are nearly square, so
+  // the dealer's cards sit below the dealer's badge and the player's above
+  // the player's badge, and the cards stay big enough to read.
+  const ratioFor = (cssWidth) => (cssWidth < 520 ? 0.86 : RATIO);
   function geometry() {
     const W = canvas.width;
     const H = canvas.height;
-    const ch = H * 0.3;
+    const tall = H / W > 0.8;
+    const ch = H * (tall ? 0.25 : 0.32);
     const cw = ch * 0.7;
-    return { W, H, cw, ch, shoe: [W - cw * 0.9, H * 0.06] };
+    return { W, H, cw, ch, tall, dealerY: H * (tall ? 0.185 : 0.1), playerY: H * 0.54, shoe: [W - cw * 0.92, H * 0.05] };
   }
-  function slotFor(who, handIndex, cardIndex, handCount) {
+  /** Cards in a row step right from `start`, closing up if they would run past `end`. */
+  const step = (pref, start, end, cw, count) => (count > 1 ? Math.max(cw * 0.18, Math.min(pref, (end - start - cw) / (count - 1))) : pref);
+  function slotFor(who, handIndex, cardIndex, handCount, cardCount) {
     const g = geometry();
-    const gap = g.cw * 0.32;
-    if (who === 'dealer') return [g.W * 0.5 - g.cw * 0.9 + cardIndex * (g.cw * 0.62), g.H * 0.12];
+    if (who === 'dealer') {
+      // On a narrow table the dealer's cards start right of centre, clear of the dealer's badge.
+      const start = g.W * 0.5 - g.cw * (g.tall ? 0.45 : 0.9);
+      return [start + cardIndex * step(g.cw * 0.72, start, g.W - g.cw * 1.02, g.cw, cardCount), g.dealerY];
+    }
     const width = g.W / handCount;
-    const left = width * handIndex + width / 2 - g.cw * (handCount > 1 ? 0.8 : 1.1);
-    return [left + cardIndex * (handCount > 1 ? gap * 1.2 : g.cw * 0.78), g.H * 0.56 - cardIndex * g.H * 0.012];
+    const start = width * handIndex + width / 2 - g.cw * (handCount > 1 ? 0.8 : 1.1);
+    const end = handCount > 1 ? width * (handIndex + 1) - g.W * 0.02 : g.W * 0.97;
+    const pref = handCount > 1 ? g.cw * 0.38 : g.cw * 0.78;
+    return [start + cardIndex * step(pref, start, end, g.cw, cardCount), g.playerY - cardIndex * g.H * 0.012];
   }
+  // A slight, fixed tilt per card, as if dealt by hand.
+  const TILT = [-4, 3, -2, 4, -3, 2].map((d) => (d * Math.PI) / 180);
 
   function layoutSprites(instant = false) {
     if (!round) return;
     const hc = round.hands.length;
     const all = [];
-    round.dealer.forEach((card, i) => all.push({ card, to: slotFor('dealer', 0, i, 1), faceUp: i === 0 || round.revealed }));
-    round.hands.forEach((h, hi) => h.cards.forEach((card, i) => all.push({ card, to: slotFor('player', hi, i, hc), faceUp: true, hand: hi })));
+    round.dealer.forEach((card, i) =>
+      all.push({ card, to: slotFor('dealer', 0, i, 1, round.dealer.length), faceUp: i === 0 || round.revealed, tilt: TILT[(i + 3) % 6] }),
+    );
+    round.hands.forEach((h, hi) =>
+      h.cards.forEach((card, i) => all.push({ card, to: slotFor('player', hi, i, hc, h.cards.length), faceUp: true, hand: hi, tilt: TILT[i % 6] })),
+    );
     const now = performance.now();
     for (const s of all) {
       let sp = sprites.find((x) => x.card === s.card);
@@ -114,6 +137,7 @@ export function mount(root) {
         sp.faceUp = s.faceUp;
       }
       sp.hand = s.hand;
+      sp.tilt = s.tilt;
       if (instant || reducedMotion()) {
         sp.x = s.to[0];
         sp.y = s.to[1];
@@ -149,115 +173,115 @@ export function mount(root) {
   }
 
   // ---------- drawing ----------
+  // Cards are artwork in the site's print style and look the same in both
+  // themes: white cards with a thick ink edge and a hard shadow on the blue
+  // felt (the felt itself is CSS). Red suits print in red, black suits in
+  // cyan, both outlined in ink. The face-down card is violet with a dashed
+  // yellow inset and a magenta gem.
   function roundRect(x, y, w, h, r) {
     ctx.beginPath();
     ctx.roundRect ? ctx.roundRect(x, y, w, h, r) : ctx.rect(x, y, w, h);
   }
 
-  function drawCardFace(card, x, y, w, h) {
-    const k = colours;
-    const r = w * 0.07;
+  function cardShape(x, y, w, h, fill) {
+    const r = w * 0.11;
+    roundRect(x + w * 0.06, y + w * 0.06, w, h, r);
+    ctx.fillStyle = SHADOW;
+    ctx.fill();
     roundRect(x, y, w, h, r);
-    ctx.fillStyle = k.label;
+    ctx.fillStyle = fill;
     ctx.fill();
-    ctx.strokeStyle = k.jet;
-    ctx.lineWidth = Math.max(1, w / 90);
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = Math.max(1.5, w * 0.05);
+    ctx.lineJoin = 'round';
     ctx.stroke();
-    // double rule, like a specimen label
-    const inset = w * 0.06;
-    ctx.lineWidth = Math.max(0.75, w / 160);
-    ctx.globalAlpha = 0.5;
-    ctx.strokeRect(x + inset, y + inset, w - inset * 2, h - inset * 2);
-    ctx.globalAlpha = 1;
-    const ink = RED.has(card.suit) ? k.garnet : k.jet;
-    ctx.fillStyle = ink;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'alphabetic';
-    const court = ['J', 'Q', 'K'].includes(card.rank);
-    // corners
-    const cs = w * 0.2;
-    ctx.font = `600 ${cs}px "Bodoni Moda", "Bodoni fallback", serif`;
-    ctx.fillText(card.rank, x + inset + cs * 0.55, y + inset + cs * 1.05);
-    suitPath(ctx, card.suit, x + inset + cs * 0.55, y + inset + cs * 1.6, cs * 0.62);
-    ctx.fill();
-    ctx.save();
-    ctx.translate(x + w, y + h);
-    ctx.rotate(Math.PI);
-    ctx.fillText(card.rank, inset + cs * 0.55, inset + cs * 1.05);
-    suitPath(ctx, card.suit, inset + cs * 0.55, inset + cs * 1.6, cs * 0.62);
-    ctx.fill();
-    ctx.restore();
-    // centre: court cards carry a letter, not a portrait
-    if (court || card.rank === 'A') {
-      ctx.font = `${court ? 'italic 500' : '500'} ${w * 0.56}px "Bodoni Moda", "Bodoni fallback", serif`;
-      ctx.fillText(card.rank, x + w / 2, y + h * 0.62);
-      suitPath(ctx, card.suit, x + w / 2, y + h * 0.78, w * 0.16);
-      ctx.fill();
-    } else {
-      suitPath(ctx, card.suit, x + w / 2, y + h / 2, w * 0.42);
-      ctx.fill();
-    }
   }
 
-  function drawCardBack(x, y, w, h) {
-    const k = colours;
-    roundRect(x, y, w, h, w * 0.07);
-    ctx.fillStyle = k.jet;
+  function suit(card, x, y, s) {
+    suitPath(ctx, card.suit, x, y, s);
+    ctx.fillStyle = RED.has(card.suit) ? RED_SUIT : BLACK_SUIT;
     ctx.fill();
-    ctx.save();
-    ctx.clip();
-    // a hexagonal crystal lattice
-    ctx.strokeStyle = k.label;
-    ctx.globalAlpha = 0.28;
-    ctx.lineWidth = Math.max(0.75, w / 150);
-    const s = w / 7;
-    const hh = s * Math.sqrt(3);
-    for (let row = -1; row < h / hh + 2; row++) {
-      for (let col = -1; col < w / (s * 3) + 2; col++) {
-        const cx = x + col * s * 3 + (row % 2 ? s * 1.5 : 0);
-        const cy = y + row * hh * 0.5;
-        ctx.beginPath();
-        for (let i = 0; i < 6; i++) {
-          const a = (i * Math.PI) / 3;
-          const px = cx + Math.cos(a) * s;
-          const py = cy + Math.sin(a) * s;
-          i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
-        }
-        ctx.closePath();
-        ctx.stroke();
-      }
-    }
-    ctx.restore();
-    ctx.strokeStyle = k.label;
-    ctx.globalAlpha = 0.6;
-    ctx.lineWidth = Math.max(1, w / 90);
-    roundRect(x + w * 0.06, y + w * 0.06, w - w * 0.12, h - w * 0.12, w * 0.04);
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = Math.max(1, s * 0.09);
+    ctx.lineJoin = 'round';
     ctx.stroke();
-    ctx.globalAlpha = 1;
+  }
+
+  function drawCardFace(card, x, y, w, h) {
+    cardShape(x, y, w, h, '#FFFFFF');
+    // Corner: the rank in heavy type, and a small suit under it. Court
+    // cards carry a letter, never a portrait.
+    ctx.fillStyle = RED.has(card.suit) ? GARNET : INK;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    const rs = w * (card.rank === '10' ? 0.3 : 0.36);
+    ctx.font = `900 ${rs}px Archivo, "Arial Black", Arial, sans-serif`;
+    ctx.fillText(card.rank, x + w * 0.12, y + w * 0.43);
+    suit(card, x + w * 0.24, y + w * 0.62, w * 0.2);
+    // Centre: one big suit.
+    suit(card, x + w * 0.56, y + h * 0.64, w * (card.rank === 'A' ? 0.52 : 0.42));
+  }
+
+  function drawCardBack(x, y, w, h, shadow = true) {
+    if (shadow) cardShape(x, y, w, h, VIOLET);
+    else {
+      roundRect(x, y, w, h, w * 0.11);
+      ctx.fillStyle = VIOLET;
+      ctx.fill();
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = Math.max(1.5, w * 0.05);
+      ctx.stroke();
+    }
+    const i = w * 0.1;
+    roundRect(x + i, y + i, w - i * 2, h - i * 2, w * 0.06);
+    ctx.setLineDash([w * 0.07, w * 0.055]);
+    ctx.strokeStyle = YELLOW;
+    ctx.lineWidth = Math.max(1, w * 0.032);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    const cx = x + w / 2;
+    const cy = y + h / 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - h * 0.16);
+    ctx.lineTo(cx + w * 0.15, cy);
+    ctx.lineTo(cx, cy + h * 0.16);
+    ctx.lineTo(cx - w * 0.15, cy);
+    ctx.closePath();
+    ctx.fillStyle = MAGENTA;
+    ctx.fill();
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = Math.max(1, w * 0.032);
+    ctx.lineJoin = 'round';
+    ctx.stroke();
   }
 
   function draw(now = performance.now()) {
-    if (!colours) readColours();
     const g = geometry();
-    const k = colours;
     ctx.clearRect(0, 0, g.W, g.H);
-    // table rules: the dealer's line and the shoe
-    ctx.strokeStyle = k.rule;
-    ctx.lineWidth = Math.max(1, g.W / 700);
-    ctx.setLineDash([g.W / 120, g.W / 160]);
+    // The table's rule and its two lines of small print.
+    const line = g.H * 0.5;
+    ctx.strokeStyle = CREAM;
+    ctx.globalAlpha = 0.55;
+    ctx.lineWidth = Math.max(1.5, g.W / 360);
+    ctx.setLineDash([g.W / 90, g.W / 120]);
     ctx.beginPath();
-    ctx.moveTo(g.W * 0.06, g.H * 0.5);
-    ctx.lineTo(g.W * 0.94, g.H * 0.5);
+    ctx.moveTo(g.W * 0.05, line);
+    ctx.lineTo(g.W * 0.95, line);
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = k.ink;
-    ctx.globalAlpha = 0.6;
-    ctx.font = `500 ${Math.round(g.W / 64)}px "Martian Mono", ui-monospace, monospace`;
+    ctx.globalAlpha = 0.9;
+    ctx.fillStyle = CREAM;
+    const dpr = g.W / Math.max(1, canvas.getBoundingClientRect().width);
+    ctx.font = `800 ${Math.round(Math.max(10.5 * dpr, g.W / (g.tall ? 30 : 58)))}px Archivo, "Arial Narrow", Arial, sans-serif`;
     ctx.textAlign = 'center';
-    ctx.fillText('DEALER STANDS ON EVERY 17 · A BRILLIANT PAYS 3 TO 2', g.W / 2, g.H * 0.5 - g.H * 0.02);
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(g.tall ? 'STANDS ON 17 · BRILLIANT PAYS 3 TO 2' : 'DEALER STANDS ON EVERY 17 · A BRILLIANT PAYS 3 TO 2', g.W / 2, line - g.H * 0.022);
     ctx.globalAlpha = 1;
-    // the shoe
-    drawCardBack(g.shoe[0], g.shoe[1], g.cw * 0.8, g.ch * 0.8);
+    // The shoe: a short stack of backs in the corner.
+    const sw = g.cw * 0.8;
+    const sh = g.ch * 0.8;
+    drawCardBack(g.shoe[0] + sw * 0.08, g.shoe[1] + sw * 0.08, sw, sh, false);
+    drawCardBack(g.shoe[0], g.shoe[1], sw, sh, false);
 
     for (const sp of sprites) {
       let scaleX = 1;
@@ -268,37 +292,38 @@ export function mount(root) {
         showFace = ft < 0.5 ? !sp.faceUp : sp.faceUp;
       }
       ctx.save();
-      ctx.translate(sp.x + g.cw / 2, sp.y);
+      ctx.translate(sp.x + g.cw / 2, sp.y + g.ch / 2);
+      ctx.rotate(sp.tilt || 0);
       ctx.scale(scaleX || 0.001, 1);
-      if (showFace) drawCardFace(sp.card, -g.cw / 2, 0, g.cw, g.ch);
-      else drawCardBack(-g.cw / 2, 0, g.cw, g.ch);
+      if (showFace) drawCardFace(sp.card, -g.cw / 2, -g.ch / 2, g.cw, g.ch);
+      else drawCardBack(-g.cw / 2, -g.ch / 2, g.cw, g.ch);
       ctx.restore();
     }
-    // mark the active hand when split
+    // Mark the hand in play when split: a yellow bar edged in ink.
     if (round && round.hands.length > 1 && round.phase === 'player') {
-      const [x, y] = slotFor('player', round.active, 0, round.hands.length);
-      ctx.strokeStyle = k.ink;
-      ctx.lineWidth = Math.max(2, g.W / 300);
+      const [x, y] = slotFor('player', round.active, 0, round.hands.length, 1);
+      const by = y + g.ch + g.H * 0.045;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = Math.max(5, g.W / 110);
       ctx.beginPath();
-      ctx.moveTo(x, y + g.ch + g.H * 0.04);
-      ctx.lineTo(x + g.cw * 1.4, y + g.ch + g.H * 0.04);
+      ctx.moveTo(x, by);
+      ctx.lineTo(x + g.cw * 1.4, by);
       ctx.stroke();
+      ctx.strokeStyle = YELLOW;
+      ctx.lineWidth = Math.max(2.5, g.W / 220);
+      ctx.stroke();
+      ctx.lineCap = 'butt';
     }
   }
 
   function resize() {
-    if (fitCanvas(canvas, RATIO)) {
+    if (fitCanvas(canvas, ratioFor(canvas.getBoundingClientRect().width))) {
       layoutSprites(true);
       draw();
     }
   }
   new ResizeObserver(resize).observe(canvas);
-  const recolour = () => {
-    colours = null;
-    requestAnimationFrame(() => draw());
-  };
-  settings.on(({ key }) => key === 'theme' && recolour());
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', recolour);
   document.fonts?.ready.then(() => draw());
 
   // ---------- words ----------
@@ -516,7 +541,7 @@ export function mount(root) {
       parts.push(
         {
           brilliant: 'Your Brilliant pays 3 to 2.',
-          win: `${who} wins.`,
+          win: `${who} beats the dealer.`,
           push: `${who} is a push.`,
           lose: `${who} loses.`,
           bust: `${who} is bust.`,

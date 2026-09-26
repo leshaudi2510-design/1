@@ -6,7 +6,7 @@ import { fmt, carats } from '../lib/format.js';
 import { sound } from '../lib/sound.js';
 import { buzz } from '../lib/haptics.js';
 import { track } from '../lib/consent.js';
-import { toast } from '../lib/ui.js';
+import { toast, reducedMotion } from '../lib/ui.js';
 
 // Buttons that change state during play use aria-disabled rather than
 // disabled, so keyboard focus stays on them instead of falling to <body>.
@@ -20,6 +20,7 @@ export function shell(root, { playSelector = '[data-action="spin"]', needed }) {
   const stakeLabel = root.querySelector('[data-stake-label]');
   const radios = [...root.querySelectorAll('.stake input[type="radio"]')];
   const state = { busy: false, lockedMessage: '' };
+  let flashTimer = 0;
 
   const api = {
     play,
@@ -38,6 +39,8 @@ export function shell(root, { playSelector = '[data-action="spin"]', needed }) {
     },
     say(text, tone = '') {
       if (!result) return;
+      clearTimeout(flashTimer);
+      result.classList.remove('is-flash');
       result.dataset.tone = tone;
       result.textContent = text;
     },
@@ -83,14 +86,24 @@ export function shell(root, { playSelector = '[data-action="spin"]', needed }) {
       track('game_round', { game: root.dataset.game, staked, returned });
       return net;
     },
-    /** Only a round that returns more than it cost gets any celebration. */
-    async celebrate(staked, returned) {
-      if (returned <= staked) return;
+    /**
+     * Only a round that returns more than it cost gets any celebration, so a
+     * loss is never dressed up as a win. The celebration is one short flash
+     * and starburst on the result box (CSS, .is-flash), played once. With
+     * reduced motion there is none.
+     */
+    celebrate(staked, returned) {
+      if (!(returned > staked)) return;
       const size = returned >= staked * 10 ? 3 : returned >= staked * 3 ? 2 : 1;
       sound.chime(size);
       buzz([18, 40, 26]);
-      const { flashOpals } = await import('../lib/opal.js');
-      flashOpals();
+      if (!result || reducedMotion()) return;
+      result.classList.remove('is-flash');
+      void result.offsetWidth; // restart the animation if the last one is still fading
+      result.dataset.size = String(size);
+      result.classList.add('is-flash');
+      clearTimeout(flashTimer);
+      flashTimer = setTimeout(() => result.classList.remove('is-flash'), 1000);
     },
   };
 

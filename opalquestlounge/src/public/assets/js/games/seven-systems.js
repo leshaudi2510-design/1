@@ -1,14 +1,16 @@
 // Seven Systems: the slot. The result is drawn from crypto.getRandomValues
 // and settled before the reels move; the animation only shows it.
-import { STRIPS, STOPS, LINES, SYMBOLS, SETS, settle, column } from './seven-systems.math.js';
-import { drawCrystal, drawCabochon } from '../lib/crystals.js';
-import { opalImage } from '../lib/opal.js';
+//
+// The reels are artwork in the site's print style: white reel strips with
+// ink rules, bright crystals in bold ink and the opal mark as the wild.
+// They look the same in both themes, so they read no theme colours.
+import { STRIPS, STOPS, SYMBOLS, SETS, settle, column } from './seven-systems.math.js';
+import { drawCrystal, drawOpal } from '../lib/crystals.js';
 import { randomInt } from '../lib/rng.js';
 import { wallet } from '../lib/wallet.js';
-import { settings } from '../lib/settings.js';
 import { sound } from '../lib/sound.js';
 import { buzz } from '../lib/haptics.js';
-import { reducedMotion, cssColours } from '../lib/ui.js';
+import { reducedMotion } from '../lib/ui.js';
 import { fmt } from '../lib/format.js';
 import { shell, shortcuts, fitCanvas } from './common.js';
 
@@ -17,31 +19,12 @@ const SPEED = 22; // stops per second while spinning
 const OMEGA = 18;
 const ZETA = 0.62;
 
-const name = (k) => SYMBOLS[k].name;
+const INK = '#18122B';
+const YELLOW = '#FFE11A';
+const REEL = '#FFFFFF';
+const REEL_SHADE = '#EDE6FF';
 
-// A still, cheap opal for the first paint: milky or black body with a few patches of colour.
-function quickOpal(w, h, dark) {
-  const c = document.createElement('canvas');
-  c.width = w;
-  c.height = h;
-  const x = c.getContext('2d');
-  x.beginPath();
-  x.ellipse(w / 2, h / 2, (w / 2) * 0.94, (h / 2) * 0.94, 0, 0, Math.PI * 2);
-  x.fillStyle = dark ? '#10131b' : '#dfe2e4';
-  x.fill();
-  x.save();
-  x.clip();
-  const hues = ['#2b88e6', '#22b573', '#d7b531', '#14a6b8', '#e06a2a', '#3cc46a'];
-  for (let i = 0; i < 14; i++) {
-    x.globalAlpha = dark ? 0.85 : 0.55;
-    x.fillStyle = hues[i % hues.length];
-    x.beginPath();
-    x.arc(w * (0.15 + ((i * 37) % 70) / 100), h * (0.15 + ((i * 53) % 70) / 100), Math.min(w, h) * 0.12, 0, Math.PI * 2);
-    x.fill();
-  }
-  x.restore();
-  return c;
-}
+const name = (k) => SYMBOLS[k].name;
 
 function describeWin(w) {
   if (w.kind === 'set') return `${SETS[w.set].name}, mixed`;
@@ -66,64 +49,60 @@ export function mount(root) {
   const blur = [0, 0, 0];
   let wins = [];
   let cache = null;
-  let theme = null;
-  let opalReady = false;
-
-  function readTheme() {
-    return { ...cssColours(['--ink', '--rule', '--paper', '--accent', '--green'], root), dark: settings.isDark() };
-  }
 
   function geometry() {
     const W = canvas.width;
     const H = canvas.height;
-    const pad = W * 0.025;
+    const pad = W * 0.03;
     const rw = (W - pad * 2) / 3;
     const rh = (H - pad * 2) / 3;
-    return { W, H, pad, rw, rh, size: Math.min(rw * 0.78, rh * 0.8) };
+    return { W, H, pad, rw, rh, size: Math.min(rw * 0.7, rh * 0.74) };
   }
 
   function buildCache() {
-    theme = readTheme();
     const g = geometry();
     const cw = Math.ceil(g.rw);
     const ch = Math.ceil(g.rh);
     cache = {};
-    // The WebGL opal is made when the browser is idle; until then a quick 2D stand-in keeps start-up light.
-    const ow = Math.round(g.size * 1.02);
-    const oh = Math.round(g.size * 0.78);
-    const opal = opalReady ? opalImage(ow, oh, { dark: theme.dark }) : quickOpal(ow, oh, theme.dark);
-    if (!opalReady) {
-      document.addEventListener(
-        'oql:opal',
-        () => {
-          opalReady = true;
-          cache = null;
-          if (!ui.busy) requestAnimationFrame(draw);
-        },
-        { once: true },
-      );
-    }
     for (const key of Object.keys(SYMBOLS)) {
       const c = document.createElement('canvas');
       c.width = cw;
       c.height = ch;
       const x = c.getContext('2d');
-      if (key === 'O') drawCabochon(x, opal, cw / 2, ch / 2, g.size, theme);
-      else drawCrystal(x, key, cw / 2, ch / 2, g.size * 0.92, theme);
+      if (key === 'O') drawOpal(x, cw / 2, ch / 2, g.size * 0.98);
+      else drawCrystal(x, key, cw / 2, ch / 2, g.size * 0.9);
       cache[key] = c;
     }
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(x, y, w, h, r) : ctx.rect(x, y, w, h);
   }
 
   function draw() {
     if (!cache) buildCache();
     const g = geometry();
+    const lw = Math.max(2, g.W / 200);
+    const win = [g.pad, g.pad, g.rw * 3, g.rh * 3];
     ctx.clearRect(0, 0, g.W, g.H);
+
+    // The reel window: white strips, the middle one a touch lighter than its neighbours' edges.
+    roundRect(...win, g.W * 0.018);
+    ctx.fillStyle = REEL;
+    ctx.fill();
     ctx.save();
-    ctx.beginPath();
-    ctx.rect(g.pad, g.pad, g.rw * 3, g.rh * 3);
     ctx.clip();
     for (let r = 0; r < 3; r++) {
+      // A lilac band at the top and bottom of each strip suggests the curve of the reel.
       const x = g.pad + r * g.rw;
+      const grad = ctx.createLinearGradient(0, g.pad, 0, g.pad + g.rh * 3);
+      grad.addColorStop(0, REEL_SHADE);
+      grad.addColorStop(0.18, REEL);
+      grad.addColorStop(0.82, REEL);
+      grad.addColorStop(1, REEL_SHADE);
+      ctx.fillStyle = grad;
+      ctx.fillRect(x, g.pad, g.rw, g.rh * 3);
       const midY = g.pad + g.rh * 1.5;
       const p = pos[r];
       const base = Math.floor(p);
@@ -145,24 +124,33 @@ export function mount(root) {
     }
     ctx.restore();
 
-    // Reel dividers and the window's rules.
-    ctx.strokeStyle = theme.rule;
-    ctx.lineWidth = Math.max(1, g.W / 600);
+    // Ink rules between the reels and round the window.
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = lw;
     for (let r = 1; r < 3; r++) {
-      const x = Math.round(g.pad + r * g.rw) + 0.5;
+      const x = Math.round(g.pad + r * g.rw);
       ctx.beginPath();
       ctx.moveTo(x, g.pad);
       ctx.lineTo(x, g.pad + g.rh * 3);
       ctx.stroke();
     }
-    // Tick marks at the middle row, like a specimen tray's centre line.
-    ctx.strokeStyle = theme.ink;
-    ctx.lineWidth = Math.max(1.5, g.W / 400);
+    ctx.lineWidth = lw * 1.5;
+    roundRect(...win, g.W * 0.018);
+    ctx.stroke();
+
+    // Yellow pointers on the middle row, outside the window.
     const my = g.pad + g.rh * 1.5;
-    for (const x of [g.pad * 0.3, g.W - g.pad * 0.3]) {
+    const t = g.pad * 0.8;
+    ctx.fillStyle = YELLOW;
+    ctx.lineWidth = Math.max(1.5, lw * 0.7);
+    ctx.lineJoin = 'round';
+    for (const [x, dir] of [[g.pad * 0.12, 1], [g.W - g.pad * 0.12, -1]]) {
       ctx.beginPath();
-      ctx.moveTo(x, my - g.rh * 0.12);
-      ctx.lineTo(x, my + g.rh * 0.12);
+      ctx.moveTo(x, my - t);
+      ctx.lineTo(x + dir * t, my);
+      ctx.lineTo(x, my + t);
+      ctx.closePath();
+      ctx.fill();
       ctx.stroke();
     }
 
@@ -170,13 +158,25 @@ export function mount(root) {
   }
 
   function drawWins(g) {
-    const lw = Math.max(2, g.W / 220);
+    const lw = Math.max(3, g.W / 150);
     ctx.save();
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     for (const w of wins) {
-      ctx.strokeStyle = theme.ink;
-      ctx.lineWidth = lw;
+      // Frame each paying cell in yellow, edged in ink.
+      w.rows.forEach((row, r) => {
+        const inset = lw * 1.4;
+        const x = g.pad + g.rw * r + inset;
+        const y = g.pad + g.rh * row + inset;
+        roundRect(x, y, g.rw - inset * 2, g.rh - inset * 2, g.rw * 0.06);
+        ctx.strokeStyle = INK;
+        ctx.lineWidth = lw * 1.9;
+        ctx.stroke();
+        ctx.strokeStyle = YELLOW;
+        ctx.lineWidth = lw;
+        ctx.stroke();
+      });
+      // The line itself: ink under yellow.
       ctx.beginPath();
       w.rows.forEach((row, r) => {
         const x = g.pad + g.rw * (r + 0.5);
@@ -184,31 +184,33 @@ export function mount(root) {
         if (r === 0) ctx.moveTo(g.pad * 0.5, y);
         ctx.lineTo(x, y);
       });
-      const last = w.rows[2];
-      ctx.lineTo(g.W - g.pad * 0.5, g.pad + g.rh * (last + 0.5));
+      ctx.lineTo(g.W - g.pad * 0.5, g.pad + g.rh * (w.rows[2] + 0.5));
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = lw * 1.9;
       ctx.stroke();
-      // Frame each paying cell with the double rule of a specimen label.
-      w.rows.forEach((row, r) => {
-        const x = g.pad + g.rw * r;
-        const y = g.pad + g.rh * row;
-        const inset = lw * 1.5;
-        ctx.lineWidth = lw * 0.6;
-        ctx.strokeRect(x + inset, y + inset, g.rw - inset * 2, g.rh - inset * 2);
-        ctx.strokeRect(x + inset * 2.4, y + inset * 2.4, g.rw - inset * 4.8, g.rh - inset * 4.8);
-      });
-      // Line number tag
+      ctx.strokeStyle = YELLOW;
+      ctx.lineWidth = lw * 0.8;
+      ctx.stroke();
+    }
+    // Line number tags on top of every line: ink discs with yellow numbers,
+    // side by side when two lines start on the same row.
+    const fs = Math.round(g.W / 30);
+    const perRow = [0, 0, 0];
+    ctx.font = `900 ${fs}px Archivo, "Arial Black", Arial, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (const w of wins) {
       const y0 = g.pad + g.rh * (w.rows[0] + 0.5);
-      const tag = String(w.line);
-      const fs = Math.round(g.W / 34);
-      ctx.font = `600 ${fs}px "Martian Mono", ui-monospace, monospace`;
-      ctx.fillStyle = theme.ink;
+      const x0 = g.pad * 1.7 + perRow[w.rows[0]]++ * fs * 1.9;
+      ctx.fillStyle = INK;
       ctx.beginPath();
-      ctx.arc(g.pad * 1.6, y0, fs * 0.85, 0, Math.PI * 2);
+      ctx.arc(x0, y0, fs * 0.8, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = theme.paper;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(tag, g.pad * 1.6, y0 + fs * 0.05);
+      ctx.strokeStyle = YELLOW;
+      ctx.lineWidth = Math.max(1.5, lw * 0.5);
+      ctx.stroke();
+      ctx.fillStyle = YELLOW;
+      ctx.fillText(String(w.line), x0, y0 + fs * 0.05);
     }
     ctx.restore();
   }
@@ -220,16 +222,6 @@ export function mount(root) {
     }
   }
   new ResizeObserver(resize).observe(canvas);
-  settings.on(({ key }) => {
-    if (key === 'theme') {
-      cache = null;
-      draw();
-    }
-  });
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    cache = null;
-    requestAnimationFrame(draw);
-  });
   document.fonts?.ready.then(() => draw());
 
   // ---------- a spin ----------

@@ -1,20 +1,33 @@
-// Lapidary Wheel: single-zero roulette. The winning pocket is chosen with
+// Lapidary Wheel: single-zero roulette. The pocket is chosen with
 // crypto.getRandomValues the moment you spin; the ball is then drawn on a
 // path that ends in that pocket.
+//
+// The wheel is artwork in the site's print style: ink outlines, garnet,
+// jet and malachite pockets, a gold rim and a cut gem at the hub. It looks
+// the same in both themes, so it reads no theme colours.
 import { WHEEL, BETS, CHIPS, TABLE_LIMIT, colourOf, settle } from './lapidary-wheel.math.js';
 import { randomInt } from '../lib/rng.js';
 import { wallet } from '../lib/wallet.js';
-import { settings } from '../lib/settings.js';
 import { sound } from '../lib/sound.js';
 import { buzz } from '../lib/haptics.js';
-import { reducedMotion, cssColours } from '../lib/ui.js';
+import { reducedMotion } from '../lib/ui.js';
 import { fmt, carats } from '../lib/format.js';
-import { shell, shortcuts, fitCanvas } from './common.js';
+import { shell, shortcuts, fitCanvas, setOff, isOff } from './common.js';
 
 const N = WHEEL.length;
 const STEP = (Math.PI * 2) / N;
 const COLOUR_NAME = { garnet: 'Garnet', jet: 'Jet', malachite: 'Malachite' };
 const spoken = (n) => `${n} ${COLOUR_NAME[colourOf(n)]}`;
+
+// Print colours (spec 3.1 and 7.20). Identical by day and by night.
+const INK = '#18122B';
+const POCKET = { garnet: '#C8102E', jet: '#18122B', malachite: '#13C08B' };
+const NUMBER = { garnet: '#FFFFFF', jet: '#FFFFFF', malachite: '#18122B' };
+const GOLD = '#FFC21A';
+const YELLOW = '#FFE11A';
+const GEM = '#3DD6FF';
+const GEM_LIGHT = '#C9F4FF';
+const CREAM = '#FFF5E1';
 
 export function mount(root) {
   const canvas = root.querySelector('.wheel__canvas');
@@ -38,168 +51,173 @@ export function mount(root) {
   let wheelAngle = -Math.PI / 2 - STEP / 2;
   let ball = null; // { angle, radius } in wheel-independent screen terms
   let landed = null; // pocket index
-  let colours = null;
 
-  function readColours() {
-    colours = {
-      ...cssColours(['--ink', '--paper', '--paper-2', '--paper-3', '--rule', '--rule-strong', '--garnet', '--jet', '--malachite', '--label'], root),
-      dark: settings.isDark(),
-    };
-  }
+  const ring = (c, r0, r1, a0 = 0, a1 = Math.PI * 2) => {
+    ctx.beginPath();
+    ctx.arc(c, c, r1, a0, a1);
+    ctx.arc(c, c, r0, a1, a0, true);
+    ctx.closePath();
+  };
+  const disc = (c, r) => {
+    ctx.beginPath();
+    ctx.arc(c, c, r, 0, Math.PI * 2);
+  };
 
   function draw() {
-    if (!colours) readColours();
     const S = canvas.width;
     const c = S / 2;
-    const k = colours;
-    ctx.clearRect(0, 0, S, S);
     const R = (f) => f * S;
+    const line = (f) => Math.max(1, S * f);
+    ctx.clearRect(0, 0, S, S);
 
-    // Bowl rim and ball track
-    ctx.fillStyle = k.jet;
-    ctx.beginPath();
-    ctx.arc(c, c, R(0.495), 0, Math.PI * 2);
+    // Ink outline, gold rim and ball track, with a groove where the ball runs.
+    disc(c, R(0.497));
+    ctx.fillStyle = INK;
     ctx.fill();
-    ctx.fillStyle = k.dark ? k.paper3 : k.paper2;
-    ctx.beginPath();
-    ctx.arc(c, c, R(0.47), 0, Math.PI * 2);
+    disc(c, R(0.482));
+    ctx.fillStyle = GOLD;
     ctx.fill();
-    ctx.strokeStyle = k.ruleStrong;
-    ctx.lineWidth = Math.max(1, S / 500);
-    for (const f of [0.47, 0.405]) {
-      ctx.beginPath();
-      ctx.arc(c, c, R(f), 0, Math.PI * 2);
-      ctx.stroke();
-    }
+    ctx.strokeStyle = INK;
+    ctx.globalAlpha = 0.3;
+    ctx.lineWidth = line(0.004);
+    disc(c, R(0.458));
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    disc(c, R(0.412));
+    ctx.fillStyle = INK;
+    ctx.fill();
 
-    // Number ring and pockets, turning with the wheel
-    const fs = Math.round(S * 0.034);
-    ctx.font = `500 ${fs}px "Martian Mono", ui-monospace, monospace`;
+    // Number ring and pockets, turning with the wheel.
+    const fs = Math.round(S * 0.037);
+    ctx.font = `800 ${fs}px Archivo, "Arial Narrow", Arial, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     for (let i = 0; i < N; i++) {
       const n = WHEEL[i];
       const a0 = wheelAngle + i * STEP;
       const a1 = a0 + STEP;
-      const col = k[colourOf(n)];
-      ctx.fillStyle = col;
-      ctx.beginPath();
-      ctx.arc(c, c, R(0.4), a0, a1);
-      ctx.arc(c, c, R(0.325), a1, a0, true);
-      ctx.closePath();
+      const col = colourOf(n);
+      ctx.fillStyle = POCKET[col];
+      ring(c, R(0.27), R(0.4), a0 - 0.002, a1 + 0.002);
       ctx.fill();
-      // pocket (a little deeper)
-      ctx.fillStyle = col;
-      ctx.beginPath();
-      ctx.arc(c, c, R(0.325), a0, a1);
-      ctx.arc(c, c, R(0.27), a1, a0, true);
-      ctx.closePath();
+      // The pocket itself sits a little deeper: shade it with ink.
+      ctx.fillStyle = 'rgb(24 18 43 / 0.34)';
+      ring(c, R(0.27), R(0.322), a0, a1);
       ctx.fill();
-      ctx.fillStyle = 'rgb(0 0 0 / 0.28)';
-      ctx.fill();
-      // number
       const am = a0 + STEP / 2;
       ctx.save();
-      ctx.translate(c + Math.cos(am) * R(0.3625), c + Math.sin(am) * R(0.3625));
+      ctx.translate(c + Math.cos(am) * R(0.362), c + Math.sin(am) * R(0.362));
       ctx.rotate(am + Math.PI / 2);
-      ctx.fillStyle = k.label;
+      ctx.fillStyle = NUMBER[col];
       ctx.fillText(String(n), 0, 0);
       ctx.restore();
     }
-    // Frets
-    ctx.strokeStyle = k.label;
-    ctx.globalAlpha = 0.55;
-    ctx.lineWidth = Math.max(1, S / 420);
+    // Frets between pockets, and the rings that frame them.
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = line(0.0045);
+    ctx.beginPath();
     for (let i = 0; i < N; i++) {
       const a = wheelAngle + i * STEP;
-      ctx.beginPath();
       ctx.moveTo(c + Math.cos(a) * R(0.27), c + Math.sin(a) * R(0.27));
       ctx.lineTo(c + Math.cos(a) * R(0.4), c + Math.sin(a) * R(0.4));
-      ctx.stroke();
     }
-    ctx.globalAlpha = 1;
+    ctx.stroke();
+    ctx.lineWidth = line(0.004);
+    disc(c, R(0.322));
+    ctx.stroke();
+
     if (landed != null) {
+      // The pocket the ball landed in: a yellow frame edged in ink.
       const a0 = wheelAngle + landed * STEP;
-      ctx.strokeStyle = k.label;
-      ctx.lineWidth = Math.max(2, S / 160);
-      ctx.beginPath();
-      ctx.arc(c, c, R(0.4) - ctx.lineWidth / 2, a0, a0 + STEP);
-      ctx.arc(c, c, R(0.27) + ctx.lineWidth / 2, a0 + STEP, a0, true);
-      ctx.closePath();
+      ctx.lineJoin = 'round';
+      ring(c, R(0.272), R(0.398), a0, a0 + STEP);
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = line(0.02);
+      ctx.stroke();
+      ctx.strokeStyle = YELLOW;
+      ctx.lineWidth = line(0.011);
       ctx.stroke();
     }
 
-    // The turret: a brilliant cut seen from above.
-    drawBrilliant(c, R(0.265), wheelAngle);
+    drawHub(c, R(0.268), wheelAngle);
 
-    // Ball
+    // Ball: white, ink edge and a hard offset shadow.
     if (ball) {
       const bx = c + Math.cos(ball.angle) * R(ball.radius);
       const by = c + Math.sin(ball.angle) * R(ball.radius);
-      const br = R(0.018);
-      ctx.fillStyle = 'rgb(0 0 0 / 0.25)';
+      const br = R(0.02);
+      ctx.fillStyle = 'rgb(24 18 43 / 0.45)';
       ctx.beginPath();
-      ctx.arc(bx + br * 0.25, by + br * 0.3, br, 0, Math.PI * 2);
+      ctx.arc(bx + br * 0.35, by + br * 0.35, br, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = k.label;
-      ctx.strokeStyle = k.jet;
-      ctx.lineWidth = Math.max(1, S / 600);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = line(0.0045);
       ctx.beginPath();
       ctx.arc(bx, by, br, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
-      ctx.fillStyle = 'rgb(255 255 255 / 0.9)';
-      ctx.beginPath();
-      ctx.arc(bx - br * 0.35, by - br * 0.35, br * 0.3, 0, Math.PI * 2);
-      ctx.fill();
     }
   }
 
-  function drawBrilliant(c, r, rot) {
-    const k = colours;
+  // The hub: a yellow cone with an ink edge and a cut gem at its centre.
+  function drawHub(c, r, rot) {
+    const S = canvas.width;
     const pt = (a, f) => [c + Math.cos(a + rot) * r * f, c + Math.sin(a + rot) * r * f];
-    ctx.fillStyle = k.dark ? k.paper2 : k.paper;
-    ctx.beginPath();
-    ctx.arc(c, c, r, 0, Math.PI * 2);
+    const poly = (pts) => {
+      ctx.beginPath();
+      pts.forEach((p, i) => (i ? ctx.lineTo(...p) : ctx.moveTo(...p)));
+      ctx.closePath();
+    };
+    ctx.lineJoin = 'round';
+    disc(c, r);
+    ctx.fillStyle = YELLOW;
     ctx.fill();
-    ctx.strokeStyle = k.ink;
-    ctx.lineWidth = Math.max(1, r / 90);
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = Math.max(1.5, S * 0.012);
     ctx.stroke();
-    const table = Array.from({ length: 8 }, (_, i) => pt((i * Math.PI) / 4 + Math.PI / 8, 0.5));
-    const stars = Array.from({ length: 8 }, (_, i) => pt((i * Math.PI) / 4, 0.74));
-    const girdle = Array.from({ length: 16 }, (_, i) => pt((i * Math.PI) / 8 + Math.PI / 16, 1));
+    // Spokes to the pockets, like the turret's arms.
+    ctx.lineWidth = Math.max(1, S * 0.006);
     ctx.beginPath();
-    table.forEach((p, i) => (i ? ctx.lineTo(...p) : ctx.moveTo(...p)));
-    ctx.closePath();
-    for (let i = 0; i < 8; i++) {
-      const a = table[i];
-      const b = table[(i + 1) % 8];
-      const s = stars[(i + 1) % 8];
-      ctx.moveTo(...a);
-      ctx.lineTo(...s);
-      ctx.lineTo(...b);
-      ctx.moveTo(...s);
-      ctx.lineTo(...girdle[(2 * i + 1) % 16]);
-      ctx.moveTo(...s);
-      ctx.lineTo(...girdle[(2 * i + 2) % 16]);
-      ctx.moveTo(...a);
-      ctx.lineTo(...girdle[(2 * i) % 16]);
+    for (let i = 0; i < 4; i++) {
+      const a = (i * Math.PI) / 2 + Math.PI / 4;
+      ctx.moveTo(...pt(a, 0.72));
+      ctx.lineTo(...pt(a, 0.96));
     }
-    ctx.globalAlpha = 0.7;
     ctx.stroke();
-    ctx.globalAlpha = 1;
+    const outer = Array.from({ length: 8 }, (_, i) => pt((i * Math.PI) / 4 + Math.PI / 8, 0.66));
+    const inner = Array.from({ length: 8 }, (_, i) => pt((i * Math.PI) / 4 + Math.PI / 8, 0.33));
+    poly(outer);
+    ctx.fillStyle = GEM;
+    ctx.fill();
+    ctx.lineWidth = Math.max(1.5, S * 0.009);
+    ctx.stroke();
+    poly(inner);
+    ctx.fillStyle = GEM_LIGHT;
+    ctx.fill();
+    ctx.lineWidth = Math.max(1, S * 0.006);
+    ctx.stroke();
+    ctx.beginPath();
+    for (let i = 0; i < 8; i += 2) {
+      ctx.moveTo(...inner[i]);
+      ctx.lineTo(...outer[i]);
+    }
+    ctx.stroke();
+    // A cream glint on the table facet.
+    ctx.strokeStyle = CREAM;
+    ctx.lineCap = 'round';
+    ctx.lineWidth = Math.max(1, S * 0.008);
+    ctx.beginPath();
+    ctx.moveTo(...pt(Math.PI * 1.1, 0.2));
+    ctx.lineTo(...pt(Math.PI * 1.35, 0.2));
+    ctx.stroke();
+    ctx.lineCap = 'butt';
   }
 
   function resize() {
     if (fitCanvas(canvas, 1)) draw();
   }
   new ResizeObserver(resize).observe(canvas);
-  const recolour = () => {
-    colours = null;
-    requestAnimationFrame(draw);
-  };
-  settings.on(({ key }) => key === 'theme' && recolour());
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', recolour);
   document.fonts?.ready.then(() => draw());
 
   // ---------- the table ----------
@@ -215,9 +233,9 @@ export function mount(root) {
     const t = total();
     totalEl.textContent = fmt(t);
     root.querySelector('[data-stake-label]').textContent = fmt(t);
-    undoBtn.disabled = ui.busy || !placed.length;
-    clearBtn.disabled = ui.busy || !placed.length;
-    rebetBtn.disabled = ui.busy || !lastBets || placed.length > 0;
+    setOff(undoBtn, ui.busy || !placed.length);
+    setOff(clearBtn, ui.busy || !placed.length);
+    setOff(rebetBtn, ui.busy || !lastBets || placed.length > 0);
     ui.refresh();
   }
 
@@ -235,6 +253,7 @@ export function mount(root) {
     }
     clearWinners();
     landed = null;
+    draw();
     bets[id] = (bets[id] || 0) + amount;
     placed.push({ id, amount });
     sound.chip();
@@ -316,21 +335,24 @@ export function mount(root) {
   });
 
   undoBtn.addEventListener('click', () => {
+    if (isOff(undoBtn)) return;
     const last = placed.at(-1);
     if (last) lift(last.id);
   });
   clearBtn.addEventListener('click', () => {
+    if (isOff(clearBtn)) return;
     bets = {};
     placed = [];
     renderBets();
     ui.say('Table cleared.');
   });
   rebetBtn.addEventListener('click', () => {
-    if (!lastBets) return;
+    if (isOff(rebetBtn) || !lastBets) return;
     const sum = lastBets.reduce((a, p) => a + p.amount, 0);
     if (!ui.allowed(sum)) return;
     clearWinners();
     landed = null;
+    draw();
     bets = {};
     placed = [];
     for (const p of lastBets) {
@@ -368,7 +390,7 @@ export function mount(root) {
           let radius = 0.437;
           if (u > 0.62) {
             const v = (u - 0.62) / 0.38;
-            radius = 0.437 - (0.437 - 0.3) * (v * v * (3 - 2 * v)) + Math.sin(v * Math.PI * 5) * 0.012 * (1 - v);
+            radius = 0.437 - (0.437 - 0.296) * (v * v * (3 - 2 * v)) + Math.sin(v * Math.PI * 5) * 0.012 * (1 - v);
             const rel = Math.floor((((angle - wheelAngle) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2) / STEP);
             if (rel !== lastPocket) {
               lastPocket = rel;
@@ -378,7 +400,7 @@ export function mount(root) {
           ball = { angle, radius };
         } else {
           const settleT = t - LAND;
-          ball = { angle: pocketAngle(t), radius: 0.3 + Math.exp(-settleT * 9) * Math.sin(settleT * 30) * 0.006 };
+          ball = { angle: pocketAngle(t), radius: 0.296 + Math.exp(-settleT * 9) * Math.sin(settleT * 30) * 0.006 };
           if (lastPocket !== -1) {
             lastPocket = -1;
             sound.stop();
@@ -416,7 +438,7 @@ export function mount(root) {
     canvas.setAttribute('aria-label', 'The wheel is spinning.');
     if (reducedMotion()) {
       wheelAngle = -Math.PI / 2 - index * STEP - STEP / 2;
-      ball = { angle: -Math.PI / 2, radius: 0.3 };
+      ball = { angle: -Math.PI / 2, radius: 0.296 };
       draw();
     } else {
       await animate(index);
