@@ -2,9 +2,10 @@
 //
 // Each mineral is a real convex polyhedron in its crystal system's habit.
 // We find its faces with a small convex hull, turn it to a fixed viewing
-// angle and draw it the way 19th-century mineralogy plates did: visible
-// edges in solid ink, hidden edges dashed, faces washed with the mineral's
-// colour. By day the ink is jet on paper; on the velvet tray it's chalk.
+// angle and print it in the site's pop style: flat bright fills in three
+// tones (lit, mid, shade), bold ink edges, a heavier ink silhouette and a
+// hard offset shadow. Opal, which has no crystal lattice, is drawn like the
+// site's opal mark. The artwork is the same in both themes.
 
 const V = (x, y, z) => [x, y, z];
 const ring = (n, r, y, phase = 0, sx = 1, sz = 1) =>
@@ -42,15 +43,17 @@ const SHAPES = {
   })(),
 };
 
-// Mineral colours as a light wash (day) and a glow (night).
+const INK = '#18122B';
+
+// Three flat tones per mineral: lit, mid and shaded faces.
 export const TINTS = {
-  G: { day: 'oklch(52% 0.15 20)', night: 'oklch(62% 0.17 20)' },
-  B: { day: 'oklch(64% 0.1 170)', night: 'oklch(72% 0.11 175)' },
-  Q: { day: 'oklch(80% 0.02 250)', night: 'oklch(82% 0.03 250)' },
-  Z: { day: 'oklch(62% 0.1 60)', night: 'oklch(70% 0.11 65)' },
-  T: { day: 'oklch(74% 0.12 75)', night: 'oklch(80% 0.12 80)' },
-  F: { day: 'oklch(78% 0.05 40)', night: 'oklch(80% 0.06 40)' },
-  X: { day: 'oklch(52% 0.07 330)', night: 'oklch(66% 0.08 330)' },
+  G: ['#FF9A8F', '#FF4A3D', '#C8102E'], // garnet red
+  B: ['#7FE8C4', '#13C08B', '#0B8A63'], // beryl green
+  Q: ['#FFFFFF', '#C9F4FF', '#7FD3EE'], // quartz ice
+  Z: ['#FFC680', '#FF9A1F', '#D2661B'], // zircon orange
+  T: ['#FFF3A0', '#FFE11A', '#E0A800'], // topaz yellow
+  F: ['#FFE0EE', '#FFB0D6', '#FF6FB5'], // orthoclase pink
+  X: ['#C9B8FF', '#9B7BFF', '#5B2BD6'], // axinite violet
 };
 
 // ---------- geometry ----------
@@ -121,71 +124,168 @@ function model(key) {
 
 /**
  * Draw a crystal into ctx, centred at (x, y), fitting a box of `size` px.
- * theme: { ink, paper, dark }
  */
-export function drawCrystal(ctx, key, x, y, size, theme) {
+export function drawCrystal(ctx, key, x, y, size) {
   const m = model(key);
   const light = norm([-0.5, 0.65, 0.6]);
   const P = (i) => [x + m.pts[i][0] * size, y + m.pts[i][1] * size];
-  const tint = TINTS[key][theme.dark ? 'night' : 'day'];
+  const [lit, mid, shade] = TINTS[key];
   const visible = m.faces.map((f) => f.n[2] > 1e-4);
-  const lw = Math.max(1, size / 60);
+  const lw = Math.max(1.5, size / 26);
+  const face = (f, dx = 0, dy = 0) => {
+    ctx.beginPath();
+    f.idx.forEach((i, k) => {
+      const [px, py] = P(i);
+      k ? ctx.lineTo(px + dx, py + dy) : ctx.moveTo(px + dx, py + dy);
+    });
+    ctx.closePath();
+  };
 
-  // Faces: a wash of colour, lighter where the light falls.
   ctx.save();
   ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+
+  // Hard offset shadow: the silhouette in ink, pushed down and right.
+  const off = size * 0.045;
+  ctx.fillStyle = INK;
   m.faces.forEach((f, fi) => {
     if (!visible[fi]) return;
-    const shade = Math.max(0, dot(f.n, light));
-    ctx.beginPath();
-    f.idx.forEach((i, k) => (k ? ctx.lineTo(...P(i)) : ctx.moveTo(...P(i))));
-    ctx.closePath();
-    ctx.fillStyle = tint;
-    ctx.globalAlpha = theme.dark ? 0.22 + shade * 0.55 : 0.18 + shade * 0.5;
+    face(f, off, off);
     ctx.fill();
   });
-  ctx.globalAlpha = 1;
 
-  // Edges: solid if either face is visible, dashed if both are hidden.
+  // Faces in three flat tones, by how squarely they face the light.
+  m.faces.forEach((f, fi) => {
+    if (!visible[fi]) return;
+    const s = dot(f.n, light);
+    face(f);
+    ctx.fillStyle = s > 0.55 ? lit : s > 0.05 ? mid : shade;
+    ctx.fill();
+  });
+
+  // Edges: every visible edge in ink, the outline heavier.
   const edges = new Map();
   m.faces.forEach((f, fi) => {
     f.idx.forEach((a, k) => {
       const b = f.idx[(k + 1) % f.idx.length];
       const id = a < b ? `${a}-${b}` : `${b}-${a}`;
-      const e = edges.get(id) || { a, b, seen: false };
-      e.seen = e.seen || visible[fi];
+      const e = edges.get(id) || { a, b, seen: 0 };
+      if (visible[fi]) e.seen += 1;
       edges.set(id, e);
     });
   });
-  ctx.strokeStyle = theme.ink;
+  ctx.strokeStyle = INK;
   for (const e of edges.values()) {
+    if (!e.seen) continue;
     ctx.beginPath();
     ctx.moveTo(...P(e.a));
     ctx.lineTo(...P(e.b));
-    if (e.seen) {
-      ctx.setLineDash([]);
-      ctx.lineWidth = lw * 1.25;
-      ctx.globalAlpha = 1;
-    } else {
-      ctx.setLineDash([lw * 3, lw * 2.5]);
-      ctx.lineWidth = lw * 0.8;
-      ctx.globalAlpha = 0.45;
-    }
+    ctx.lineWidth = e.seen === 1 ? lw * 1.5 : lw;
     ctx.stroke();
+  }
+
+  // A cream glint on the most lit face.
+  let best = -1;
+  let bestS = -Infinity;
+  m.faces.forEach((f, fi) => {
+    const s = dot(f.n, light);
+    if (visible[fi] && s > bestS) {
+      bestS = s;
+      best = fi;
+    }
+  });
+  if (best >= 0) {
+    const pts = m.faces[best].idx.map(P);
+    const cx = pts.reduce((a, p) => a + p[0], 0) / pts.length;
+    const cy = pts.reduce((a, p) => a + p[1], 0) / pts.length;
+    sparkle(ctx, cx - size * 0.04, cy - size * 0.04, size * 0.07, '#FFFFFF', lw * 0.55);
   }
   ctx.restore();
 }
 
-/** Opal: a cabochon from the opal renderer, with a fine ink outline. */
-export function drawCabochon(ctx, img, x, y, size, theme) {
-  const w = size * 1.02;
-  const h = size * 0.78;
-  ctx.drawImage(img, x - w / 2, y - h / 2, w, h);
-  ctx.save();
-  ctx.strokeStyle = theme.ink;
-  ctx.lineWidth = Math.max(1, size / 60) * 1.25;
+/** A four-point star with an ink edge. */
+function sparkle(ctx, x, y, s, fill, lw) {
+  const k = s * 0.3;
   ctx.beginPath();
-  ctx.ellipse(x, y, (w / 2) * 0.94, (h / 2) * 0.94, 0, 0, Math.PI * 2);
+  ctx.moveTo(x, y - s);
+  ctx.lineTo(x + k, y - k);
+  ctx.lineTo(x + s, y);
+  ctx.lineTo(x + k, y + k);
+  ctx.lineTo(x, y + s);
+  ctx.lineTo(x - k, y + k);
+  ctx.lineTo(x - s, y);
+  ctx.lineTo(x - k, y - k);
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = lw;
+  ctx.lineJoin = 'round';
   ctx.stroke();
+}
+
+// The opal, from the site's opal mark (the "opal" symbol in lib/art.mjs),
+// in its 48 × 48 box: a cyan stone with magenta, yellow, red and green
+// patches of colour, a halftone, a white highlight and a yellow sparkle.
+let OPAL = null;
+function opalPaths() {
+  if (OPAL) return OPAL;
+  const dots = new Path2D();
+  for (let y = 3; y < 48; y += 6) for (let x = 3; x < 48; x += 6) {
+    dots.moveTo(x + 1.25, y);
+    dots.arc(x, y, 1.25, 0, Math.PI * 2);
+  }
+  OPAL = {
+    stone: new Path2D('M24 4c10 0 17 9 17 20s-7 20-17 20S7 35 7 24 14 4 24 4z'),
+    patches: [
+      ['#FF2E93', new Path2D('M0 16L21 6l14 13-19 10z')],
+      ['#FFE11A', new Path2D('M24 29l24-8v20l-18 7z')],
+      ['#FF4A3D', new Path2D('M2 34l15-4 5 18H0z')],
+      ['#13C08B', new Path2D('M30 4l18 2v10l-13 3z')],
+    ],
+    dots,
+    shine: new Path2D('M14 17c1.5-4.5 4.5-7 8.5-8'),
+    star: new Path2D('M40 4l1.3 3.2 3.2 1.3-3.2 1.3L40 13l-1.3-3.2-3.2-1.3 3.2-1.3z'),
+  };
+  return OPAL;
+}
+
+/** Draw the opal (the wild) centred at (x, y), fitting a box of `size` px. */
+export function drawOpal(ctx, x, y, size) {
+  const o = opalPaths();
+  const s = size / 42;
+  ctx.save();
+  ctx.translate(x - 24 * s, y - 24 * s);
+  ctx.scale(s, s);
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  // hard shadow
+  ctx.save();
+  ctx.translate(2, 2);
+  ctx.fillStyle = INK;
+  ctx.fill(o.stone);
+  ctx.restore();
+  ctx.save();
+  ctx.clip(o.stone);
+  ctx.fillStyle = '#00AEEF';
+  ctx.fillRect(0, 0, 48, 48);
+  for (const [fill, p] of o.patches) {
+    ctx.fillStyle = fill;
+    ctx.fill(p);
+  }
+  ctx.fillStyle = 'rgb(24 18 43 / 0.35)';
+  ctx.fill(o.dots);
+  ctx.restore();
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 3;
+  ctx.stroke(o.stone);
+  ctx.strokeStyle = '#FFFFFF';
+  ctx.lineWidth = 3.2;
+  ctx.stroke(o.shine);
+  ctx.fillStyle = '#FFE11A';
+  ctx.fill(o.star);
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 1.4;
+  ctx.stroke(o.star);
   ctx.restore();
 }

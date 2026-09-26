@@ -1,89 +1,291 @@
-/* ---------- 22. Our own tables: panel style ---------- */
-.tables{padding:var(--section) 0}
-.game{background:var(--surface);color:var(--text);border:var(--bw) solid var(--line);border-radius:var(--r-stage);box-shadow:8px 8px 0 var(--pop);overflow:hidden}
+/* ---------- 22. Our own games: the .game panels (spec 7.20) ----------
+   Lapidary Wheel (roulette), Brilliant Twenty-One (blackjack) and Seven
+   Systems (our slot, shown only when the Pragmatic demos are off).
+   Markup: src/lib/ui/tables.mjs. Scripts: assets/js/games/*.js.
+   The canvases are artwork in fixed print colours, the same in both themes. */
+
+.game{position:relative;background:var(--surface);color:var(--text);border:var(--bw) solid var(--line);border-radius:var(--r-stage);box-shadow:8px 8px 0 var(--pop);overflow:hidden}
 .game + .game{margin-top:36px}
-.game__head{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 16px;border-bottom:var(--bw) solid var(--line);background:var(--gh, var(--g))}
-.game__crest{width:44px;height:44px;flex:none;border-radius:50%;border:var(--bw-ctl) solid var(--k);background:var(--y);display:grid;place-items:center;color:var(--k)}
+
+/* Head band, coloured by game (a class, not an inline style: CSP) */
+.game.wheel{--gh:#18CF96}
+.game.twentyone{--gh:#3DD6FF}
+.game.slot{--gh:#FF4FB0}
+.game__head{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 16px;border-bottom:var(--bw) solid var(--line);background:var(--gh, var(--g));color:var(--k)}
+.game__crest{width:44px;height:44px;flex:none;border-radius:50%;border:var(--bw-ctl) solid var(--k);background:var(--y);display:grid;place-items:center;color:var(--k);box-shadow:2px 2px 0 var(--k)}
 .game__crest svg{width:26px;height:26px}
-.game__title{font:900 24px/1.05 var(--f-display);font-stretch:112%;color:var(--k)}
-.game__facts{margin-left:auto;display:flex;gap:8px}
-.game__facts div{display:flex;align-items:center;gap:6px;background:#FFFFFF;color:var(--k);border:2px solid var(--k);border-radius:999px;padding:5px 10px;font:700 14px/1 var(--f-ui)}
+.game__title{font:900 24px/1.05 var(--f-display);font-stretch:112%;letter-spacing:-.01em;color:var(--k)}
+.game__facts{margin-left:auto;display:flex;flex-wrap:wrap;gap:8px}
+.game__facts div{display:flex;align-items:center;gap:6px;background:#FFFFFF;color:var(--k);border:2px solid var(--k);border-radius:var(--r-pill);padding:5px 10px;font:700 14px/1 var(--f-ui);white-space:nowrap}
 .game__facts dt{font-weight:600;color:#4A4160}
 .game__facts dd{font-weight:900;font-variant-numeric:tabular-nums}
-.game__result{font:800 17px/1.35 var(--f-ui);padding:10px 14px;border:var(--bw-ctl) solid var(--ctl-line);border-radius:12px;background:var(--surface-2)}
-.game__controls{display:grid;gap:14px}
+
+/* Result box: aria-live; tone set by common.js (up, down, locked) */
+.game__result{position:relative;font:800 17px/1.35 var(--f-ui);padding:10px 14px;border:var(--bw-ctl) solid var(--ctl-line);border-radius:12px;background:var(--surface-2);color:var(--text)}
+.game__result[data-tone="up"]{border-left:10px solid var(--g)}
+.game__result[data-tone="locked"]{border-left:10px solid var(--r)}
+
+/* The only celebration: one short flash and a starburst on the result box,
+   played once, and only when a round returns more than its stake
+   (common.js adds .is-flash). None under reduced motion. */
+.game__result.is-flash{animation:result-flash .8s ease-out 1}
+.game__result.is-flash::after{content:"";position:absolute;top:-16px;right:-8px;width:44px;height:44px;pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,4 59,32 86,18 72,43 97,52 70,60 84,86 57,72 48,97 40,70 14,84 28,58 3,48 30,40 17,14 42,29' fill='%23FF2E93' stroke='%2318122B' stroke-width='6' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+  animation:result-burst .8s ease-out 1 both}
+.game__result.is-flash[data-size="2"]::after{--burst-to:1.2}
+.game__result.is-flash[data-size="3"]::after{--burst-to:1.4}
+/* Yellow with ink text, then straight back: the text never passes through a low-contrast mix */
+@keyframes result-flash{
+  0%,55%{background:var(--y);color:var(--k);border-color:var(--k)}
+  57%{background:var(--surface-2);color:var(--text)}
+}
+@keyframes result-burst{
+  0%{transform:scale(.2) rotate(-30deg);opacity:1}
+  35%{transform:scale(var(--burst-to, 1)) rotate(0);opacity:1}
+  75%{opacity:1}
+  100%{transform:scale(var(--burst-to, 1)) rotate(6deg);opacity:0}
+}
+
+.game__controls{display:grid;gap:14px;align-content:start}
 .game__buttons{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center}
 .game__buttons .btn{min-height:48px;padding:10px 18px;font-size:16px}
-.game__buttons .btn--play{min-height:56px;padding:12px 22px;font-size:17px}
-.game__disclaimer{padding:10px 16px;border-top:2px dashed color-mix(in srgb, var(--text) 30%, transparent);font-size:14.5px;color:var(--text-2)}
+.game__buttons .btn--play{min-height:56px;padding:12px 22px;font-size:17px;border-width:var(--bw)}
+.game__buttons .btn--quiet{min-height:44px;padding:8px 12px}
+.game__disclaimer{padding:12px 18px 14px;border-top:2px dashed color-mix(in srgb, var(--text) 30%, transparent);font-size:14.5px;line-height:1.5;color:var(--text-2)}
+.game__disclaimer > span:first-child{font-weight:600;color:var(--text)}
+.game__keys{font-size:14px;line-height:1.9;color:var(--text-2)}
+:is(.game, .table-faq, .game-body) kbd{font:700 13px/1 var(--f-ui);padding:3px 6px;border:2px solid var(--ctl-line);border-bottom-width:4px;border-radius:6px;background:var(--surface);color:var(--text);white-space:nowrap}
+.game .stake{max-width:360px}
+
+/* ---------- Roulette ---------- */
 .wheel__layout{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,9fr);gap:24px;padding:18px}
-.wheel__stage{display:grid;gap:12px;align-content:start;justify-items:center}
-.wheel__stage svg{width:100%;max-width:260px;height:auto}
-.wheel__history{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
-.wheel__history li{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:800 14px/1 var(--f-ui);border:2px solid var(--k)}
+.wheel__stage{display:grid;gap:16px;align-content:start;justify-items:center}
+.wheel__canvas{display:block;width:100%;max-width:300px;height:auto;aspect-ratio:1}
+.wheel__last{display:grid;gap:8px;justify-items:center}
+.wheel__last-label{font:800 13px/1.2 var(--f-ui);font-stretch:115%;text-transform:uppercase;letter-spacing:.1em;color:var(--text-2)}
+.wheel__history{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;min-height:32px;max-width:260px}
+.wheel__history:empty::before{content:"None yet";font:500 14px/32px var(--f-body);color:var(--text-2)}
+.wheel__history li{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:800 14px/1 var(--f-ui);font-variant-numeric:tabular-nums;border:2px solid var(--ctl-line)}
 .wheel__table{display:grid;gap:14px;align-content:start;min-width:0}
-/* bet chips: the chip-value picker reads as physical chips */
+:is(.bet, .wheel__history li, .wheel-order li).is-garnet{background:#C8102E;color:#FFFFFF}
+:is(.bet, .wheel__history li, .wheel-order li).is-jet{background:#18122B;color:#FFFFFF}
+:is(.bet, .wheel__history li, .wheel-order li).is-malachite{background:#13C08B;color:#18122B}
+
+/* Chip value picker: poker chips (spec 7.5) */
 .segmented.chips{display:flex;flex-wrap:wrap;gap:10px;border:0;background:none;overflow:visible;border-radius:0}
-.segmented.chips label,.segmented.chips label + label{flex:none;margin-left:0}
 .segmented.chips legend{float:left;width:100%;font:800 15px/1.2 var(--f-ui);margin-bottom:8px}
-.segmented.chips label{width:52px;height:52px;min-height:0;padding:0;border-radius:50%;border:var(--bw-ctl) solid var(--k)!important;background:var(--chip);color:var(--chip-t);
-  font:900 15px/1 var(--f-ui);box-shadow:inset 0 0 0 5px var(--chip), inset 0 0 0 8px rgb(255 255 255 / .9), 3px 3px 0 var(--pop);transition:transform .12s, box-shadow .12s}
-.segmented.chips label:nth-of-type(1){--chip:#FFFFFF;--chip-t:#18122B}
-.segmented.chips label:nth-of-type(2){--chip:#C8102E;--chip-t:#FFFFFF}
-.segmented.chips label:nth-of-type(3){--chip:#13C08B;--chip-t:#18122B}
-.segmented.chips label:nth-of-type(4){--chip:#18122B;--chip-t:#FFFFFF}
-.segmented.chips label:nth-of-type(5){--chip:#5B2BD6;--chip-t:#FFFFFF}
-.segmented.chips label:nth-of-type(1){box-shadow:inset 0 0 0 5px #FFFFFF, inset 0 0 0 8px #00AEEF, 3px 3px 0 var(--pop)}
+.segmented.chips label,.segmented.chips label + label{flex:none;margin-left:0}
+.segmented.chips label{width:52px;height:52px;min-height:0;padding:0;border-radius:50%;border:var(--bw-ctl) solid var(--k);background:var(--chip);color:var(--chip-t);
+  font:900 15px/1 var(--f-ui);font-variant-numeric:tabular-nums;box-shadow:inset 0 0 0 5px var(--chip), inset 0 0 0 8px var(--chip-ring, rgb(255 255 255 / .9)), 3px 3px 0 var(--pop);transition:transform .12s, box-shadow .12s}
+.segmented.chips label:first-of-type,.segmented.chips label:last-of-type{border-radius:50%}
+.chips .chip-1{--chip:#FFFFFF;--chip-t:#18122B;--chip-ring:#00AEEF}
+.chips .chip-5{--chip:#C8102E;--chip-t:#FFFFFF}
+.chips .chip-25{--chip:#13C08B;--chip-t:#18122B}
+.chips .chip-100{--chip:#18122B;--chip-t:#FFFFFF}
+.segmented.chips label.chip-100{font-size:13px;letter-spacing:-.03em}
+.chips .chip-500{--chip:#5B2BD6;--chip-t:#FFFFFF}
 .segmented.chips label:hover{transform:translate(-1px,-2px);background:var(--chip)}
 .segmented.chips label:has(input:checked){background:var(--chip);color:var(--chip-t);transform:translateY(-4px);outline:3px solid var(--y);outline-offset:3px}
 .segmented.chips label:has(input:focus-visible){outline:3px solid var(--focus);outline-offset:4px}
+
+/* The betting table. The DOM runs zero; 3 2 1; 6 5 4 …; the column bets.
+   grid-auto-flow: column lays that out as the standard table. */
 .board{display:grid;gap:4px;min-width:0}
 .board__numbers{display:grid;grid-auto-flow:column;grid-template-rows:repeat(3, 44px);grid-template-columns:1.3fr repeat(12, minmax(0,1fr)) 1.2fr;gap:4px}
 .board__dozens{display:grid;grid-template-columns:1fr repeat(3, 4fr) 1fr;gap:4px}
 .board__even{display:grid;grid-template-columns:1fr repeat(6, 2fr) 1fr;gap:4px}
 .board__dozens::before,.board__dozens::after,.board__even::before,.board__even::after{content:""}
-.bet{position:relative;display:grid;place-items:center;min-width:24px;min-height:36px;padding:0;border:2px solid var(--k);border-radius:6px;background:var(--surface);color:var(--text);
+.bet{position:relative;display:grid;place-items:center;min-width:24px;min-height:36px;padding:0;margin:0;border:2px solid var(--ctl-line);border-radius:6px;background:var(--surface);color:var(--text);
   font:800 15px/1 var(--f-ui);font-variant-numeric:tabular-nums;cursor:pointer}
 .bet:hover{outline:3px solid var(--y);outline-offset:-3px}
+.bet.is-winner{z-index:1;box-shadow:inset 0 0 0 3px var(--y), 0 0 0 3px var(--text)}
+.bet:focus-visible{z-index:2;outline:3px solid var(--focus);outline-offset:2px}
 .bet--zero{grid-row:span 3}
 .bet--col{font-size:13px}
-.is-garnet{background:#C8102E;color:#FFFFFF}
-.is-jet{background:#18122B;color:#FFFFFF}
-.is-malachite{background:#13C08B;color:#18122B}
 .bet--out{min-height:40px;font-size:14px}
-.bet__chip{position:absolute;right:-5px;top:-7px;min-width:24px;height:24px;padding:0 4px;border-radius:999px;background:var(--y);color:var(--k);border:2px solid var(--k);display:grid;place-items:center;font:900 11.5px/1 var(--f-ui)}
+.bet__chip{position:absolute;right:-5px;top:-7px;min-width:24px;height:24px;padding:0 4px;border-radius:var(--r-pill);background:var(--y);color:var(--k);border:2px solid var(--k);display:grid;place-items:center;font:900 11.5px/1 var(--f-ui)}
 .bet__chip:empty{display:none}
 .wheel__staked{font:700 15.5px/1.3 var(--f-ui)}
 .wheel__staked small{font-weight:600;color:var(--text-2)}
+
+/* ---------- Blackjack ---------- */
 .twentyone__layout{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:20px;padding:18px}
-.twentyone__stage{position:relative;border:var(--bw) solid var(--k);border-radius:16px;min-height:280px;overflow:hidden;
+.twentyone__stage{position:relative;align-self:start;border:var(--bw) solid var(--k);border-radius:16px;overflow:hidden;
   background:radial-gradient(ellipse at 50% 20%, #2F6BE0, #1740B8 60%, #0F2C85)}
 .twentyone__stage::after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle, rgb(255 255 255 / .08) 30%, transparent 32%);background-size:10px 10px;pointer-events:none}
-.twentyone__stage svg{position:absolute;inset:0;width:100%;height:100%}
-.hand{position:absolute;left:14px;z-index:2;display:inline-flex;align-items:center;gap:8px;background:#FFFFFF;color:var(--k);border:2px solid var(--k);border-radius:999px;padding:5px 12px 5px 6px;font:800 15px/1 var(--f-ui);box-shadow:3px 3px 0 var(--k)}
-.hand__who{background:var(--k);color:var(--y);border-radius:999px;padding:5px 8px;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.twentyone__canvas{position:relative;z-index:1;display:block;width:100%;height:auto}
+.hand{position:absolute;left:14px;z-index:2;display:inline-flex;align-items:center;gap:8px;max-width:calc(100% - 28px);background:#FFFFFF;color:var(--k);border:2px solid var(--k);border-radius:var(--r-pill);padding:5px 12px 5px 6px;font:800 15px/1 var(--f-ui);font-variant-numeric:tabular-nums;box-shadow:3px 3px 0 var(--k)}
+.hand__who{background:var(--k);color:var(--y);border-radius:var(--r-pill);padding:5px 8px;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
 .hand--dealer{top:14px}
 .hand--player{bottom:14px}
+.twentyone__side{min-width:0}
+.twentyone__hint{display:flex;align-items:center;gap:8px;padding:8px 12px;border:2px solid var(--k);border-radius:10px;background:var(--hl-bg);color:var(--hl-text);font:700 15.5px/1.35 var(--f-ui)}
 .twentyone__moves{padding:12px;border:var(--bw-ctl) dashed var(--ctl-line);border-radius:14px}
 .twentyone__moves .btn{flex:1 1 0;min-width:0;padding:10px 8px}
-.stake{max-width:360px}
-.switch--inline{display:flex;align-items:center;gap:10px;font:700 15px/1.3 var(--f-ui);cursor:pointer}
-.switch--inline input{appearance:none;width:46px;height:28px;border-radius:999px;border:var(--bw-ctl) solid var(--ctl-line);background:var(--surface-2);position:relative;cursor:pointer;flex:none;margin:0}
-.switch--inline input::after{content:"";position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:var(--text);transition:transform .12s}
-.switch--inline input:checked{background:var(--y);border-color:var(--k)}
-.switch--inline input:checked::after{transform:translateX(18px);background:var(--k)}
-.game__keys{font-size:14px;color:var(--text-2)}
-kbd{font:700 13px/1 var(--f-ui);padding:3px 6px;border:2px solid var(--ctl-line);border-bottom-width:4px;border-radius:6px;background:var(--surface)}
+.twentyone__shoe{font-size:14.5px;line-height:1.45;color:var(--text-2)}
+/* The hint switch: track first, label after (spec 7.20) */
+.switch.switch--inline{display:flex;align-items:center;gap:10px;padding:0;min-height:44px;justify-self:start}
+.switch--inline > span{font:700 15px/1.3 var(--f-ui)}
 
+/* ---------- Seven Systems ---------- */
+.slot__layout{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:20px;padding:18px}
+.slot__stage{position:relative;align-self:start;padding:8px;border:var(--bw) solid var(--k);border-radius:16px;overflow:hidden;background:linear-gradient(160deg, #FF4FB0, #8B3CF0 55%, #5B2BD6)}
+.slot__stage::after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle, rgb(255 255 255 / .16) 30%, transparent 32%);background-size:10px 10px;pointer-events:none}
+.slot__canvas{position:relative;z-index:1;display:block;width:100%;height:auto}
+.slot__side{min-width:0}
+/* The in-game paytable: a popover card in the dialog style */
+.paytable-pop{width:min(460px, 100% - 32px);max-height:calc(100dvh - 32px);overflow:auto;margin:auto;padding:0;background:var(--surface);color:var(--text);
+  border:var(--bw-heavy) solid var(--line);border-radius:var(--r-stage);box-shadow:10px 10px 0 var(--pop)}
+.paytable-pop::backdrop{background:var(--backdrop)}
+.pop__head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px 10px 18px;background:var(--y);color:var(--k);border-bottom:var(--bw) solid var(--k);--focus:#18122B}
+.pop__title{font:900 22px/1.1 var(--f-display);font-stretch:112%}
+.pop__title small{font:700 14px/1 var(--f-ui);font-stretch:100%}
+.pop__head .icon-btn{background:#FFFFFF;color:var(--k);border-color:var(--k);box-shadow:3px 3px 0 var(--k)}
+.paytable-pop .paytable{border:0;border-radius:0;box-shadow:none}
+.paytable-pop .paytable tbody th{width:auto}
+.pop__foot{padding:12px 18px 16px;font-size:15px;line-height:1.5;color:var(--text-2);border-top:2px solid color-mix(in srgb, var(--text) 16%, transparent)}
+.paytable tr.is-hit > *{background:var(--y);color:var(--k)}
+/* Mineral swatches in the paytables: the crystals' own fills */
+.pt__name{display:inline-flex;align-items:center}
+.sym{display:inline-block;flex:none;width:12px;height:12px;margin:0 10px 0 2px;border:2px solid var(--k);transform:rotate(45deg)}
+.sym--O{background:conic-gradient(#00AEEF 0 25%, #FF2E93 0 50%, #FFE11A 0 75%, #13C08B 0)}
+.sym--G{background:#FF4A3D} .sym--B{background:#13C08B} .sym--Q{background:#C9F4FF} .sym--Z{background:#FF9A1F}
+.sym--T{background:#FFE11A} .sym--F{background:#FFB0D6} .sym--X{background:#9B7BFF}
+.sym--set-hex{background:linear-gradient(90deg, #13C08B 50%, #C9F4FF 0)}
+.sym--set-right{background:linear-gradient(90deg, #FF4A3D 34%, #FF9A1F 0 67%, #FFE11A 0)}
+.sym--set-tilt{background:linear-gradient(90deg, #FFB0D6 50%, #9B7BFF 0)}
+
+/* ---------- Our table pages: hero, body, facts ---------- */
+.game-hero--table .game{z-index:1}
+.game-body__grid--table{grid-template-areas:"prose side"}
+.game-body__grid--table > .prose{grid-area:prose;min-width:0}
+.table-side{grid-area:side;display:grid;gap:18px;align-content:start;min-width:0;
+  grid-template-areas:"facts" "note" "toc"}
+.table-side .facts{grid-area:facts}
+.table-side .side-note{grid-area:note;color:var(--text-2)}
+.table-side .toc{grid-area:toc}
+.table-side .paytable{font-size:15px}
+.table-side .paytable th,.table-side .paytable td{padding:10px 14px}
+.table-side .paytable tbody th{width:40%;font-size:14.5px}
+.table-side .paytable td{font-size:16px}
+.toc{padding:14px 18px 12px;background:var(--surface);border:var(--bw) solid var(--line);border-radius:var(--r-box);box-shadow:5px 5px 0 var(--pop)}
+.toc__head{font:800 13px/1.2 var(--f-ui);font-stretch:115%;text-transform:uppercase;letter-spacing:.12em;color:var(--text-2);margin-bottom:4px}
+.toc a{display:flex;align-items:center;gap:12px;padding:6px 0;font:700 16px/1.3 var(--f-ui);color:var(--text);text-decoration:underline;text-decoration-thickness:2px;text-decoration-color:var(--m);text-underline-offset:4px}
+.toc a:hover{text-decoration-thickness:3px}
+.toc a::before{content:"";flex:none;width:9px;height:9px;background:var(--y);border:2px solid var(--k);transform:rotate(45deg)}
+.table-faq{margin-top:var(--section)}
+.table-more{padding-top:0}
+
+/* Prose parts on these pages */
+.callout--figure{display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px}
+.callout--figure > * + *{margin-top:0}
+.callout--figure > p:last-child{flex:1 1 18em}
+.callout__figure{font:900 clamp(30px, 1.6vw + 20px, 42px)/1 var(--f-display);font-stretch:112%;letter-spacing:-.01em;
+  text-shadow:.03em .03em 0 var(--plate), .06em .06em 0 var(--plate)}
+/* Visually hidden text in a scrolling table is absolutely positioned; keep
+   it inside the scroll box, or it widens the page on phones. */
+.game-body .table-wrap{position:relative}
+.paytable--wide tbody th{width:auto}
+.paytable--wide td.num{white-space:nowrap}
+.paytable--wide td.td--text{font:400 15.5px/1.45 var(--f-body)}
+.slot-pays tbody th small{display:block;margin-top:2px;font:400 14px/1.4 var(--f-body);color:var(--text-2)}
+.prose .wheel-order{counter-reset:none;display:flex;flex-wrap:wrap;gap:6px}
+.prose .wheel-order > li{counter-increment:none;min-height:0;padding:0;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;
+  font:800 14px/1 var(--f-ui);font-variant-numeric:tabular-nums;border:2px solid var(--ctl-line)}
+.prose .wheel-order > li::before{content:none}
+/* Basic-strategy charts */
+.strategy{border-collapse:separate;border-spacing:3px;min-width:100%;font:800 14px/1 var(--f-ui);font-variant-numeric:tabular-nums}
+.strategy caption{text-align:left;font:800 15px/1.3 var(--f-ui);color:var(--text-2);padding:0 0 8px 2px}
+.strategy thead th{padding:8px 4px;border-radius:5px;background:var(--k);color:var(--y);font-size:13.5px;text-align:center}
+.strategy thead th:first-child{text-align:left;padding-inline:10px;white-space:nowrap}
+.strategy tbody th{padding:6px 10px 6px 4px;text-align:left;white-space:nowrap}
+.strategy td{min-width:34px;height:32px;padding:0;text-align:center;border:2px solid var(--k);border-radius:5px;color:var(--k)}
+.strategy abbr{text-decoration:none;cursor:help}
+.mv--H{background:#FFE11A} .mv--S{background:#3DD6FF} .mv--D{background:#FF4FB0} .mv--Ds{background:#FFB0D6} .mv--P{background:#13C08B}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:15.5px}
+.legend > span{display:inline-flex;align-items:center;gap:8px}
+.legend .mv{display:inline-grid;place-items:center;min-width:32px;height:28px;padding:0 6px;border:2px solid var(--k);border-radius:5px;color:var(--k);font:800 14px/1 var(--f-ui)}
+
+/* ---------- responsive ---------- */
 @media (max-width: 1099px){
-  .game-hero__grid,.game-body__grid{grid-template-columns:1fr}
-  .game-hero .game__side{grid-template-columns:repeat(2, minmax(0,1fr));align-items:start}
-  .twentyone__layout{grid-template-columns:1fr}
+  .twentyone__layout,.slot__layout{grid-template-columns:1fr}
+  .twentyone__stage,.slot__stage{max-width:720px;width:100%;justify-self:center}
+  .game-body__grid--table{grid-template-areas:"side" "prose"}
+  .table-side{grid-template-columns:minmax(0,3fr) minmax(0,2fr);grid-template-areas:"facts toc" "note toc";align-items:start}
 }
 @media (max-width: 860px){
   .wheel__layout{grid-template-columns:1fr}
-  .wheel__stage{grid-template-columns:auto 1fr;justify-items:start;align-items:center}
-  .wheel__stage svg{max-width:120px}
+  .wheel__stage{grid-template-columns:auto minmax(0,1fr);justify-items:start;align-items:center}
+  .wheel__canvas{width:150px}
+  .wheel__last{justify-items:start}
+  .wheel__history{justify-content:flex-start}
+}
+@media (max-width: 720px){
+  .game{border-radius:18px;box-shadow:6px 6px 0 var(--pop)}
+  .game__head{padding:10px 12px}
+  .game__title{font-size:22px}
+  .game__facts{margin-left:0;width:100%}
+  .wheel__layout,.twentyone__layout,.slot__layout{padding:12px;gap:16px}
+  .game__disclaimer{padding:10px 12px 12px}
+  .game__buttons .btn{flex:1 1 auto}
+  .game__buttons .btn--play{min-height:52px;padding:10px 16px;font-size:16px}
+  .wheel__canvas{width:128px}
+  /* phones: the table turns upright, 1 2 3 across, zero on top, column bets underneath */
+  .board__numbers{grid-auto-flow:row;grid-template-rows:none;grid-auto-rows:34px;grid-template-columns:repeat(3, minmax(0,1fr));gap:4px;direction:rtl}
+  .bet{direction:ltr;font-size:12.5px;border-radius:5px;min-height:30px}
+  .bet--zero{grid-row:auto;grid-column:1 / -1}
+  .bet--col{font-size:11.5px}
+  .bet--out{font-size:12.5px;min-height:36px}
+  .board__dozens,.board__even{grid-template-columns:repeat(3, minmax(0,1fr));gap:4px}
+  .board__dozens::before,.board__dozens::after,.board__even::before,.board__even::after{display:none}
+  .segmented.chips label{width:46px;height:46px;font-size:14px}
+  .segmented.chips label.chip-100{font-size:12px}
+  /* the slot's Spin button comes up under the reels, above the result */
+  .slot__side .game__controls > .game__buttons{order:-1}
+  .twentyone__moves{padding:10px;gap:10px}
+  .twentyone__moves .btn{flex:1 1 40%}
+  .hand{font-size:14px;left:10px}
+  .hand--dealer{top:10px}
+  .hand--player{bottom:10px}
+  .hand__who{font-size:11px;padding:4px 7px}
+  .table-side{grid-template-columns:1fr;grid-template-areas:"facts" "note" "toc"}
+  .prose .wheel-order{gap:5px}
+  .prose .wheel-order > li{width:34px;height:34px;font-size:13px}
+  .strategy{font-size:13px}
+  .strategy td{min-width:30px;height:30px}
+}
+
+/* Key hints mean little on a touch screen without a keyboard */
+@media (max-width: 720px) and (pointer: coarse){
+  .game__keys{display:none}
+}
+
+/* ---------- preferences ---------- */
+@media (prefers-reduced-motion: reduce){
+  .game__result.is-flash,.game__result.is-flash::after{animation:none}
+  .game__result.is-flash::after{display:none}
+}
+@media (prefers-contrast: more){
+  .slot__stage::after{display:none}
+}
+@media (forced-colors: active){
+  .game,.game__head,.game__result,.bet,.twentyone__stage,.slot__stage,.hand,.toc,.paytable-pop,.twentyone__moves{border-color:CanvasText}
+  .game__head,.game__crest,.game__facts div{forced-color-adjust:none}
+  /* the felt and the reel frame are artwork under the canvas: keep their colours */
+  .twentyone__stage,.slot__stage{forced-color-adjust:none}
+  /* the colours carry meaning on the table and in the charts: keep them */
+  :is(.bet, .wheel__history li, .wheel-order li):is(.is-garnet, .is-jet, .is-malachite),.segmented.chips label,.strategy td,.legend .mv,.sym{forced-color-adjust:none}
+  .segmented.chips label:has(input:checked){outline-color:Highlight}
+  .game__result.is-flash{animation:none}
+}
+
+/* ---------- Game-page (75-game-page.css) responsive rules ----------
+   These came across from the mockup's game.css with the stylesheet split.
+   They style the Pragmatic game page's hero and body, and ours. Keep them
+   in step with 75-game-page.css; they can move there once it carries them. */
+@media (max-width: 1099px){
+  .game-hero__grid,.game-body__grid{grid-template-columns:1fr}
+  .game-hero .game__side{grid-template-columns:repeat(2, minmax(0,1fr));align-items:start}
 }
 @media (max-width: 720px){
   .game-hero .game__side{grid-template-columns:1fr}
@@ -91,21 +293,4 @@ kbd{font:700 13px/1 var(--f-ui);padding:3px 6px;border:2px solid var(--ctl-line)
   .game-hero h1{font-size:clamp(32px, 9vw, 40px);font-stretch:104%}
   .game-hero .stage__after{margin-top:16px}
   .features{grid-template-columns:1fr}
-  .game__head{padding:10px 12px}
-  .game__facts{margin-left:0;width:100%}
-  .wheel__layout,.twentyone__layout{padding:12px}
-  /* phones: the table turns upright, 1 2 3 across, zero on top, column bets underneath */
-  .board__numbers{grid-auto-flow:row;grid-template-rows:none;grid-auto-rows:34px;grid-template-columns:repeat(3, minmax(0,1fr));gap:4px;direction:rtl}
-  .bet--zero{grid-row:auto;grid-column:1 / -1}
-  .bet{direction:ltr}
-  .board__dozens{grid-template-columns:repeat(3, 1fr)}
-  .board__even{grid-template-columns:repeat(3, 1fr)}
-  .board__dozens::before,.board__dozens::after,.board__even::before,.board__even::after{display:none}
-  .bet{font-size:12.5px;border-radius:5px;min-height:30px}
-  .bet--col{font-size:10.5px}
-  .bet--out{font-size:12px;min-height:36px}
-  .board__dozens,.board__even{gap:3px}
-  .segmented.chips label{width:46px;height:46px;font-size:14px}
-  .game__buttons .btn{flex:1 1 auto}
-  .twentyone__moves .btn{flex:1 1 40%}
 }
