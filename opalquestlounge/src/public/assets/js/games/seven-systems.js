@@ -326,7 +326,7 @@ export function mount(root) {
   }
 
   ui.play.addEventListener('click', spin);
-  shortcuts(root, { s: spin, ' ': () => document.activeElement === root && spin() }, radios);
+  shortcuts(root, { s: spin }, radios);
 
   resize();
   draw();

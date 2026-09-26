@@ -147,7 +147,7 @@
   .status__ico{width:27px;height:27px}
   .status__ico svg{width:15px;height:15px}
   .status__txt b{font-size:14.5px}
-  .status__unit,.status__session .status__unit{font-size:9px;letter-spacing:.08em}
+  .status__unit,.status__session .status__unit{letter-spacing:.06em}
   .colophon__grid{grid-template-columns:1fr 1fr}
 }
 @media (max-width: 380px){
@@ -158,7 +158,7 @@
 @media (max-width: 340px){
   .brand__name b{font-size:11.5px}
   .brand__opal{width:30px;height:30px}
-  .status__unit,.status__session .status__unit{letter-spacing:.06em}
+  .status__unit,.status__session .status__unit{letter-spacing:.04em}
   .status__balance,.status__session{padding:4px 8px}
   .dock svg{width:44px;padding:4px 10px}
 }

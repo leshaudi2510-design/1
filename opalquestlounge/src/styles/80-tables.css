@@ -56,6 +56,11 @@
 .game__keys{font-size:14px;line-height:1.9;color:var(--text-2)}
 :is(.game, .table-faq, .game-body) kbd{font:700 13px/1 var(--f-ui);padding:3px 6px;border:2px solid var(--ctl-line);border-bottom-width:4px;border-radius:6px;background:var(--surface);color:var(--text);white-space:nowrap}
 .game .stake{max-width:360px}
+/* While a round runs the stakes are aria-disabled (common.js), so they keep
+   focus: the disabled look of spec 7, with the stake in play still marked */
+.game .stake label:has(input[aria-disabled="true"]),.game .stake input[aria-disabled="true"]{cursor:not-allowed}
+.game .stake label:has(input[aria-disabled="true"]){border-style:dashed}
+.game .stake label:has(input[aria-disabled="true"]:not(:checked)){background:var(--surface-2);color:var(--text-2);border-color:var(--text-2)}
 
 /* ---------- Roulette ---------- */
 .wheel__layout{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,9fr);gap:24px;padding:18px}
@@ -89,11 +94,15 @@
 .segmented.chips label:has(input:focus-visible){outline:3px solid var(--focus);outline-offset:4px}
 
 /* The betting table. The DOM runs zero; 3 2 1; 6 5 4 …; the column bets.
-   grid-auto-flow: column lays that out as the standard table. */
-.board{display:grid;gap:4px;min-width:0}
-.board__numbers{display:grid;grid-auto-flow:column;grid-template-rows:repeat(3, 44px);grid-template-columns:1.3fr repeat(12, minmax(0,1fr)) 1.2fr;gap:4px}
-.board__dozens{display:grid;grid-template-columns:1fr repeat(3, 4fr) 1fr;gap:4px}
-.board__even{display:grid;grid-template-columns:1fr repeat(6, 2fr) 1fr;gap:4px}
+   grid-auto-flow: column lays that out as the standard table. The dozen and
+   even-money rows share the numbers' columns, so each bet lines up with the
+   numbers it covers: the empty ::before and ::after fill the zero and 2:1
+   columns, a dozen spans four number columns and an even-money bet two. */
+.board{--board-cols:1.3fr repeat(12, minmax(0,1fr)) 1.2fr;display:grid;gap:4px;min-width:0}
+.board__numbers{display:grid;grid-auto-flow:column;grid-template-rows:repeat(3, 44px);grid-template-columns:var(--board-cols);gap:4px}
+.board__dozens,.board__even{display:grid;grid-template-columns:var(--board-cols);gap:4px}
+.board__dozens > .bet{grid-column:span 4}
+.board__even > .bet{grid-column:span 2}
 .board__dozens::before,.board__dozens::after,.board__even::before,.board__even::after{content:""}
 .bet{position:relative;display:grid;place-items:center;min-width:24px;min-height:36px;padding:0;margin:0;border:2px solid var(--ctl-line);border-radius:6px;background:var(--surface);color:var(--text);
   font:800 15px/1 var(--f-ui);font-variant-numeric:tabular-nums;cursor:pointer}
@@ -110,10 +119,16 @@
 
 /* ---------- Blackjack ---------- */
 .twentyone__layout{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:20px;padding:18px}
-.twentyone__stage{position:relative;align-self:start;border:var(--bw) solid var(--k);border-radius:16px;overflow:hidden;
+.twentyone__stage{position:relative;align-self:start;border:var(--bw) solid var(--k);border-radius:16px;overflow:hidden;container-type:inline-size;
   background:radial-gradient(ellipse at 50% 20%, #2F6BE0, #1740B8 60%, #0F2C85)}
 .twentyone__stage::after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle, rgb(255 255 255 / .08) 30%, transparent 32%);background-size:10px 10px;pointer-events:none}
-.twentyone__canvas{position:relative;z-index:1;display:block;width:100%;height:auto}
+/* The table's shape is set here, before any script runs, so nothing moves
+   when the game starts: 720 × 420, or nearly square on a narrow table, where
+   the cards need the height. brilliant-21.js reads the box and draws to it. */
+.twentyone__canvas{position:relative;z-index:1;display:block;width:100%;height:auto;aspect-ratio:720 / 420}
+@container (width < 520px){
+  .twentyone__canvas{aspect-ratio:1 / .86}
+}
 .hand{position:absolute;left:14px;z-index:2;display:inline-flex;align-items:center;gap:8px;max-width:calc(100% - 28px);background:#FFFFFF;color:var(--k);border:2px solid var(--k);border-radius:var(--r-pill);padding:5px 12px 5px 6px;font:800 15px/1 var(--f-ui);font-variant-numeric:tabular-nums;box-shadow:3px 3px 0 var(--k)}
 .hand__who{background:var(--k);color:var(--y);border-radius:var(--r-pill);padding:5px 8px;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
 .hand--dealer{top:14px}
@@ -237,6 +252,7 @@
   .bet--col{font-size:11.5px}
   .bet--out{font-size:12.5px;min-height:36px}
   .board__dozens,.board__even{grid-template-columns:repeat(3, minmax(0,1fr));gap:4px}
+  .board__dozens > .bet,.board__even > .bet{grid-column:auto}
   .board__dozens::before,.board__dozens::after,.board__even::before,.board__even::after{display:none}
   .segmented.chips label{width:46px;height:46px;font-size:14px}
   .segmented.chips label.chip-100{font-size:12px}
@@ -247,7 +263,7 @@
   .hand{font-size:14px;left:10px}
   .hand--dealer{top:10px}
   .hand--player{bottom:10px}
-  .hand__who{font-size:11px;padding:4px 7px}
+  .hand__who{padding:4px 7px}
   .table-side{grid-template-columns:1fr;grid-template-areas:"facts" "note" "toc"}
   .prose .wheel-order{gap:5px}
   .prose .wheel-order > li{width:34px;height:34px;font-size:13px}
