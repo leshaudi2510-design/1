@@ -146,7 +146,9 @@ export default function pragmaticGame(ctx, game) {
     ['Ways to pay', pays.main, pays.small, 'pays'],
     ['Volatility', g.volatility || '', '', 'volatility'],
     ['Top payout', g.topPayout ? `${num(g.topPayout)}× stake` : '', '', 'topPayout'],
-    ['<abbr title="Return to player">RTP</abbr>', g.rtpLabel, 'Pragmatic Play’s figure for this version', 'rtp'],
+    // Credited to Pragmatic Play only once the figure has been checked; until
+    // then it is the default reported at launch and in reviews (see "verify").
+    ['<abbr title="Return to player">RTP</abbr>', g.rtpLabel, verify.has('rtp') ? 'Default reported at launch and in reviews. The i button in the demo shows this version’s figure.' : 'Pragmatic Play’s published default.', 'rtp'],
     ['Released', when, '', 'released'],
   ].filter(([, value]) => value);
 
@@ -220,7 +222,7 @@ export default function pragmaticGame(ctx, game) {
           </tbody>
         </table>
         <div class="side-note">
-          <p>RTP is Pragmatic Play’s figure for this version of the game. Casinos can run versions set lower, so the same game may return less elsewhere. Press the i button inside the demo for its own paytable and rules.</p>
+          <p>The RTP shown is the game’s usual default. The version in this demo may be set differently: press the i button inside the demo for the paytable, rules and RTP of the version you are playing. Demo credits have no value.</p>
           <p class="side-note__disclaimer">${esc(ctx.disclaimer)}</p>
         </div>
       </aside>

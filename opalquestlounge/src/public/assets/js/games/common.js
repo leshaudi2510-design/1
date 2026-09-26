@@ -17,6 +17,7 @@ export function shell(root, { playSelector = '[data-action="spin"]', needed }) {
   const play = root.querySelector(playSelector);
   const topup = root.querySelector('[data-action="topup"]');
   const result = root.querySelector('[data-result]');
+  const ageAsk = root.querySelector('[data-age-ask]');
   const stakeLabel = root.querySelector('[data-stake-label]');
   const radios = [...root.querySelectorAll('.stake input[type="radio"]')];
   const state = { busy: false, lockedMessage: '' };
@@ -66,6 +67,13 @@ export function shell(root, { playSelector = '[data-action="spin"]', needed }) {
         setOff(play, state.busy || !status.ok || need <= 0 || !wallet.canStake(need));
       }
       if (topup) topup.hidden = state.busy || !wallet.canTopUp() || !status.ok;
+      // "Confirm my age", only while the age question is unanswered. Once it is,
+      // focus moves on from the button before it hides.
+      if (ageAsk) {
+        const hide = status.ok || status.reason !== 'unconfirmed';
+        if (hide && ageAsk.contains(document.activeElement)) play?.focus();
+        ageAsk.hidden = hide;
+      }
       if (!status.ok && !state.busy) {
         if (state.lockedMessage !== status.message) api.say(status.message, 'locked');
         state.lockedMessage = status.message;

@@ -1,7 +1,7 @@
 # Opal Quest Lounge
 
 Сайт бесплатного социального казино для **opalquestlounge.com** (аудитория — Великобритания).
-Три собственные игры на виртуальные **Carats**. Реальных денег, призов и покупок нет. Только 18+.
+Собственные игры на виртуальные **Carats** и бесплатные демо слотов Pragmatic Play (см. «Режим Pragmatic»; без них вместо демо — наш слот Seven Systems). Реальных денег, призов и покупок нет. Только 18+.
 
 > Free-to-play social casino game. No real-money gambling and no prizes of real-world value. For adults 18+.
 
@@ -66,10 +66,25 @@ opalquestlounge/
 },
 "analytics": { "ga4": "", "adsConversionId": "" },  // пусто — баннера нет, сторонних запросов нет
 "contactEndpoint": "",                               // пусто — форма открывает почтовый клиент (mailto)
-"lastUpdated": "2026-09-25"                          // дата в подвале, Terms, Privacy и sitemap
+"lastUpdated": "2026-09-25",                         // дата в подвале, Terms, Privacy и sitemap
+"pragmatic": {
+  "enabled": true,                                   // false (или --no-pragmatic) — сайт без демо Pragmatic Play
+  "writtenConsent": ""                               // номер и дата письменного согласия Pragmatic Play
+}
 ```
 
 Пока в полях оператора стоят `[…]`, сборка печатает предупреждения. `node build.mjs --strict` превращает их в ошибки: используйте его при деплое.
+
+## Режим Pragmatic
+
+По умолчанию сайт показывает 12 демо слотов Pragmatic Play в `<iframe>`, который создаётся только после нажатия Play. Это решение владельца поверх исходного «без iframe». Два вопроса по нему **ещё не решены** (подробно — `COMPLIANCE.md`, раздел «Режим Pragmatic»):
+
+1. **Письменное согласие Pragmatic Play.** Их условия разрешают использовать игры с другими продуктами только с «express written consent». Пока `pragmatic.writtenConsent` пуст, сборка предупреждает, а `--strict` падает.
+2. **Google Ads или названия Pragmatic.** Правило Google для social casino запрещает имена брендов игр на реальные деньги, а названия слотов Pragmatic стоят в заголовках страниц. Если нужна реклама, рекламируйте домен со сборкой `node build.mjs --no-pragmatic` — одинаковой для всех посетителей. С включёнными демо и заданным `adsConversionId` сборка предупреждает, а `--strict` падает.
+
+Ещё до запуска: сверить факты из `verify` в `src/data/pragmatic-games.json` с экраном «i» в каждом демо (сборка печатает, что осталось).
+
+`node build.mjs --no-pragmatic` собирает сайт без демо: вместо них наш слот Seven Systems, и в сборке нет ни страниц, ни скриптов, ни картинок Pragmatic, ни адреса `pragmaticplay.net`.
 
 Юридические тексты (Terms, Privacy, Cookies) написаны под текущую конфигурацию, но это не юридическая консультация. Перед запуском их должен посмотреть юрист.
 
@@ -88,7 +103,8 @@ npm run simulate:21       # 20 млн раздач блэкджека
 
 Сборка сама проверяет: один `h1` на страницу, title ≤ 60 и description ≤ 155 символов, `lang="en-GB"`, canonical,
 дисклеймер на каждой странице, валидность JSON-LD (VideoGame, BreadcrumbList), битые ссылки, запрещённые слова
-(deposit, withdraw, cash out, bonus code, real money wins, win big, jackpot, hurry, don't miss out),
+(deposit, withdraw, cash out, bonus code, real money wins, win big, jackpot, hurry, don't miss out) и сравнения игр между собой («the highest of the games here»),
+CSP (адрес демо в `frame-src` и `connect-src` только при включённых демо) и отсутствие в страницах прямых адресов демо Pragmatic,
 американскую орфографию, бюджет первого экрана (HTML + CSS + JS < 150 KB gzip).
 
 ## Деплой

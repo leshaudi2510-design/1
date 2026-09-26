@@ -66,7 +66,7 @@ export default function privacy(ctx) {
       body: ctx.analyticsOn
         ? html`<p>With your consent only, we use ${a.ga4 ? 'Google Analytics 4 to count visits and see which games are played' : ''}${a.ga4 && a.adsConversionId ? ', and ' : ''}${a.adsConversionId ? 'Google Ads measurement to see whether an advert led to a visit' : ''}. Nothing from Google loads on our pages until you choose “Accept all” or switch it on in Cookie settings. Our lawful basis is consent. You can change your mind at any time from Cookie settings in the footer.</p>
       <p>Google processes this data as our processor and may transfer it to the United States under the UK Extension to the EU–US Data Privacy Framework or standard contractual clauses. We use Google Consent Mode, with every signal set to “denied” until you choose otherwise. IP addresses are not logged or stored by Google Analytics 4.</p>
-      ${pp ? '<p>This is separate from any analytics Pragmatic Play runs inside its demos, which our settings can’t switch off.</p>' : ''}`
+      ${pp ? '<p>This is separate from any analytics Pragmatic Play runs inside its demos, which our settings can’t switch off. If you choose “Reject all”, each Play button asks before it loads a demo.</p>' : ''}`
         : html`<p>We don’t use analytics, advertising pixels, social media plug-ins or any other tracking on our pages. ${pp ? 'No request goes to another company’s server when you visit, except a Pragmatic Play demo after you press Play.' : 'No request goes to another company’s server when you visit.'} If that changes, we’ll ask for your consent first and update this notice.</p>`,
     },
     {

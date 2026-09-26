@@ -3,12 +3,30 @@
    assets/js/games/pragmatic.js): idle · loading · ready · failed · blocked,
    plus [data-expanded] (the fullscreen fallback) and :fullscreen. */
 .stage{position:relative;z-index:1;background:var(--stage-frame);border:var(--bw-heavy) solid var(--line);border-radius:var(--r-stage);box-shadow:10px 10px 0 var(--pop);overflow:hidden;color:var(--text)}
-.stage__bar{display:flex;align-items:center;gap:10px 14px;padding:10px 14px;border-bottom:var(--bw-heavy) solid var(--line);flex-wrap:wrap;min-height:62px}
+/* The bar keeps the same rows in every state: it is always tall enough for the
+   46px fullscreen button (46 + 2 × 7 + 4 = 64), and Close demo, shown from
+   Play on, keeps its place while idle (hidden, so it can't be focused), so
+   pressing Play never makes the bar or the stage jump. */
+.stage__bar{display:flex;align-items:center;gap:10px 14px;padding:7px 14px;border-bottom:var(--bw-heavy) solid var(--line);flex-wrap:wrap;min-height:64px;container-type:inline-size}
 .stage__label{font:900 14px/1 var(--f-ui);font-stretch:118%;text-transform:uppercase;letter-spacing:.07em;background:var(--m);color:var(--k);border:var(--bw-ctl) solid var(--k);border-radius:6px;padding:7px 10px 6px;transform:rotate(-2deg);flex:none}
-.stage__name{flex:1 1 6em;min-width:0;font:800 18px/1.15 var(--f-ui);font-stretch:104%} /* takes the spare room; wraps its own text before pushing the tools to a new row */
+.stage__name{flex:1 1 6em;min-width:0;font:800 18px/1.15 var(--f-ui);font-stretch:104%} /* takes the spare room */
 .stage__prov{display:inline-flex;align-items:center;gap:7px;font:600 15px/1.2 var(--f-body);color:var(--text-2)}
-.stage__bar .stage__prov,.stage__bar > .btn{margin-left:auto}
+.stage__bar .stage__prov{margin-left:auto}
 .stage__tools{margin-left:auto;display:flex;align-items:center;gap:8px}
+.stage__tools .when-ready{display:inline-flex!important;visibility:hidden}
+.stage:is([data-state="loading"],[data-state="ready"]) .stage__tools .when-ready{visibility:visible}
+/* Home: the tools replace the provider once Play is pressed. The name takes
+   the squeeze, and on a narrow bar the decorative label makes way for them
+   (the label isn't part of the stage's name). On the narrowest phones the
+   name steps out of sight too (still the stage's name for screen readers);
+   the loading message and the game itself name it. */
+.stage--featured .stage__name{flex-basis:0;overflow-wrap:break-word}
+@container (max-width: 520px){
+  .stage--featured:is([data-state="loading"],[data-state="ready"]) .stage__label{display:none}
+}
+@container (max-width: 290px){
+  .stage--featured:is([data-state="loading"],[data-state="ready"]) .stage__name{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+}
 
 /* the screen: a 16:10 cover with our art, the lettering and the Play button */
 .stage__screen{position:relative;aspect-ratio:16/10;container-type:inline-size;--focus:#FFFFFF;
@@ -42,7 +60,8 @@
 .btn--sm svg{width:18px;height:18px}
 
 /* tools that belong to a running demo: Close demo shows from the moment Play
-   is pressed (focus moves to it, and it can cancel a slow load) */
+   is pressed (focus moves to it, and it can cancel a slow load); on game
+   pages it keeps its place, hidden, before that (see .stage__tools above) */
 .when-ready{display:none!important}
 .stage:is([data-state="loading"],[data-state="ready"]) .when-ready{display:inline-flex!important}
 .stage:is([data-state="loading"],[data-state="ready"]) .when-idle{display:none}
@@ -90,7 +109,7 @@ html:has(.stage[data-expanded]){overflow:hidden}
 }
 @media (max-width: 720px){
   .stage{border-width:3px;box-shadow:6px 6px 0 var(--pop);border-radius:18px}
-  .stage__bar{padding:8px 10px;min-height:50px;gap:8px;border-bottom-width:3px}
+  .stage__bar{padding:8px 10px;min-height:65px;gap:8px;border-bottom-width:3px} /* 46 + 2 × 8 + 3 */
   .stage__label{font-size:11.5px;padding:6px 7px 5px;letter-spacing:.05em;font-stretch:112%}
   .stage__name{font-size:16px;font-stretch:100%}
   .stage__bar .stage__prov{display:none}

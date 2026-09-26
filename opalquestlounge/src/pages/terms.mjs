@@ -86,7 +86,7 @@ export default function terms(ctx) {
       id: 'fair-play',
       title: 'Fair play on our games',
       body: html`<p>Results on our own games come from your browser’s cryptographic random number generator. We publish the rules, the pays and the return to player for each one on its page. Results don’t depend on your balance, history or time spent playing.</p>
-    ${pp ? `<p>For the Pragmatic Play demos, the figures we show, such as return to player, come from Pragmatic Play’s published game information. Pragmatic Play decides how its demos work.</p>` : ''}`,
+    ${pp ? `<p>For the Pragmatic Play demos, the figures we show, such as return to player, are the usual defaults taken from Pragmatic Play’s announcements and independent reviews. The version in a demo may differ; its own information screen (the i button) is the one to go by. Pragmatic Play decides how its demos work.</p>` : ''}`,
     },
     {
       id: 'tools',

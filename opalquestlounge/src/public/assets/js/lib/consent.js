@@ -2,13 +2,21 @@
 // Every consent signal starts as "denied". No Google script is requested
 // until the visitor says yes, and nothing optional exists unless it's
 // configured in site.config.json.
+//
+// The Pragmatic Play demos set cookies of their own once they load. Pressing
+// Play loads one (the caption beside the button says so). The stored choice
+// also records `demos`: false after "Reject all", true after "Accept all",
+// and "Save choices" keeps what it was. After "Reject all", each Play button
+// asks before it loads a demo (assets/js/games/pragmatic.js).
 import config from '../config.js';
 import { store } from './store.js';
 import { toast } from './ui.js';
 
 const { ga4, adsConversionId } = config.analytics || {};
 const configured = Boolean(ga4 || adsConversionId);
+const demosOn = Boolean(config.pragmatic?.enabled);
 const MAX_AGE = 365 * 24 * 3600 * 1000;
+const validChoice = (saved) => Boolean(saved && saved.v === 1 && Date.now() - saved.at < MAX_AGE);
 let loaded = false;
 let current = { analytics: false, ads: false };
 
@@ -74,7 +82,9 @@ function apply(choice, { fromUser = false } = {}) {
 }
 
 function save(choice) {
-  store.set('consent', { v: 1, analytics: Boolean(choice.analytics), ads: Boolean(choice.ads), at: Date.now() });
+  const before = store.get('consent', null);
+  const demos = typeof choice.demos === 'boolean' ? choice.demos : before?.demos;
+  store.set('consent', { v: 1, analytics: Boolean(choice.analytics), ads: Boolean(choice.ads), ...(typeof demos === 'boolean' ? { demos } : {}), at: Date.now() });
   apply(choice, { fromUser: true });
   document.querySelector('.consent-banner')?.setAttribute('hidden', '');
 }
@@ -84,11 +94,17 @@ export function track(name, params = {}) {
   if (current.analytics && loaded) gtag('event', name, params);
 }
 
+/** Did the visitor choose "Reject all" (within the last 12 months)? Then a demo asks before it loads. */
+export function demosRefused() {
+  const saved = store.get('consent', null);
+  return validChoice(saved) && saved.demos === false;
+}
+
 export function startConsent() {
   const dialog = document.getElementById('consent');
   const banner = document.querySelector('.consent-banner');
   const saved = store.get('consent', null);
-  const valid = saved && saved.v === 1 && Date.now() - saved.at < MAX_AGE;
+  const valid = validChoice(saved);
   if (valid) apply(saved);
   else if (configured && banner) banner.hidden = false;
 
@@ -107,13 +123,14 @@ export function startConsent() {
     const b = e.target.closest('[data-consent]');
     if (!b) return;
     const kind = b.dataset.consent;
-    if (kind === 'accept') save({ analytics: true, ads: true });
-    if (kind === 'reject') save({ analytics: false, ads: false });
+    if (kind === 'accept') save({ analytics: true, ads: true, demos: true });
+    if (kind === 'reject') save({ analytics: false, ads: false, demos: false });
     if (kind === 'save') {
       const read = (n) => Boolean(dialog?.querySelector(`input[name="${n}"]`)?.checked);
       save({ analytics: read('analytics'), ads: read('ads') });
     }
     if (dialog?.open) dialog.close();
-    if (!configured) toast('Saved. There’s nothing optional to switch on at the moment.');
+    // With the demos on, "Reject all" and "Accept all" change whether a demo asks first.
+    if (!configured) toast(demosOn ? 'Saved.' : 'Saved. There’s nothing optional to switch on at the moment.');
   });
 }

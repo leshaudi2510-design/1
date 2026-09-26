@@ -26,7 +26,7 @@
 .ticks svg{width:24px;height:24px;flex:none}
 .hero__ctas{display:flex;flex-wrap:wrap;gap:14px 16px}
 .hero .btn--primary:not(.btn--play){background:var(--cta-bg);color:var(--cta-text);border-color:var(--cta-line);--btn-pop:var(--cta-pop);--gloss:inset 0 3px 0 rgb(255 255 255 / .18)}
-.hero .btn--secondary{background:var(--surface);color:var(--text);border-color:var(--k);--btn-pop:var(--k)}
+.hero__ctas .btn--secondary{background:var(--surface);color:var(--text);border-color:var(--k);--btn-pop:var(--k)} /* the CTA row only: the stage's buttons keep their own look */
 .hero__burst{position:absolute;z-index:0;inset:-7% -3% -1% -7%;margin:auto;--bf:var(--burst)}
 .hero__burst svg{transform:rotate(8deg)}
 /* Demos switched off: our own slot panel stands on the burst instead of the stage */

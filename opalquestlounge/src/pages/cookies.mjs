@@ -90,14 +90,14 @@ export default function cookies(ctx) {
       </ul>
       <p>Pragmatic Play decides what its demos store, so we can’t list every item or say how long each lasts. Its ${ext(PRAGMATIC_TERMS, 'terms of use')} apply inside the demo. Some browsers block storage set inside frames like this, or keep it apart from other sites.</p>
       <div class="callout callout--note">
-        <p><strong>How to avoid it:</strong> don’t press Play on a slot demo. Our own tables, ${tables.join(' and ')}, work without it and load nothing from anyone else. To remove anything a demo has already stored, clear the site data for <code>pragmaticplay.net</code> in your browser settings.</p>
+        <p><strong>How to avoid it:</strong> don’t press Play on a slot demo. If you choose “Reject all” in Cookie settings, each Play button asks before it loads a demo. Our own tables, ${tables.join(' and ')}, work without it and load nothing from anyone else. To remove anything a demo has already stored, clear the site data for <code>pragmaticplay.net</code> in your browser settings.</p>
       </div>`
         : html`<p>None. Every game on the site is our own, and nothing loads from another company’s servers.</p>`,
     },
     {
       id: 'links',
       title: 'Links to other sites',
-      body: html`<p>Pages such as Responsible gaming link to support organisations${pp ? ', and a demo that doesn’t load offers a link to open it on Pragmatic Play’s own site' : ''}. Those sites have their own cookie policies, which apply once you follow a link.</p>`,
+      body: html`<p>Pages such as Responsible gaming link to support organisations. Those sites have their own cookie policies, which apply once you follow a link.</p>`,
     },
     {
       id: 'remove',

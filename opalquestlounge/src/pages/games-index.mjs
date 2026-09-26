@@ -142,7 +142,7 @@ export default function gamesIndex(ctx) {
     </table>
     </div>
     <p class="rtp__note">${pp
-      ? `Pragmatic Play's figures are the ones it publishes for the standard version of each game. Inside a demo, the i button opens the game's own paytable. Our own games' figures are worked out as each game page explains. Demo credits and ${esc(c.plural)} have no cash value.`
+      ? `The Pragmatic Play figures are the usual defaults, taken from Pragmatic's announcements and independent reviews. A demo can run a version set differently: inside it, the i button shows the figures for the version you are playing. Our own games' figures are worked out as each game page explains. Demo credits and ${esc(c.plural)} have no cash value.`
       : `Each game page shows how its figure is worked out. ${esc(c.plural)} have no cash value.`}</p>
   </div>
 </section>`,
