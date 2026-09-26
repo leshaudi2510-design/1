@@ -555,10 +555,16 @@ async function stageExtras() {
     const before = await focusAt(page);
     await page.clock.runFor(30000);
     const shown = await until(page, () => document.getElementById('reality-check-dialog').open);
+    // The close event comes a frame after the dialog closes; rg.js's own close
+    // handler was added first, so it has run once this one has.
+    await page.evaluate(() => {
+      window.__oqlRcClosed = false;
+      document.getElementById('reality-check-dialog').addEventListener('close', () => (window.__oqlRcClosed = true), { once: true });
+    });
     if (answer === 'Escape') await page.keyboard.press('Escape');
     else await pressOn(page, `#reality-check-dialog [data-rc="${answer}"]`);
-    await until(page, () => !document.getElementById('reality-check-dialog').open);
-    await page.clock.runFor(200); // the dialog's close event, and the focus hooks' timers
+    await until(page, () => window.__oqlRcClosed);
+    await page.clock.runFor(200); // the focus hooks' timers (the page's clock is paused)
     const after = await focusAt(page);
     const state = (await stageInfo(page)).state;
     const lost = await lostFocus(page);
