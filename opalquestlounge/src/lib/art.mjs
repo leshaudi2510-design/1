@@ -207,27 +207,6 @@ export const COVERS = {
     title: `<span class="toon" data-text="Buffalo King">Buffalo King</span><br><span class="rib">Megaways</span>`,
     size: '11.5cqi',
   },
-  // A wrapped sweet and a round multiplier bomb. Objects only: no faces.
-  'sweet-bonanza': {
-    c1: '#A8E63C', c2: '#2E9A46', tf: 'gold', acc: '#B8F05A',
-    art: `${star(28, 26, 9, '#FFF5E1')}<circle cx="104" cy="18" r="2.6" fill="#FFF5E1"/><circle cx="52" cy="114" r="2.2" fill="#FFF5E1"/>
-      <g transform="rotate(-18 70 70)">
-        <path class="ink" d="M42 70L20 50l5 20-5 20z" fill="#FFE11A"/>
-        <path class="ink" d="M98 70l22-20-5 20 5 20z" fill="#FFE11A"/>
-        <path class="ink-t" d="M22 58l14 8M22 82l14-8M118 58l-14 8M118 82l-14-8" fill="none"/>
-        <ellipse class="ink" cx="70" cy="70" rx="30" ry="21" fill="#FF2E93"/>
-        <path d="M56 51q-9 19 0 38M70 49q-9 21 0 42M84 51q-9 19 0 38" fill="none" stroke="#FFF5E1" stroke-width="5" stroke-linecap="round"/>
-        <ellipse cx="70" cy="70" rx="30" ry="21" fill="none" stroke="#18122B" stroke-width="4"/>
-        <path d="M52 60q6-8 16-9" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
-      </g>
-      <path class="ink-t" d="M150 44q4-14 14-20" fill="none"/>
-      ${star(166, 20, 9, '#FFE11A', 'ink-t')}
-      <rect class="ink" x="139" y="38" width="18" height="12" rx="3" fill="#4A4160" transform="rotate(18 148 44)"/>
-      <circle class="ink" cx="142" cy="74" r="27" fill="#5B2BD6"/>
-      <path d="M124 64a20 20 0 0 1 12-12" fill="none" stroke="#C9B8FF" stroke-width="4" stroke-linecap="round"/>
-      <text class="cover__num" x="142" y="80" text-anchor="middle" font-size="15" fill="#FFE11A">100×</text>`,
-    title: `<small>Sweet</small><span class="toon" data-text="Bonanza">Bonanza</span>`,
-  },
   // The bolt again, struck through a plaque that reads 1000.
   'gates-of-olympus-1000': {
     c1: '#FF3FA4', c2: '#6B21C8', tf: 'gold', acc: '#FF6FC0',

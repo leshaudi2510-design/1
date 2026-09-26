@@ -96,7 +96,7 @@ export function makeContext(cfg) {
   // Lobby order: the featured demo first, then a mix of mechanics, then our tables.
   const LOBBY = [
     'gates-of-olympus', 'big-bass-bonanza', 'wolf-gold', 'great-rhino-megaways', 'madame-destiny-megaways', 'zeus-vs-hades-gods-of-war',
-    'wild-west-gold', 'buffalo-king-megaways', 'sweet-bonanza', 'gates-of-olympus-1000', 'fruit-party', 'big-bass-splash',
+    'wild-west-gold', 'buffalo-king-megaways', 'gates-of-olympus-1000', 'fruit-party', 'big-bass-splash',
   ];
   const slots = pragmaticOn
     ? LOBBY.map((slug) => pragmatic.find((g) => g.slug === slug)).filter(Boolean).concat(pragmatic.filter((g) => !LOBBY.includes(g.slug)))

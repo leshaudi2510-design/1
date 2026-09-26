@@ -1,5 +1,5 @@
 {
-  "_about": "Pragmatic Play demo slots shown in the lobby. Facts were researched on 26 September 2026 from Pragmatic press releases, captured game configs and third-party reviews; pragmaticplay.com itself could not be reached from the build environment. Fields listed in 'verify' must be checked against the game's own information screen (the i button in the demo) before launch. Games with characters likely to appeal to under-18s (The Dog House, Sugar Rush, Starlight Princess) are left out on purpose; see COMPLIANCE.md.",
+  "_about": "Pragmatic Play demo slots shown in the lobby. Facts were researched on 26 September 2026 from Pragmatic press releases, captured game configs and third-party reviews; pragmaticplay.com itself could not be reached from the build environment. Fields listed in 'verify' must be checked against the game's own information screen (the i button in the demo) before launch. Games whose art is likely to appeal to under-18s are left out on purpose: characters (The Dog House, Starlight Princess) and sweets or candy (Sugar Rush, Sweet Bonanza). See COMPLIANCE.md, section 7 (child appeal).",
   "games": [
     {
       "slug": "gates-of-olympus",
@@ -84,35 +84,6 @@
       ],
       "verify": ["rtp", "released"],
       "appeal": "low"
-    },
-    {
-      "slug": "sweet-bonanza",
-      "name": "Sweet Bonanza",
-      "symbol": "vs20fruitsw",
-      "released": 2019,
-      "grid": "6×5",
-      "pays": "Anywhere on the grid: 8 or more of the same symbol",
-      "tags": ["tumble", "multipliers", "free-spins", "pay-anywhere"],
-      "volatility": "High",
-      "topPayout": 21175,
-      "rtp": 96.48,
-      "motif": "a wrapped sweet and a round multiplier bomb",
-      "summary": "The slot that made pay-anywhere tumbles popular: fruit and sweets on a 6×5 grid, with multiplier bombs up to 100× in free spins.",
-      "theme": "A pastel sweet-shop setting where fruit and wrapped sweets are the symbols and lollipops are the scatters.",
-      "howItPlays": [
-        "Eight or more of the same symbol anywhere on the 6×5 grid pay. There are no lines to follow.",
-        "Paying symbols tumble away and new ones fall into their place, again and again, until no new combination forms.",
-        "Four to six lollipop scatters in one spin start the free spins."
-      ],
-      "bonus": "Four or more lollipop scatters start 10 free spins, and three or more during the feature add 5 more. Multiplier bombs worth 2× to 100× land only in free spins; at the end of each tumble sequence their values are added together and multiply that sequence's pay.",
-      "features": [
-        "Launched on 25 June 2019.",
-        "Pragmatic's launch announcement gave the top payout as 21,175× the stake.",
-        "An optional ante bet costs 25% more and makes the free spins more likely to start."
-      ],
-      "verify": ["rtp", "topPayout"],
-      "appeal": "medium",
-      "appealNote": "Sweets with no characters. The ASA found Sweet Bonanza's promotion acceptable in its 2026 Videoslots ruling."
     },
     {
       "slug": "fruit-party",

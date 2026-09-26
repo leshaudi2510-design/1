@@ -27,7 +27,7 @@
 .badge{position:absolute;z-index:3;top:9px;left:9px;font:800 12px/1 var(--f-ui);font-stretch:110%;text-transform:uppercase;letter-spacing:.08em;
   background:var(--cream);color:var(--k);border:2px solid var(--k);border-radius:var(--r-pill);padding:5px 9px 4px;transform:rotate(-4deg)}
 .badge--ours{background:var(--y)}
-/* numerals drawn inside a cover (the "1000" plaque, the "100×" bomb) */
+/* numerals drawn inside a cover (the "1000" plaque) */
 .cover__num{font-family:var(--f-display);font-weight:900;font-stretch:112%;letter-spacing:-.02em}
 
 
@@ -61,8 +61,10 @@
 .tile__prov{display:flex;align-items:center;gap:7px;font:600 14px/1.2 var(--f-body);color:var(--text-2)}
 .dot{width:11px;height:11px;border-radius:50%;border:2px solid var(--text);flex:none;display:inline-block}
 .dot--pp{background:var(--c)} .dot--oq{background:var(--m)}
-.tile__facts{display:flex;flex-wrap:nowrap;gap:5px;margin-top:auto;padding-top:6px;min-width:0}
-.tile__facts span{font:700 12.5px/1 var(--f-ui);font-stretch:102%;padding:5px 8px;border:2px solid var(--ctl-line);border-radius:var(--r-pill);white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+/* Two tags on one row. A tag that doesn't fit drops to a second row whole;
+   the ellipsis is a last resort for a single tag wider than the tile. */
+.tile__facts{display:flex;flex-wrap:wrap;gap:5px;margin-top:auto;padding-top:6px;min-width:0}
+.tile__facts span{font:700 12.5px/1 var(--f-ui);font-stretch:102%;padding:5px 8px;border:2px solid var(--ctl-line);border-radius:var(--r-pill);white-space:nowrap;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .tile__facts span:first-child{flex:none}
 .tile__short{display:none;color:var(--text-2);font-size:15.5px;line-height:1.5;margin-top:4px}
 
@@ -95,36 +97,49 @@
 /* ---------- responsive ---------- */
 /* Wide card: cover on the left, body beside it. Used by our tables at
    600–1239px (so the lobby rows close), by the table pair on the games index
-   from 1240px, and by an odd first tile in a short grid on phones. */
+   from 1240px, by the first slot on the games index when the slots are an odd
+   number (.grid--lead, from games-index.mjs), and by an odd first tile in a
+   short grid on phones. */
 @media (max-width: 1239px) and (min-width: 600px){
   .grid{grid-template-columns:repeat(4, minmax(0,1fr))}
   /* our two tables become wide cards so the grid closes on a full row */
-  .tile--table{grid-column:span 2;flex-direction:row}
-  .tile--table .cover{width:46%;flex:none;border-bottom:0;border-right:var(--bw) solid var(--line);border-radius:calc(var(--r-tile) - 3px) 0 0 calc(var(--r-tile) - 3px)}
-  .tile--table .tile__body{padding:18px;justify-content:center}
-  .tile--table .tile__title{font-size:21px}
-  .tile--table .tile__facts{margin-top:10px}
+  .tile--table,.grid--lead > .tile:first-child{grid-column:span 2;flex-direction:row}
+  .tile--table .cover,.grid--lead > .tile:first-child .cover{width:46%;flex:none;border-bottom:0;border-right:var(--bw) solid var(--line);border-radius:calc(var(--r-tile) - 3px) 0 0 calc(var(--r-tile) - 3px)}
+  .tile--table .tile__body,.grid--lead > .tile:first-child .tile__body{padding:18px;justify-content:center;min-width:0}
+  .tile--table .tile__title,.grid--lead > .tile:first-child .tile__title{font-size:21px}
+  .tile--table .tile__facts,.grid--lead > .tile:first-child .tile__facts{margin-top:10px}
   .grid--more .tile:nth-child(5){display:none}
   .tile__facts{gap:4px}
   .tile__body{padding-inline:12px}
   .tile__facts span{padding:5px 7px;letter-spacing:-.005em}
 }
-/* the table pair's one-line descriptions, wherever the wide card has room */
+/* Four columns at 721–819px are the narrowest tiles: the phone tag metrics
+   keep both tags on one row there. */
+@media (min-width: 721px) and (max-width: 819px){
+  .tile__body{padding-inline:10px}
+  .tile__facts span{font-size:11.5px;font-stretch:100%;letter-spacing:-.01em;padding:4px 5px}
+}
+/* the wide cards' one-line descriptions, wherever the card has room */
 @media (min-width: 1000px), (min-width: 600px) and (max-width: 720px){
-  .grid--pair .tile__short{display:block}
+  .grid--pair .tile__short,.grid--lead > .tile:first-child .tile__short{display:block}
 }
 @media (min-width: 1240px){
   .grid.grid--pair{grid-template-columns:repeat(2, minmax(0,1fr));gap:28px 32px}
-  .grid--pair .tile{flex-direction:row}
-  .grid--pair .tile .cover{width:40%;flex:none;border-bottom:0;border-right:var(--bw) solid var(--line);border-radius:calc(var(--r-tile) - 3px) 0 0 calc(var(--r-tile) - 3px)}
-  .grid--pair .tile__body{padding:22px 24px;justify-content:center;gap:6px}
-  .grid--pair .tile__title{font-size:22px}
-  .grid--pair .tile__facts{margin-top:14px}
+  /* a group whose rows close on four columns but not on five (games-index.mjs) */
+  .grid.grid--four{grid-template-columns:repeat(4, minmax(0,1fr))}
+  .grid--lead > .tile:first-child{grid-column:span 2}
+  .grid--pair .tile,.grid--lead > .tile:first-child{flex-direction:row}
+  .grid--pair .tile .cover,.grid--lead > .tile:first-child .cover{width:40%;flex:none;border-bottom:0;border-right:var(--bw) solid var(--line);border-radius:calc(var(--r-tile) - 3px) 0 0 calc(var(--r-tile) - 3px)}
+  .grid--pair .tile__body,.grid--lead > .tile:first-child .tile__body{padding:22px 24px;justify-content:center;gap:6px;min-width:0}
+  .grid--pair .tile__title,.grid--lead > .tile:first-child .tile__title{font-size:22px}
+  .grid--pair .tile__facts,.grid--lead > .tile:first-child .tile__facts{margin-top:14px}
 }
-/* Three games in all (the demos switched off): on the games index the slot
-   and the tables sit side by side, on the same column tracks as the grid. */
+/* Three games in all (the demos switched off): three columns, so the row
+   closes. On the games index the slot and the tables sit side by side on the
+   same three tracks. */
 @media (min-width: 721px){
-  .lobby__groups--split{display:grid;grid-template-columns:repeat(5, minmax(0,1fr));grid-template-rows:auto auto;gap:0 22px}
+  .grid.grid--n3:not(.grid--more){grid-template-columns:repeat(3, minmax(0,1fr))}
+  .lobby__groups--split{display:grid;grid-template-columns:repeat(3, minmax(0,1fr));grid-template-rows:auto auto;gap:0 22px}
   .lobby__groups--split > .lobby__group{display:grid;grid-row:span 2;grid-template-rows:subgrid;grid-template-columns:subgrid;grid-column:span 2}
   .lobby__groups--split > .lobby__group:first-child{grid-column:span 1}
   .lobby__groups--split > .lobby__group + .lobby__group{margin-top:0}
@@ -132,9 +147,6 @@
   .lobby__groups--split h2{font-size:clamp(26px, 1.2vw + 14px, 34px)}
   .lobby__groups--split .sechead p{margin-top:10px}
   .lobby__groups--split .grid{grid-column:1 / -1;grid-template-columns:subgrid}
-}
-@media (max-width: 1239px) and (min-width: 721px){
-  .lobby__groups--split{grid-template-columns:repeat(4, minmax(0,1fr))}
 }
 @media (max-width: 720px){
   .filters{gap:8px}
@@ -152,12 +164,12 @@
   .tile__facts span{font-size:11.5px;font-stretch:100%;letter-spacing:-.01em;padding:4px 5px}
   .badge{font-size:10.5px;top:7px;left:7px;padding:4px 7px 3px}
   .grid--more .tile:nth-child(5){display:none}
-  /* a short grid with an odd tile out: the first one becomes a wide card */
-  :is(.grid--n1, .grid--n3) > .tile:first-child{grid-column:1 / -1;flex-direction:row}
-  :is(.grid--n1, .grid--n3) > .tile:first-child .cover{width:46%;flex:none;border-bottom:0;border-right:var(--bw) solid var(--line);border-radius:11px 0 0 11px}
-  :is(.grid--n1, .grid--n3) > .tile:first-child .tile__body{padding:14px;justify-content:center}
-  :is(.grid--n1, .grid--n3) > .tile:first-child .tile__title{font-size:18px}
-  :is(.grid--n1, .grid--n3) > .tile:first-child .tile__facts{margin-top:8px}
+  /* a grid with an odd tile out: the first one becomes a wide card */
+  :is(.grid--n1, .grid--n3, .grid--lead) > .tile:first-child{grid-column:1 / -1;flex-direction:row}
+  :is(.grid--n1, .grid--n3, .grid--lead) > .tile:first-child .cover{width:46%;flex:none;border-bottom:0;border-right:var(--bw) solid var(--line);border-radius:11px 0 0 11px}
+  :is(.grid--n1, .grid--n3, .grid--lead) > .tile:first-child .tile__body{padding:14px;justify-content:center;min-width:0}
+  :is(.grid--n1, .grid--n3, .grid--lead) > .tile:first-child .tile__title{font-size:18px}
+  :is(.grid--n1, .grid--n3, .grid--lead) > .tile:first-child .tile__facts{margin-top:8px}
   .lobby__group .sechead{margin-bottom:16px}
   .paytable--index{min-width:660px}
   .paytable--index tbody th{font-size:15.5px}

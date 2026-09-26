@@ -60,14 +60,21 @@ export default function gamesIndex(ctx) {
     ? `${Words(slots.length)} free Pragmatic Play slot demos and our own roulette and blackjack. Filter by feature and compare RTP and top payouts. No real money. 18+.`
     : `Our own slot, roulette and blackjack, played with free ${c.plural}. Compare their rules, RTP and top payouts. No real money, no prizes. For adults 18+.`;
 
+  // The slot rows close at every width (spec 5): an odd number of slots leads
+  // with a wide card, and from 1240px the grid keeps four columns when four
+  // close the rows and five would not (twelve cells: 5/5/2 on five columns).
+  const cells = slots.length + (slots.length % 2);
+  const many = pp && slots.length > 3;
   const groups = [
     {
       id: 'slots',
       title: pp ? 'Slot demos' : 'Our slot',
       intro: pp
-        ? `Pragmatic Play's own demos. Each one loads only when you press Play, and plays with practice credits, not ${esc(c.plural)}.`
+        ? `Pragmatic Play's own demos. Each one loads only when you press Play, and plays with demo credits, which aren't ${esc(c.plural)} and have no value.`
         : 'Seven Systems: three reels of crystal drawings.',
       games: slots,
+      cls: many && cells % 5 !== 0 && cells % 4 === 0 ? 'grid--four' : '',
+      lead: many && slots.length % 2 === 1,
     },
     {
       id: 'tables',
