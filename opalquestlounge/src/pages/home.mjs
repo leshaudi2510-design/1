@@ -1,126 +1,223 @@
+// Home (spec section 8): hero with the featured demo, the tape, the lobby,
+// How it works, Safer play, questions. When the Pragmatic Play demos are
+// switched off (site.config.json "pragmatic.enabled": false) the hero shows
+// our own slot instead and the copy speaks about our three games.
 import { html, esc, num } from '../lib/html.mjs';
 import { organizationLd, websiteLd } from '../lib/layout.mjs';
-import { pragmaticStage, gameList } from '../lib/games-ui.mjs';
-import { icons } from '../lib/icons.mjs';
+import { pragmaticStage, slotPanel, lobby } from '../lib/games-ui.mjs';
+import { icons, icon } from '../lib/icons.mjs';
+
+const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+const words = (n) => WORDS[n] || num(n);
+const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/** The fact strip under the featured demo: grid, mechanics, how it pays, volatility. */
+function demoFacts(g) {
+  const facts = [/^\d+×\d+$/.test(g.grid) ? `${g.grid} grid` : g.grid.replace(/,.*$/, '')];
+  if (g.tags.includes('megaways')) facts.push('Megaways');
+  if (g.tags.includes('tumble')) facts.push('Tumble');
+  const ways = /up to ([\d,]+) ways/i.exec(g.pays);
+  const lines = /(\d+) (?:fixed )?paylines/i.exec(g.pays);
+  if (/anywhere/i.test(g.pays)) facts.push('Pays anywhere');
+  else if (/^clusters/i.test(g.pays)) facts.push('Cluster pays');
+  else if (ways) facts.push(`${ways[1]} ways`);
+  else if (lines) facts.push(`${lines[1]} paylines`);
+  if (/^(low|medium|high|very high)$/i.test(g.volatility || '')) facts.push(`${cap(g.volatility.toLowerCase())} volatility`);
+  return facts.slice(0, 4);
+}
+
+const factStrip = (facts, link) =>
+  html`<p class="stage__facts">${facts.map((f) => `<span class="fact">${f}</span>`)}<a class="fact fact--link" href="${link.href}">${link.text} ${icons.arrow}</a></p>`;
 
 export default function home(ctx) {
   const c = ctx.cur;
+  const pp = ctx.pragmaticOn;
+  const slots = ctx.games.filter((g) => !g.table);
+  const tables = ctx.games.filter((g) => g.table);
+  // The lobby: the first eight slots, then our tables.
+  const shown = [...slots.slice(0, 8), ...tables];
+  const shownSlots = shown.length - tables.length;
+  const f = ctx.featured;
+  const house = ctx.game('seven-systems');
+  const noBuy = ctx.cfg.purchases ? 'No purchases needed' : 'Nothing to buy';
+
+  const hero = pp
+    ? {
+        kicker: 'Pragmatic Play demos and our own tables',
+        h1: 'Slot demos in full colour.',
+        stage: html`${pragmaticStage(ctx, f, { featured: true })}
+        ${factStrip(demoFacts(f), { href: f.path, text: 'Rules and features' })}`,
+        lede: `Try free Pragmatic Play slot demos, then take a seat at our own roulette and blackjack tables with free ${esc(c.plural)}. Nothing here pays out, so there's nothing to chase.`,
+      }
+    : {
+        kicker: 'Our own slot, roulette and blackjack',
+        h1: 'Slots and tables in full colour.',
+        stage: html`${slotPanel(ctx, { variant: 'hero', headingId: 'hero-game' })}
+        ${factStrip(
+          [...house.tileFacts, `RTP ${house.rtpLabel}`],
+          { href: house.path, text: 'Rules and paytable' },
+        )}`,
+        lede: `Spin Seven Systems, our own three-reel slot, then take a seat at our roulette and blackjack tables. You play with free ${esc(c.plural)}. Nothing here pays out, so there's nothing to chase.`,
+      };
+
+  const lobbyIntro = pp
+    ? `${cap(words(shownSlots))} Pragmatic Play slot demos and ${words(tables.length)} tables of our own. Every game is free, and each one has its rules and RTP on its own page.`
+    : `Our own slot and ${words(tables.length)} tables. Every game is free, and each one has its rules and RTP on its own page.`;
+  const more =
+    shown.length < ctx.games.length
+      ? `See all ${ctx.games.length} games`
+      : `Compare all ${words(ctx.games.length)} games`;
+
+  const steps = pp
+    ? [
+        ['Press play on a demo', `Slot demos stay switched off until you press Play. Then they load from Pragmatic Play's servers, with Pragmatic's own practice credits.`],
+        [`Take a seat with ${esc(c.plural)}`, `Our roulette and blackjack tables use ${esc(c.plural)}, a free virtual currency. You start with ${num(c.startingBalance)}. Drop below ${num(c.topUpBelow)} and you can claim another ${num(c.topUpAmount)} at any time.`],
+        ['Nothing pays out', ctx.cfg.purchases
+          ? `You can buy extra ${esc(c.plural)} if you choose, but ${esc(c.plural)} and demo credits can't be sold, paid out or swapped for prizes. Nothing on this site has a cash value.`
+          : `${esc(c.plural)} and demo credits can't be bought, sold, paid out or swapped for prizes. There is no real money anywhere on this site.`],
+      ]
+    : [
+        ['Pick a game', `Spin Seven Systems, bet on Lapidary Wheel or play a hand of <span class="nobr">Brilliant Twenty-One</span>. All three run in your browser.`],
+        [`Play with ${esc(c.plural)}`, `Every game uses ${esc(c.plural)}, a free virtual currency. You start with ${num(c.startingBalance)}. Drop below ${num(c.topUpBelow)} and you can claim another ${num(c.topUpAmount)} at any time.`],
+        ['Nothing pays out', ctx.cfg.purchases
+          ? `You can buy extra ${esc(c.plural)} if you choose, but they can't be sold, paid out or swapped for prizes. Nothing on this site has a cash value.`
+          : `${esc(c.plural)} can't be bought, sold, paid out or swapped for prizes. There is no real money anywhere on this site.`],
+      ];
+
+  const tools = [
+    ['limits', 'tool--y', icons.timer, 'Set a time limit', 'Lower it and it applies at once. Raise it and it waits until tomorrow.'],
+    ['break', 'tool--m', icons.pause, 'Take a break', "24 hours, 7 or 30 days. It can't be cut short."],
+    ['reality-check', 'tool--c', icons.bell, 'Reality checks', 'A reminder every 15, 30 or 60 minutes, with your time played'],
+    ['self-check', 'tool--r', icons.check, 'Check in with yourself', 'Nine quick questions, answered privately'],
+  ];
+
+  const faq = [
+    ['Is any real money involved?', `No. You can't pay in or bet real money here, nothing pays out, and nothing you play for has real-world value. Your ${esc(c.plural)} balance is kept only in your browser.`],
+    pp
+      ? ['Why do the slots load from another website?', `The slots are made by Pragmatic Play, who host the demos. So that your browser doesn't contact their servers without asking, a demo only loads after you press its Play button. Pragmatic Play's own privacy policy applies inside the demo, and our <a href="/cookies/">cookies page</a> says what it may store.`]
+      : ['How are results decided?', `By your browser's own cryptographic random number generator. Each result is fixed before the reels, wheel or cards start to move, and nothing changes with your balance, your history or how long you've played.`],
+    ['Why is it for adults only?', `Games that look like gambling are for adults, even when they're free. ${esc(ctx.brand)} is for people aged 18 and over in the United Kingdom. We ask your age on your first visit, and we never aim our games or adverts at anyone under 18.`],
+  ];
+
   return {
     id: 'home',
     path: '/',
-    title: `Free Social Casino Games · ${ctx.brand}`,
-    description: `Free slots, European roulette and blackjack played with virtual ${c.plural}. No real money, no prizes and no purchases. For adults 18+ in the UK.`,
+    title: pp ? `Free Slot Demos and Table Games · ${ctx.brand}` : `Free Slot, Roulette and Blackjack · ${ctx.brand}`,
+    description: pp
+      ? `Free-to-play social casino for UK adults: Pragmatic Play slot demos and our own roulette and blackjack with free ${c.plural}. No real money, no prizes.`
+      : `Free-to-play social casino for UK adults: our own slot, roulette and blackjack, played with free ${c.plural}. No real money, no prizes${ctx.cfg.purchases ? '' : ', nothing to buy'}.`,
     jsonld: [
       organizationLd(ctx),
       websiteLd(ctx),
       {
         '@type': 'ItemList',
-        name: 'Games',
-        itemListElement: ctx.games.map((g, i) => ({ '@type': 'ListItem', position: i + 1, url: g.url, name: g.name })),
+        name: 'The lobby',
+        numberOfItems: shown.length,
+        itemListElement: shown.map((g, i) => ({ '@type': 'ListItem', position: i + 1, url: g.url, name: g.name })),
       },
     ],
+    modules: pp
+      ? ['/assets/js/games/pragmatic.js']
+      : ['/assets/js/games/seven-systems.js', '/assets/js/games/seven-systems.math.js', '/assets/js/lib/crystals.js'],
+    // Loaded on demand by app.js, but part of what the home page needs.
+    budgetModules: ['/assets/js/lib/lobby.js'],
     bodyClass: 'is-home',
     body: html`
-<section class="hero" aria-labelledby="hero-title">
-  <header class="hero__head">
-    <p class="eyebrow"><span class="num">No. 000</span> · The lounge · Free to play</p>
-    <h1 id="hero-title" class="hero__title">Play for ${esc(c.plural)}, <em>never for cash.</em></h1>
-  </header>
-  <p class="label hero__disclaimer">${esc(ctx.disclaimer)}</p>
-  <div class="hero__game">
-    ${ctx.featured ? pragmaticStage(ctx, ctx.featured, { featured: true }) : ''}
+<section class="hero${pp ? '' : ' hero--house'}" aria-labelledby="hero-h">
+  <div class="wrap hero__grid">
+    <div class="hero__head">
+      <p class="kicker"><span class="sticker">Free to play</span> ${hero.kicker}</p>
+      <h1 id="hero-h" class="display">${hero.h1} <span class="hl">Played for fun.</span></h1>
+    </div>
+    <div class="hero__stage">
+      <div class="hero__burst burst" aria-hidden="true"><svg focusable="false"><use href="#burst-b"/></svg></div>
+      ${hero.stage}
+    </div>
+    <div class="hero__body">
+      <p class="lede">${hero.lede}</p>
+      <ul class="ticks">
+        <li>${icons.tick}No sign-up</li>
+        <li>${icons.tick}${noBuy}</li>
+        <li>${icons.tick}Regular break reminders</li>
+      </ul>
+      <div class="hero__ctas">
+        <a class="btn btn--primary" href="#lobby">Browse the lobby ${icons.arrow}</a>
+        <a class="btn btn--secondary" href="#how">How it works</a>
+      </div>
+    </div>
   </div>
-  <div class="hero__text">
-    <p class="hero__lede">${esc(ctx.brand)} is a free games room laid out like a Victorian mineral cabinet. Spin a slot of crystal drawings, bet on a single-zero wheel or play twenty-one. You play with virtual ${esc(c.plural)}, and they never leave your device.</p>
-    <ul class="hero__links">
-      <li><a href="#carats">${icons.arrowDown}How ${esc(c.plural)} work</a></li>
-      <li><a href="/responsible-gaming/">${icons.pause}Limits and breaks</a></li>
-    </ul>
+</section>
+
+<div class="tape" role="note" aria-label="The short version">
+  <ul class="wrap"><li>Free to play</li><li>No cash prizes</li><li>Adults 18+ only</li><li>Play money only</li><li>Take breaks</li></ul>
+</div>
+
+<section class="lobby" id="lobby" aria-labelledby="lobby-h">
+  <div class="wrap">
+    <div class="sechead">
+      <h2 id="lobby-h" class="display">The lobby</h2>
+      <p>${lobbyIntro}</p>
+    </div>
+    ${lobby(ctx, { games: shown, id: 'lobby', headingLevel: 3 })}
+    <p class="lobby__more"><a class="btn btn--secondary" href="/games/">${more} ${icons.arrow}</a></p>
   </div>
-  <figure class="specimen hero__specimen">
-    <canvas data-opal="specimen" width="480" height="360" aria-hidden="true"></canvas>
-    <figcaption class="specimen__label">
-      <span class="num">Specimen No. 001</span>
-      <span>Precious opal. Play-of-colour: harlequin.</span>
-      <span class="specimen__hint">Move, tilt or scroll to turn it in the light. It flashes when a game pays back more than you staked.</span>
-    </figcaption>
-  </figure>
 </section>
 
-<section class="section cabinet" aria-labelledby="cabinet-title">
-  <header class="section__head">
-    <p class="eyebrow">Three drawers</p>
-    <h2 id="cabinet-title">The cabinet</h2>
-    <p>Each game has its own page with the full rules, the paytable, how we work out its return to player and a little history.</p>
-  </header>
-  ${gameList(ctx)}
+<section class="band band--how" id="how" aria-labelledby="how-h">
+  <div class="wrap">
+    <div class="sechead">
+      <h2 id="how-h" class="display">How it works</h2>
+      <p>Free to play, with no cash prizes. Here is the whole deal in three panels.</p>
+    </div>
+    <ol class="steps">
+      ${steps.map(
+        ([h, p], i) => html`<li class="step">
+        <span class="step__num burst" aria-hidden="true"><svg focusable="false"><use href="#burst-c"/></svg><b>${i + 1}</b></span>
+        <h3>${h}</h3>
+        <p>${p}</p>
+      </li>`,
+      )}
+    </ol>
+    <div class="how__note"><span class="sticker">Worth knowing</span><p>Doing well in a free game doesn't mean you'd do well gambling with real money.</p></div>
+  </div>
 </section>
 
-<section class="section carats" id="carats" aria-labelledby="carats-title">
-  <header class="section__head">
-    <p class="eyebrow">The currency</p>
-    <h2 id="carats-title">How ${esc(c.plural)} work</h2>
-    <p>A carat is a jeweller's weight: one fifth of a gram. Here it's only a way of keeping score.</p>
-  </header>
-  <dl class="facts-list">
+<section class="band band--safe" id="safer" aria-labelledby="safe-h">
+  <div class="wrap safe">
     <div>
-      <dt><span class="num">${num(c.startingBalance)}</span> to start</dt>
-      <dd>Your first visit gives you ${ctx.carats(c.startingBalance)}. They're kept in this browser, on this device. There's no account to make.</dd>
+      <h2 id="safe-h" class="display">Safer play, built in</h2>
+      <p class="safe__lede">Games should be a break, not a habit. These tools work on every game${pp ? ', including the Pragmatic Play demos' : ' on the site'}.</p>
+      <ul class="tools">
+        ${tools.map(
+          ([anchor, cls, ico, title, note]) =>
+            `<li><a class="tool ${cls}" href="/responsible-gaming/#${anchor}"><span class="ti" aria-hidden="true">${ico}</span><span>${title}<small>${note}</small></span></a></li>`,
+        )}
+      </ul>
     </div>
-    <div>
-      <dt>Free top-ups</dt>
-      <dd>If your balance drops below ${num(c.topUpBelow)}, press <strong>Claim ${ctx.carats(c.topUpAmount)}</strong>. It costs nothing and there's no wait.</dd>
+    <div class="helpline" role="group" aria-labelledby="help-h">
+      <h3 id="help-h">Need to talk?</h3>
+      <p>GamCare's National Gambling Helpline is free, confidential and open 24 hours a day.</p>
+      <a class="tel" href="tel:+448088020133">${icons.phone}<span class="num">0808 8020 133</span></a>
+      <p>Or visit <a href="https://www.begambleaware.org/">BeGambleAware.org</a> and <a href="https://www.gamcare.org.uk/">GamCare.org.uk</a> for advice and live chat.</p>
+      <p class="clocknote"><span class="status__session"><span class="status__ico" aria-hidden="true">${icons.clockDisc}</span><span class="status__txt"><span class="visually-hidden">Session time:</span><b class="num" data-session>0:00</b><span class="status__unit" aria-hidden="true">Session</span></span></span><span>Your session clock stays in the header the whole time you play.</span></p>
     </div>
-    <div>
-      <dt>No value outside the lounge</dt>
-      <dd>${esc(c.plural)} can't be bought, sold, cashed in, transferred or swapped for prizes. They only measure play.</dd>
-    </div>
-    <div>
-      <dt>${ctx.cfg.purchases ? 'Optional purchases' : 'Nothing to buy'}</dt>
-      <dd>${ctx.cfg.purchases
-        ? `You can buy extra ${esc(c.plural)} if you choose. They still have no cash value.`
-        : `There are no in-game purchases, adverts in the games or paid extras. Every game is free.`}</dd>
-    </div>
-  </dl>
+  </div>
 </section>
 
-<section class="section limits" aria-labelledby="limits-title">
-  <header class="section__head">
-    <p class="eyebrow">Responsible gaming</p>
-    <h2 id="limits-title">Play within limits</h2>
-    <p>Free games can still take up more time than you meant. These tools are built into every page.</p>
-  </header>
-  <ol class="tools">
-    <li><h3>${icons.clock}Session clock</h3><p>The time you've spent this session is always in the top bar.</p></li>
-    <li><h3>${icons.pause}A break every 30 minutes</h3><p>Every half hour you'll see how long you've played and what you staked. Take five minutes or carry on.</p></li>
-    <li><h3>${icons.sliders}Daily time limit</h3><p>Set a limit in Settings. When you reach it, the games pause until midnight.</p></li>
-    <li><h3>${icons.lounge}Longer breaks</h3><p>Lock the games on this device for a day, a week or a month from the <a href="/responsible-gaming/">responsible gaming page</a>.</p></li>
-  </ol>
-  <p class="helpline">If gambling of any kind is a worry for you or someone close to you, call the <strong>National Gambling Helpline</strong> on <a class="tel" href="tel:+448088020133">0808 8020 133</a>. It's run by GamCare, free and open 24 hours a day.</p>
-</section>
-
-<section class="section faq" aria-labelledby="faq-title">
-  <header class="section__head">
-    <p class="eyebrow">Questions</p>
-    <h2 id="faq-title">Questions people ask</h2>
-  </header>
-  <div class="faq__list">
-    <details name="faq"><summary>Is this gambling?</summary>
-      <p>No. You can't pay to play and you can't win money or anything worth money. ${esc(c.plural)} are free and have no value outside this site. The games copy casino formats, which is why we keep them for adults.</p></details>
-    <details name="faq"><summary>Can I buy ${esc(c.plural)}?</summary>
-      <p>${ctx.cfg.purchases ? `Yes, if you want to, but you never need to. Purchased ${esc(c.plural)} have no cash value.` : `No. There's nothing to buy anywhere on the site. If you run low, you can claim a free top-up of ${ctx.carats(c.topUpAmount)}.`}</p></details>
-    <details name="faq"><summary>Why do I have to be 18 or over?</summary>
-      <p>Slots, roulette and blackjack are gambling formats, even when nothing is at stake. UK advertising rules expect games like these to be aimed at adults, and we agree. We ask your age on your first visit.</p></details>
-    <details name="faq"><summary>How are results decided?</summary>
-      <p>By your browser's cryptographic random number generator, <code>crypto.getRandomValues</code>. The result is fixed before any animation starts; the reels, wheel and cards only show it. Nothing changes with your balance, your history or how long you've played.</p></details>
-    <details name="faq"><summary>What does RTP mean if nothing is paid out?</summary>
-      <p>Return to player is the share of staked ${esc(c.plural)} that comes back over a very long run. Lapidary Wheel returns ${ctx.game('lapidary-wheel').rtpLabel} and Brilliant Twenty-One ${ctx.game('brilliant-twenty-one').rtpLabel} with basic strategy. Each game page shows how the figure is worked out.</p></details>
-    <details name="faq"><summary>Is my balance saved?</summary>
-      <p>Yes, in this browser's local storage. It isn't sent to us and doesn't follow you to other devices. Clearing your browser's site data resets it to ${num(c.startingBalance)}.</p></details>
-    <details name="faq"><summary>Can I play offline or install the site?</summary>
-      <p>Yes. After your first visit the games work without a connection. On a phone, use your browser's <em>Add to Home Screen</em> or <em>Install</em> option.</p></details>
-    <details name="faq"><summary>Who runs ${esc(ctx.brand)}?</summary>
-      <p>${esc(ctx.op.companyName)}, a company registered in ${esc(ctx.op.registeredIn)}. The <a href="/about/">about page</a> has the full details.</p></details>
+<section class="faq" aria-labelledby="faq-h">
+  <div class="wrap faq__grid">
+    <div>
+      <h2 id="faq-h" class="display">Straight answers</h2>
+      <p class="faq__intro">More on the <a href="/about/">About</a> page, or <a href="/contact/">get in touch</a>.</p>
+    </div>
+    <div>
+      ${faq.map(
+        ([q, a], i) => html`<details class="qa"${i === 0 ? ' open' : ''}>
+        <summary><span class="q" aria-hidden="true">?</span>${q}${icon('i-chev', 'chev')}</summary>
+        <div class="a"><p>${a}</p></div>
+      </details>`,
+      )}
+    </div>
   </div>
 </section>`,
   };

@@ -27,8 +27,11 @@
 .hero__ctas{display:flex;flex-wrap:wrap;gap:14px 16px}
 .hero .btn--primary:not(.btn--play){background:var(--cta-bg);color:var(--cta-text);border-color:var(--cta-line);--btn-pop:var(--cta-pop);--gloss:inset 0 3px 0 rgb(255 255 255 / .18)}
 .hero .btn--secondary{background:var(--surface);color:var(--text);border-color:var(--k);--btn-pop:var(--k)}
-.hero__burst{position:absolute;z-index:0;inset:-7% -3% -1% -7%;margin:auto}
+.hero__burst{position:absolute;z-index:0;inset:-7% -3% -1% -7%;margin:auto;--bf:var(--burst)}
 .hero__burst svg{transform:rotate(8deg)}
+/* Demos switched off: our own slot panel stands on the burst instead of the stage */
+.hero--house .hero__stage > .game{position:relative;z-index:1}
+.hero--house .hero__stage canvas{max-width:100%;height:auto}
 
 
 /* ---------- 12. Section furniture ---------- */
@@ -57,7 +60,7 @@ h2.display,.h2{font-size:clamp(32px, 2.4vw + 16px, 52px)}
 .steps{display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:26px;margin-top:44px}
 .step{position:relative;background:var(--surface);color:var(--text);border:var(--bw) solid var(--line);border-radius:var(--r-box);padding:60px 24px 24px;box-shadow:7px 7px 0 var(--k)}
 .step:nth-child(1){--sc:var(--step-1)} .step:nth-child(2){--sc:var(--step-2)} .step:nth-child(3){--sc:var(--step-3)}
-.step__num{position:absolute;top:-34px;left:16px;width:80px;height:80px}
+.step__num{position:absolute;top:-34px;left:16px;width:80px;height:80px;--bf:var(--sc)}
 .step__num b{position:absolute;inset:0;display:grid;place-items:center;font:900 32px/1 var(--f-ui);font-stretch:112%;color:var(--k)}
 .step h3{font:900 22px/1.15 var(--f-ui);font-stretch:110%;margin-bottom:10px}
 .step p{color:var(--text-2)}
@@ -74,6 +77,10 @@ h2.display,.h2{font-size:clamp(32px, 2.4vw + 16px, 52px)}
 .safe h2{margin-bottom:16px}
 .safe__lede{font-size:18px;max-width:34em;margin-bottom:24px;font-weight:500}
 .tools{display:grid;grid-template-columns:repeat(2, minmax(0,1fr));gap:14px}
+.tools > li{display:flex}
+.tools > li > .tool{flex:1}
+/* icon tile colours (no inline styles: CSP) */
+.tool--y{--tc:#FFE11A} .tool--m{--tc:#FF4FB0} .tool--c{--tc:#3DD6FF} .tool--r{--tc:#FF6A4D}
 .tool{display:flex;align-items:center;gap:12px;min-height:72px;padding:12px 14px;background:var(--surface);color:var(--text);text-decoration:none;
   border:var(--bw) solid var(--line);border-radius:var(--r-ctl);box-shadow:4px 4px 0 var(--k);font:800 16.5px/1.2 var(--f-ui);transition:transform .12s, box-shadow .12s}
 .tool small{display:block;font:400 14.5px/1.35 var(--f-body);color:var(--text-2);margin-top:3px}
@@ -111,7 +118,7 @@ h2.display,.h2{font-size:clamp(32px, 2.4vw + 16px, 52px)}
 
 /* ---------- responsive ---------- */
 @media (max-width: 999px){
-  .hero__grid{grid-template-columns:1fr;grid-template-areas:"head" "stage" "body"}
+  .hero__grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "stage" "body"}
   .hero__stage{max-width:720px;width:100%;padding:12px 16px 12px 4px}
   .hero__body{margin-top:26px}
   .hero{--rx:50%;--ry:58%}

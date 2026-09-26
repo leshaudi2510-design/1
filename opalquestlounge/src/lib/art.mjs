@@ -207,6 +207,108 @@ export const COVERS = {
     title: `<span class="toon" data-text="Buffalo King">Buffalo King</span><br><span class="rib">Megaways</span>`,
     size: '11.5cqi',
   },
+  // A wrapped sweet and a round multiplier bomb. Objects only: no faces.
+  'sweet-bonanza': {
+    c1: '#A8E63C', c2: '#2E9A46', tf: 'gold', acc: '#B8F05A',
+    art: `${star(28, 26, 9, '#FFF5E1')}<circle cx="104" cy="18" r="2.6" fill="#FFF5E1"/><circle cx="52" cy="114" r="2.2" fill="#FFF5E1"/>
+      <g transform="rotate(-18 70 70)">
+        <path class="ink" d="M42 70L20 50l5 20-5 20z" fill="#FFE11A"/>
+        <path class="ink" d="M98 70l22-20-5 20 5 20z" fill="#FFE11A"/>
+        <path class="ink-t" d="M22 58l14 8M22 82l14-8M118 58l-14 8M118 82l-14-8" fill="none"/>
+        <ellipse class="ink" cx="70" cy="70" rx="30" ry="21" fill="#FF2E93"/>
+        <path d="M56 51q-9 19 0 38M70 49q-9 21 0 42M84 51q-9 19 0 38" fill="none" stroke="#FFF5E1" stroke-width="5" stroke-linecap="round"/>
+        <ellipse cx="70" cy="70" rx="30" ry="21" fill="none" stroke="#18122B" stroke-width="4"/>
+        <path d="M52 60q6-8 16-9" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+      </g>
+      <path class="ink-t" d="M150 44q4-14 14-20" fill="none"/>
+      ${star(166, 20, 9, '#FFE11A', 'ink-t')}
+      <rect class="ink" x="139" y="38" width="18" height="12" rx="3" fill="#4A4160" transform="rotate(18 148 44)"/>
+      <circle class="ink" cx="142" cy="74" r="27" fill="#5B2BD6"/>
+      <path d="M124 64a20 20 0 0 1 12-12" fill="none" stroke="#C9B8FF" stroke-width="4" stroke-linecap="round"/>
+      <text class="cover__num" x="142" y="80" text-anchor="middle" font-size="15" fill="#FFE11A">100×</text>`,
+    title: `<small>Sweet</small><span class="toon" data-text="Bonanza">Bonanza</span>`,
+  },
+  // The bolt again, struck through a plaque that reads 1000.
+  'gates-of-olympus-1000': {
+    c1: '#FF3FA4', c2: '#6B21C8', tf: 'gold', acc: '#FF6FC0',
+    art: `<g class="ink" fill="#FFF5E1"><rect x="10" y="30" width="16" height="84"/><rect x="174" y="30" width="16" height="84"/><rect x="4" y="22" width="28" height="9" rx="2"/><rect x="168" y="22" width="28" height="9" rx="2"/></g>
+      <path class="ink-t" d="M16 36v72M20 36v72M180 36v72M184 36v72" fill="none"/>
+      <polygon class="ink" points="112,0 70,70 96,70 76,142 138,52 110,52 132,0" fill="#FFE11A"/>
+      <g transform="rotate(-5 100 86)">
+        <rect class="ink" x="34" y="64" width="132" height="46" rx="7" fill="#18122B"/>
+        <text class="cover__num" x="103" y="104" text-anchor="middle" font-size="44" fill="#FF2E93">1000</text>
+        <text class="cover__num" x="100" y="101" text-anchor="middle" font-size="44" fill="#FFE11A">1000</text>
+      </g>
+      <g class="ink-t"><path d="M40 30l6-7h11l6 7-12 14z" fill="#3DD6FF"/><path d="M144 30l6-7h11l6 7-12 14z" fill="#13C08B"/></g>
+      ${star(64, 16, 7, '#FFF5E1')}${star(158, 128, 7, '#FFF5E1')}`,
+    title: `<small>Gates of</small><span class="toon" data-text="Olympus">Olympus</span>`,
+  },
+  // A slice of watermelon and a cherry pair. No faces.
+  'fruit-party': {
+    c1: '#18CFC4', c2: '#0B5E8E', tf: 'gold', acc: '#3DE0D6',
+    art: `${star(176, 22, 9, '#FFF5E1')}<circle cx="24" cy="24" r="2.6" fill="#FFF5E1"/><circle cx="124" cy="14" r="2.2" fill="#FFF5E1"/>
+      <g transform="rotate(-14 74 50)">
+        <path class="ink" d="M24 50a50 50 0 0 0 100 0z" fill="#1E9E4A"/>
+        <path d="M31 50a43 43 0 0 0 86 0z" fill="#FFF5E1"/>
+        <path class="ink-t" d="M36 50a38 38 0 0 0 76 0z" fill="#FF3D5A"/>
+        <path d="M24 50h100" stroke="#18122B" stroke-width="4" stroke-linecap="round"/>
+        <g fill="#18122B"><ellipse cx="58" cy="64" rx="2.4" ry="4" transform="rotate(20 58 64)"/><ellipse cx="74" cy="72" rx="2.4" ry="4"/><ellipse cx="90" cy="64" rx="2.4" ry="4" transform="rotate(-20 90 64)"/><ellipse cx="66" cy="80" rx="2.4" ry="4" transform="rotate(12 66 80)"/><ellipse cx="82" cy="80" rx="2.4" ry="4" transform="rotate(-12 82 80)"/></g>
+      </g>
+      <path d="M134 90q0-30 20-52M160 86q2-28-6-48" fill="none" stroke="#18122B" stroke-width="4" stroke-linecap="round"/>
+      <path class="ink-t" d="M154 38q16-14 30-4q-14 14-30 4z" fill="#2BB673"/>
+      <circle class="ink" cx="132" cy="100" r="15" fill="#E0263C"/>
+      <circle class="ink" cx="162" cy="96" r="15" fill="#E0263C"/>
+      <path d="M125 94a8 8 0 0 1 6-5M155 90a8 8 0 0 1 6-5" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>`,
+    title: `<span class="toon" data-text="Fruit Party">Fruit Party</span>`,
+  },
+  // A float bobbing in rings of splash ripples.
+  'big-bass-splash': {
+    c1: '#8A5CFF', c2: '#0E6CC4', tf: 'gold', acc: '#A487FF',
+    art: `<circle class="ink" cx="164" cy="30" r="15" fill="#FFE11A"/>
+      ${star(30, 26, 8, '#FFF5E1')}<circle cx="62" cy="16" r="2.4" fill="#FFF5E1"/>
+      <path class="ink" d="M-4 96q13-8 26 0t26 0 26 0 26 0 26 0 26 0 26 0 26 0V150H-4z" fill="#0A4FA0"/>
+      <g fill="none" stroke="#FFF5E1" stroke-linecap="round"><ellipse cx="100" cy="106" rx="76" ry="13" stroke-width="3"/><ellipse cx="100" cy="104" rx="52" ry="9" stroke-width="3.5"/><ellipse cx="100" cy="102" rx="30" ry="6" stroke-width="4"/></g>
+      <g class="ink-t" fill="#FFF5E1">
+        <path d="M62 66q-8-10-4-18q8 6 4 18z"/><path d="M138 66q8-10 4-18q-8 6-4 18z"/>
+        <path d="M48 84q-12-4-14-12q10 0 14 12z"/><path d="M152 84q12-4 14-12q-10 0-14 12z"/>
+      </g>
+      <g transform="rotate(10 100 80)">
+        <rect class="ink" x="95" y="34" width="10" height="22" rx="3" fill="#FFF5E1"/>
+        <path class="ink" d="M78 80a22 22 0 0 1 44 0z" fill="#FF4A3D"/>
+        <path class="ink" d="M78 80a22 22 0 0 0 44 0z" fill="#FFF5E1"/>
+        <rect class="ink-t" x="76" y="76" width="48" height="9" rx="3" fill="#FFE11A"/>
+        <path d="M86 68a14 14 0 0 1 8-6" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+      </g>`,
+    title: `<small>Big Bass</small><span class="toon" data-text="Splash">Splash</span>`,
+  },
+  // Our own slot (shown only when the Pragmatic demos are switched off): a
+  // faceted crystal point between two smaller ones, with an opal at its foot.
+  'seven-systems': {
+    c1: '#FF4FB0', c2: '#7A1FA8', tf: 'gold', acc: '#FF4FB0', ours: true,
+    art: `${star(30, 24, 9, '#FFF5E1')}${star(172, 30, 7, '#FFF5E1')}<circle cx="152" cy="12" r="2.4" fill="#FFF5E1"/>
+      <g transform="rotate(-24 52 92)">
+        <polygon class="ink" points="52,48 64,62 64,112 40,112 40,62" fill="#B58BFF"/>
+        <path class="ink-t" d="M52 48v64M40 62l12 6 12-6" fill="none"/>
+        <polygon points="52,48 40,62 52,68" fill="#E6DAFF"/>
+      </g>
+      <g transform="rotate(22 150 92)">
+        <polygon class="ink" points="150,50 162,64 162,112 138,112 138,64" fill="#FFC21A"/>
+        <path class="ink-t" d="M150 50v62M138 64l12 6 12-6" fill="none"/>
+        <polygon points="150,50 138,64 150,70" fill="#FFF3A6"/>
+      </g>
+      <polygon points="78,36 100,50 100,122 78,110" fill="#C9F4FF"/>
+      <polygon points="100,50 122,36 122,110 100,122" fill="#3DD6FF"/>
+      <polygon points="100,6 78,36 100,50" fill="#FFFFFF"/>
+      <polygon points="100,6 122,36 100,50" fill="#8FE6FF"/>
+      <path class="ink-t" d="M78 36l22 14 22-14M100 50v72" fill="none"/>
+      <polygon class="ink" points="100,6 122,36 122,110 100,122 78,110 78,36" fill="none"/>
+      <path d="M86 44v50" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="100" cy="126" rx="26" ry="14" fill="#00AEEF"/>
+      <path d="M78 122q10-10 22-6-4 8-22 6z" fill="#FF2E93"/><path d="M104 116q14-2 20 8-12 2-20-8z" fill="#FFE11A"/><path d="M92 132q8-6 18 0-8 6-18 0z" fill="#13C08B"/>
+      <ellipse class="ink" cx="100" cy="126" rx="26" ry="14" fill="none"/>
+      <path d="M84 120q6-5 14-5" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>`,
+    title: `<small>Seven</small><span class="toon" data-text="Systems">Systems</span>`,
+  },
   'lapidary-wheel': {
     c1: '#18CF96', c2: '#067A5E', tf: 'gold', acc: '#18CF96', ours: true,
     art: WHEEL,
@@ -222,15 +324,36 @@ export const COVERS = {
         <path class="ink-t" d="M106 84l7-8h22l7 8-18 22z" fill="#3DD6FF"/>
         <path d="M106 84h36M118 76l-3 8 9 22 9-22-3-8" fill="none" stroke="#18122B" stroke-width="1.6" stroke-linejoin="round"/></g>
       ${star(30, 40, 10, '#FFE11A', 'ink-t')}`,
-    title: `<small>Brilliant</small><span class="toon" data-text="Twenty‑One">Twenty‑One</span>`,
-    size: '10.4cqi',
+    // A plain hyphen kept on one line by .nobr (the fonts have no U+2011).
+    title: `<small>Brilliant</small><span class="toon nobr" data-text="Twenty-One">Twenty-One</span>`,
+    size: '9.8cqi',
   },
 };
 
+/**
+ * A cover for a game that has no drawing of its own yet (a new entry in
+ * pragmatic-games.json, say): a cut gem on the default violet-to-magenta
+ * ground, with the game's name as the lettering. Draw a proper one in
+ * COVERS using the recipe in the spec (section 10).
+ */
+export function coverFor(slug, name = '') {
+  if (COVERS[slug]) return COVERS[slug];
+  const text = String(name).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  return {
+    c1: '#5B2BD6', c2: '#E0288F', tf: 'gold', acc: '#FF4FB0', generic: true,
+    art: `<path class="ink" d="M62 52l16-22h44l16 22-38 54z" fill="#3DD6FF"/>
+      <path class="ink-t" d="M62 52h76M88 30l-8 22 20 54 20-54-8-22" fill="none"/>
+      ${star(40, 30, 9, '#FFF5E1')}${star(164, 84, 8, '#FFF5E1')}`,
+    title: `<span class="toon" data-text="${text}">${text}</span>`,
+  };
+}
 
 /**
  * CSS rules carrying each cover's colours. The site's CSP (style-src 'self')
  * blocks inline style attributes, so the build appends these to site.css.
+ * Every rule sits on [data-cover="slug"], which tiles carry on both the tile
+ * and its cover, and the stage on its screen. --ct-size sizes the lettering
+ * on tiles only; the stage sets its own size.
  */
 export function coverCss() {
   const tf = { gold: 'var(--tf-gold)', ice: 'var(--tf-ice)', cream: 'var(--tf-cream)', rose: 'var(--tf-rose)' };
@@ -238,9 +361,8 @@ export function coverCss() {
     .map(([slug, c]) => {
       const vars = [`--c1:${c.c1}`, `--c2:${c.c2}`, `--tf:${tf[c.tf] || tf.gold}`, `--acc:${c.acc}`];
       if (c.rib) vars.push(`--rib:${c.rib}`);
-      let css = `[data-cover="${slug}"]{${vars.join(';')}}`;
-      if (c.size) css += `\n[data-cover="${slug}"] .ct{font-size:${c.size}}`;
-      return css;
+      if (c.size) vars.push(`--ct-size:${c.size}`);
+      return `[data-cover="${slug}"]{${vars.join(';')}}`;
     })
     .join('\n');
 }
