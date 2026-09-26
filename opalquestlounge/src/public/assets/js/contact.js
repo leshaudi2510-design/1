@@ -32,13 +32,18 @@ if (form) {
     return text;
   }
 
+  // The browser may restore a draft after a reload or Back: count it.
+  const updateCount = () => (count.textContent = nf.format(message.value.length));
+  updateCount();
+  addEventListener('pageshow', updateCount);
+
   // Validate on leaving a field once it has been touched, and re-check as they fix it.
   form.addEventListener('focusout', (e) => {
     if (e.target.matches('input, select, textarea') && e.target.value) show(e.target);
   });
   form.addEventListener('input', (e) => {
     if (e.target.getAttribute('aria-invalid') === 'true') show(e.target);
-    if (e.target === message) count.textContent = nf.format(message.value.length);
+    if (e.target === message) updateCount();
   });
 
   form.addEventListener('submit', async (e) => {
@@ -81,7 +86,7 @@ if (form) {
         const res = await fetch(endpoint, { method: 'POST', headers: { Accept: 'application/json' }, body: new FormData(form) });
         if (!res.ok) throw new Error(String(res.status));
         form.reset();
-        count.textContent = '0';
+        updateCount();
         status.textContent = 'Thanks. Your message has been sent and we’ll reply by email.';
       } catch {
         status.textContent = `Sorry, that didn’t send. Please email us at ${form.dataset.email}.`;
