@@ -19,6 +19,8 @@ import { layout, setAssetVersion, csp } from './src/lib/layout.mjs';
 import home from './src/pages/home.mjs';
 import gamesIndex from './src/pages/games-index.mjs';
 import sevenSystems from './src/pages/seven-systems.mjs';
+import pragmaticGame from './src/pages/pragmatic-game.mjs';
+import { coverCss } from './src/lib/art.mjs';
 import lapidaryWheel from './src/pages/lapidary-wheel.mjs';
 import brilliant21 from './src/pages/brilliant-twenty-one.mjs';
 import about from './src/pages/about.mjs';
@@ -30,11 +32,11 @@ import contact from './src/pages/contact.mjs';
 import { notFound, offline } from './src/pages/misc.mjs';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
-const OUT = path.join(ROOT, process.env.OUT_DIR || 'dist');
+const OUT = path.resolve(ROOT, process.env.OUT_DIR || 'dist');
 const PUBLIC = path.join(ROOT, 'src/public');
 const strict = process.argv.includes('--strict');
 
-const cfg = JSON.parse(await fs.readFile(path.join(ROOT, process.env.SITE_CONFIG || 'site.config.json'), 'utf8'));
+const cfg = JSON.parse(await fs.readFile(path.resolve(ROOT, process.env.SITE_CONFIG || 'site.config.json'), 'utf8'));
 const ctx = makeContext(cfg);
 
 // ---------- helpers ----------
@@ -65,6 +67,8 @@ const STYLES = path.join(ROOT, 'src/styles');
 const partials = (await fs.readdir(STYLES).catch(() => [])).filter((f) => f.endsWith('.css')).sort();
 if (partials.length) {
   const parts = await Promise.all(partials.map(async (f) => `/* ---- ${f} ---- */\n${(await fs.readFile(path.join(STYLES, f), 'utf8')).trim()}\n`));
+  // Per-game cover colours, generated as rules because the CSP blocks inline styles.
+  parts.push(`/* ---- generated: cover colours (src/lib/art.mjs) ---- */\n${coverCss()}\n`);
   await write('assets/css/site.css', parts.join('\n'));
 }
 
@@ -94,12 +98,11 @@ await write(
 );
 
 // ---------- 2. pages ----------
+const HOUSE_PAGES = { 'seven-systems': sevenSystems, 'lapidary-wheel': lapidaryWheel, 'brilliant-twenty-one': brilliant21 };
 const pages = [
   home(ctx),
   gamesIndex(ctx),
-  sevenSystems(ctx),
-  lapidaryWheel(ctx),
-  brilliant21(ctx),
+  ...ctx.games.map((g) => (g.provider === 'pragmatic' ? pragmaticGame(ctx, g) : HOUSE_PAGES[g.slug](ctx))),
   about(ctx),
   responsibleGaming(ctx),
   terms(ctx),

@@ -26,11 +26,8 @@ UNICODES = (
 
 JOBS = [
     # file in, file out, axis limits (None = keep full range)
-    # Google Fonts lists the italic file first; these names match what each file really is.
-    ("bodoni-roman.woff2", "bodoni-moda.woff2", {"wght": (400, 800), "opsz": (6, 96)}),
-    ("bodoni-italic.woff2", "bodoni-moda-italic.woff2", {"wght": (400, 700), "opsz": (6, 96)}),
-    ("geologica.woff2", "geologica.woff2", {"wght": (300, 700), "SHRP": (0, 100), "slnt": 0, "CRSV": 0}),
-    ("martian.woff2", "martian-mono.woff2", {"wght": (300, 700), "wdth": (75, 112.5)}),
+    ("archivo.woff2", "archivo.woff2", {"wght": (500, 900), "wdth": (100, 125)}),
+    ("radio-canada.woff2", "radio-canada.woff2", {"wght": (400, 700)}),
 ]
 
 for src, out, limits in JOBS:

@@ -23,7 +23,7 @@ export function csp(ctx) {
     "manifest-src 'self'",
     "worker-src 'self'",
     // Pragmatic Play demos, loaded only when the visitor presses "Play demo".
-    `frame-src ${(ctx.cfg.pragmatic?.frameHosts || []).join(' ') || "'none'"}`,
+    `frame-src ${(ctx.pragmaticOn && ctx.cfg.pragmatic.frameHosts?.join(' ')) || "'none'"}`,
     "object-src 'none'",
     "base-uri 'self'",
     `form-action 'self' mailto:${endpoint}`,
@@ -383,7 +383,7 @@ ${robots}
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="${ctx.cfg.themeColor.light}">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="${ctx.cfg.themeColor.dark}">
-${(page.preloadFonts || ['bodoni-moda', 'geologica']).map((f) => `<link rel="preload" href="/assets/fonts/${f}.woff2" as="font" type="font/woff2" crossorigin>`)}
+${(page.preloadFonts || ['archivo', 'radio-canada']).map((f) => `<link rel="preload" href="/assets/fonts/${f}.woff2" as="font" type="font/woff2" crossorigin>`)}
 <link rel="stylesheet" href="/assets/css/site.css?v=${v}">
 <link rel="modulepreload" href="/assets/js/app.js?v=${v}">
 ${modules.map((m) => `<link rel="modulepreload" href="${m}">`)}

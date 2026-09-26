@@ -1,0 +1,15 @@
+/* ---------- 24. Preferences (last, so they win) ---------- */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+  .btn:hover,.btn:active,.tile:hover,.tile:active,.tool:hover,.tool:active,.chip:hover,.chip:active,.icon-btn:active,.segmented.chips label:hover,.segmented.chips label:has(input:checked){transform:none}
+}
+@media (prefers-contrast: more){
+  :root{--text-2:var(--text)}
+  .cover::after,.hero::after,.hero::before,.game-hero::before,.game-hero::after,.band::before,.twentyone__stage::after{display:none}
+}
+@media (forced-colors: active){
+  .btn,.chip,.tile,.status__balance,.status__session,.icon-btn,.step,.qa,.tool,.helpline,.stage,.paytable,.segmented{border-color:CanvasText}
+  .chip[aria-pressed="true"],.segmented label:has(input:checked){forced-color-adjust:none;background:Highlight;color:HighlightText}
+  .cover,.stage__screen{forced-color-adjust:none}
+  .display{text-shadow:none}
+}

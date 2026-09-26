@@ -1,6 +1,5 @@
-Copyright 2020 The Bodoni Moda Project Authors (https://github.com/indestructible-type/Bodoni)
-Copyright 2020 The Geologisk Project Authors (https://github.com/monokromskriftforlag/geologisk)
-Copyright 2021 The Martian Mono Project Authors (https://github.com/evilmartians/mono)
+Copyright 2020 The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo)
+Copyright 2017 The Radio-Canada Project Authors (https://github.com/cbcrc/radiocanadafonts)
 
 The files in this folder are subsets of those fonts (Latin characters, trimmed
 variation ranges) made with tools/subset-fonts.py. No Reserved Font Names apply.

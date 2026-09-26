@@ -1,0 +1,59 @@
+/* ---------- 5. Age notice ribbon (every page, first thing on screen) ---------- */
+.age-notice{background:var(--notice-bg);color:var(--notice-text)}
+.age-notice__row{display:flex;align-items:center;gap:12px;min-height:46px;padding:6px 0}
+.age-notice p{font-size:15px;line-height:1.35;font-weight:500}
+.age-notice strong{font-weight:700}
+.age-notice a{margin-left:auto;flex:none;color:var(--notice-link);font:700 15px/1.2 var(--f-ui);padding:6px 0}
+.age-notice :focus-visible{outline-color:var(--y)}
+
+/* 18+ mark: cream disc, red ring, ink halo. Same component everywhere. */
+.age-mark{flex:none;display:grid;place-items:center;width:var(--am,56px);height:var(--am,56px);border-radius:50%;
+  background:var(--mark-bg);color:var(--mark-text);border:calc(var(--am,56px) * .09) solid var(--r);box-shadow:0 0 0 2.5px var(--k);
+  font:900 calc(var(--am,56px) * .33)/1 var(--f-ui);font-stretch:100%;letter-spacing:-.03em}
+.age-notice .age-mark{--am:34px;--mark-bg:#FFF5E1;--mark-text:#18122B;box-shadow:0 0 0 2px #FFF5E1}
+
+/* ---------- 6. Header ---------- */
+.masthead{position:sticky;top:0;z-index:40;background:var(--header-bg);border-bottom:var(--bw) solid var(--line)}
+.cmyk{display:grid;grid-template-columns:repeat(4,1fr);height:6px}
+.cmyk i:nth-child(1){background:var(--c)} .cmyk i:nth-child(2){background:var(--m)}
+.cmyk i:nth-child(3){background:var(--y)} .cmyk i:nth-child(4){background:var(--r)}
+.masthead__row{display:flex;align-items:center;gap:24px;min-height:72px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);flex:none;border-radius:10px}
+.brand__opal{width:46px;height:46px}
+.brand__name{display:flex;flex-direction:column;align-items:flex-start;line-height:1}
+.brand__name b{font:900 21px/1 var(--f-ui);font-stretch:125%;text-transform:uppercase;letter-spacing:-.01em}
+.brand__name span{margin-top:4px;font:800 11px/1 var(--f-ui);font-stretch:112%;text-transform:uppercase;letter-spacing:.26em;background:var(--m);color:var(--k);padding:3px 5px 3px 7px;border-radius:3px}
+.nav ul{display:flex;gap:2px}
+.nav li{flex:none}
+.nav a{display:block;white-space:nowrap;padding:10px 12px;font:700 16px/1.2 var(--f-ui);font-stretch:104%;color:var(--text);text-decoration:none;border-radius:10px;
+  background:linear-gradient(var(--y),var(--y)) no-repeat 12px calc(100% - 7px)/0 7px;transition:background-size .15s ease}
+.nav a:hover,.nav a[aria-current="page"]{background-size:calc(100% - 24px) 7px}
+.status{margin-left:auto;display:flex;align-items:center;gap:10px}
+.status__balance,.status__session{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:5px 14px 5px 6px;border:var(--bw-ctl) solid var(--ctl-line);border-radius:var(--r-pill);background:var(--surface);white-space:nowrap}
+.status__ico{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--k);flex:none}
+.status__ico svg{width:19px;height:19px}
+.status__balance .status__ico{background:var(--c)}
+.status__session .status__ico{background:var(--y)}
+.status__txt{display:flex;align-items:baseline;gap:6px}
+.status__txt b{font:900 17px/1 var(--f-ui);font-stretch:108%}
+.status__unit{font:700 14px/1 var(--f-ui);color:var(--text-2)}
+.status__session .status__unit{order:-1;font-size:12px;text-transform:uppercase;letter-spacing:.1em}
+
+
+/* ---------- 16. Footer (colophon) ---------- */
+.colophon{background:var(--foot-bg);color:var(--foot-text);padding:56px 0 40px;--focus:#FFE11A;--link:#FFF5E1}
+.colophon a{color:var(--foot-text)}
+.colophon__grid{display:grid;grid-template-columns:minmax(0,5fr) repeat(3, minmax(0,2fr));gap:32px}
+.colophon .brand{color:var(--foot-text)}
+.colophon__disclaimer{display:flex;gap:14px;align-items:center;margin-top:20px;max-width:30em;font-size:15.5px;line-height:1.45}
+.colophon__disclaimer .age-mark{--am:50px;--mark-bg:var(--foot-bg);--mark-text:var(--foot-text);box-shadow:0 0 0 2.5px var(--foot-text)}
+.colophon__support{margin-top:16px;font-size:15px;color:var(--foot-text-2)}
+.colophon__support a{font-weight:700;display:inline-block;padding:2px 0}
+.colophon h2{font:800 13px/1 var(--f-ui);font-stretch:115%;text-transform:uppercase;letter-spacing:.16em;color:var(--y);margin-bottom:14px}
+.colophon li + li{margin-top:2px}
+.colophon li a,.colophon .linkish{display:inline-block;padding:6px 0;font:400 15.5px/1.3 var(--f-body);text-decoration:none;background:none;border:0;cursor:pointer;color:var(--foot-text);text-align:left}
+.colophon li a:hover,.colophon .linkish:hover{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+.colophon__slug{margin-top:40px;padding-top:22px;border-top:2px solid var(--foot-rule);display:grid;gap:8px;font-size:14px;line-height:1.55;color:var(--foot-text-2)}
+
+/* ---------- 17. Dock (phones) ---------- */
+.dock{display:none}

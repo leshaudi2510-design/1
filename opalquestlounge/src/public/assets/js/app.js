@@ -60,6 +60,7 @@ const GAMES = {
   'seven-systems': () => import('./games/seven-systems.js'),
   'lapidary-wheel': () => import('./games/lapidary-wheel.js'),
   'brilliant-twenty-one': () => import('./games/brilliant-21.js'),
+  pragmatic: () => import('./games/pragmatic.js'),
 };
 function startGames() {
   document.querySelectorAll('[data-game]').forEach(async (root) => {

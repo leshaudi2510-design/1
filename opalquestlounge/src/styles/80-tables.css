@@ -1,0 +1,111 @@
+/* ---------- 22. Our own tables: panel style ---------- */
+.tables{padding:var(--section) 0}
+.game{background:var(--surface);color:var(--text);border:var(--bw) solid var(--line);border-radius:var(--r-stage);box-shadow:8px 8px 0 var(--pop);overflow:hidden}
+.game + .game{margin-top:36px}
+.game__head{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 16px;border-bottom:var(--bw) solid var(--line);background:var(--gh, var(--g))}
+.game__crest{width:44px;height:44px;flex:none;border-radius:50%;border:var(--bw-ctl) solid var(--k);background:var(--y);display:grid;place-items:center;color:var(--k)}
+.game__crest svg{width:26px;height:26px}
+.game__title{font:900 24px/1.05 var(--f-display);font-stretch:112%;color:var(--k)}
+.game__facts{margin-left:auto;display:flex;gap:8px}
+.game__facts div{display:flex;align-items:center;gap:6px;background:#FFFFFF;color:var(--k);border:2px solid var(--k);border-radius:999px;padding:5px 10px;font:700 14px/1 var(--f-ui)}
+.game__facts dt{font-weight:600;color:#4A4160}
+.game__facts dd{font-weight:900;font-variant-numeric:tabular-nums}
+.game__result{font:800 17px/1.35 var(--f-ui);padding:10px 14px;border:var(--bw-ctl) solid var(--ctl-line);border-radius:12px;background:var(--surface-2)}
+.game__controls{display:grid;gap:14px}
+.game__buttons{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center}
+.game__buttons .btn{min-height:48px;padding:10px 18px;font-size:16px}
+.game__buttons .btn--play{min-height:56px;padding:12px 22px;font-size:17px}
+.game__disclaimer{padding:10px 16px;border-top:2px dashed color-mix(in srgb, var(--text) 30%, transparent);font-size:14.5px;color:var(--text-2)}
+.wheel__layout{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,9fr);gap:24px;padding:18px}
+.wheel__stage{display:grid;gap:12px;align-content:start;justify-items:center}
+.wheel__stage svg{width:100%;max-width:260px;height:auto}
+.wheel__history{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.wheel__history li{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:800 14px/1 var(--f-ui);border:2px solid var(--k)}
+.wheel__table{display:grid;gap:14px;align-content:start;min-width:0}
+/* bet chips: the chip-value picker reads as physical chips */
+.segmented.chips{display:flex;flex-wrap:wrap;gap:10px;border:0;background:none;overflow:visible;border-radius:0}
+.segmented.chips label,.segmented.chips label + label{flex:none;margin-left:0}
+.segmented.chips legend{float:left;width:100%;font:800 15px/1.2 var(--f-ui);margin-bottom:8px}
+.segmented.chips label{width:52px;height:52px;min-height:0;padding:0;border-radius:50%;border:var(--bw-ctl) solid var(--k)!important;background:var(--chip);color:var(--chip-t);
+  font:900 15px/1 var(--f-ui);box-shadow:inset 0 0 0 5px var(--chip), inset 0 0 0 8px rgb(255 255 255 / .9), 3px 3px 0 var(--pop);transition:transform .12s, box-shadow .12s}
+.segmented.chips label:nth-of-type(1){--chip:#FFFFFF;--chip-t:#18122B}
+.segmented.chips label:nth-of-type(2){--chip:#C8102E;--chip-t:#FFFFFF}
+.segmented.chips label:nth-of-type(3){--chip:#13C08B;--chip-t:#18122B}
+.segmented.chips label:nth-of-type(4){--chip:#18122B;--chip-t:#FFFFFF}
+.segmented.chips label:nth-of-type(5){--chip:#5B2BD6;--chip-t:#FFFFFF}
+.segmented.chips label:nth-of-type(1){box-shadow:inset 0 0 0 5px #FFFFFF, inset 0 0 0 8px #00AEEF, 3px 3px 0 var(--pop)}
+.segmented.chips label:hover{transform:translate(-1px,-2px);background:var(--chip)}
+.segmented.chips label:has(input:checked){background:var(--chip);color:var(--chip-t);transform:translateY(-4px);outline:3px solid var(--y);outline-offset:3px}
+.segmented.chips label:has(input:focus-visible){outline:3px solid var(--focus);outline-offset:4px}
+.board{display:grid;gap:4px;min-width:0}
+.board__numbers{display:grid;grid-auto-flow:column;grid-template-rows:repeat(3, 44px);grid-template-columns:1.3fr repeat(12, minmax(0,1fr)) 1.2fr;gap:4px}
+.board__dozens{display:grid;grid-template-columns:1fr repeat(3, 4fr) 1fr;gap:4px}
+.board__even{display:grid;grid-template-columns:1fr repeat(6, 2fr) 1fr;gap:4px}
+.board__dozens::before,.board__dozens::after,.board__even::before,.board__even::after{content:""}
+.bet{position:relative;display:grid;place-items:center;min-width:24px;min-height:36px;padding:0;border:2px solid var(--k);border-radius:6px;background:var(--surface);color:var(--text);
+  font:800 15px/1 var(--f-ui);font-variant-numeric:tabular-nums;cursor:pointer}
+.bet:hover{outline:3px solid var(--y);outline-offset:-3px}
+.bet--zero{grid-row:span 3}
+.bet--col{font-size:13px}
+.is-garnet{background:#C8102E;color:#FFFFFF}
+.is-jet{background:#18122B;color:#FFFFFF}
+.is-malachite{background:#13C08B;color:#18122B}
+.bet--out{min-height:40px;font-size:14px}
+.bet__chip{position:absolute;right:-5px;top:-7px;min-width:24px;height:24px;padding:0 4px;border-radius:999px;background:var(--y);color:var(--k);border:2px solid var(--k);display:grid;place-items:center;font:900 11.5px/1 var(--f-ui)}
+.bet__chip:empty{display:none}
+.wheel__staked{font:700 15.5px/1.3 var(--f-ui)}
+.wheel__staked small{font-weight:600;color:var(--text-2)}
+.twentyone__layout{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:20px;padding:18px}
+.twentyone__stage{position:relative;border:var(--bw) solid var(--k);border-radius:16px;min-height:280px;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 20%, #2F6BE0, #1740B8 60%, #0F2C85)}
+.twentyone__stage::after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle, rgb(255 255 255 / .08) 30%, transparent 32%);background-size:10px 10px;pointer-events:none}
+.twentyone__stage svg{position:absolute;inset:0;width:100%;height:100%}
+.hand{position:absolute;left:14px;z-index:2;display:inline-flex;align-items:center;gap:8px;background:#FFFFFF;color:var(--k);border:2px solid var(--k);border-radius:999px;padding:5px 12px 5px 6px;font:800 15px/1 var(--f-ui);box-shadow:3px 3px 0 var(--k)}
+.hand__who{background:var(--k);color:var(--y);border-radius:999px;padding:5px 8px;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.hand--dealer{top:14px}
+.hand--player{bottom:14px}
+.twentyone__moves{padding:12px;border:var(--bw-ctl) dashed var(--ctl-line);border-radius:14px}
+.twentyone__moves .btn{flex:1 1 0;min-width:0;padding:10px 8px}
+.stake{max-width:360px}
+.switch--inline{display:flex;align-items:center;gap:10px;font:700 15px/1.3 var(--f-ui);cursor:pointer}
+.switch--inline input{appearance:none;width:46px;height:28px;border-radius:999px;border:var(--bw-ctl) solid var(--ctl-line);background:var(--surface-2);position:relative;cursor:pointer;flex:none;margin:0}
+.switch--inline input::after{content:"";position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:var(--text);transition:transform .12s}
+.switch--inline input:checked{background:var(--y);border-color:var(--k)}
+.switch--inline input:checked::after{transform:translateX(18px);background:var(--k)}
+.game__keys{font-size:14px;color:var(--text-2)}
+kbd{font:700 13px/1 var(--f-ui);padding:3px 6px;border:2px solid var(--ctl-line);border-bottom-width:4px;border-radius:6px;background:var(--surface)}
+
+@media (max-width: 1099px){
+  .game-hero__grid,.game-body__grid{grid-template-columns:1fr}
+  .game-hero .game__side{grid-template-columns:repeat(2, minmax(0,1fr));align-items:start}
+  .twentyone__layout{grid-template-columns:1fr}
+}
+@media (max-width: 860px){
+  .wheel__layout{grid-template-columns:1fr}
+  .wheel__stage{grid-template-columns:auto 1fr;justify-items:start;align-items:center}
+  .wheel__stage svg{max-width:120px}
+}
+@media (max-width: 720px){
+  .game-hero .game__side{grid-template-columns:1fr}
+  .game-hero__title{margin:10px 0 16px}
+  .game-hero h1{font-size:clamp(32px, 9vw, 40px);font-stretch:104%}
+  .game-hero .stage__after{margin-top:16px}
+  .features{grid-template-columns:1fr}
+  .game__head{padding:10px 12px}
+  .game__facts{margin-left:0;width:100%}
+  .wheel__layout,.twentyone__layout{padding:12px}
+  /* phones: the table turns upright, 1 2 3 across, zero on top, column bets underneath */
+  .board__numbers{grid-auto-flow:row;grid-template-rows:none;grid-auto-rows:34px;grid-template-columns:repeat(3, minmax(0,1fr));gap:4px;direction:rtl}
+  .bet--zero{grid-row:auto;grid-column:1 / -1}
+  .bet{direction:ltr}
+  .board__dozens{grid-template-columns:repeat(3, 1fr)}
+  .board__even{grid-template-columns:repeat(3, 1fr)}
+  .board__dozens::before,.board__dozens::after,.board__even::before,.board__even::after{display:none}
+  .bet{font-size:12.5px;border-radius:5px;min-height:30px}
+  .bet--col{font-size:10.5px}
+  .bet--out{font-size:12px;min-height:36px}
+  .board__dozens,.board__even{gap:3px}
+  .segmented.chips label{width:46px;height:46px;font-size:14px}
+  .game__buttons .btn{flex:1 1 auto}
+  .twentyone__moves .btn{flex:1 1 40%}
+}

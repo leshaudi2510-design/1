@@ -1,11 +1,10 @@
 import { html, esc, num } from '../lib/html.mjs';
 import { organizationLd, websiteLd } from '../lib/layout.mjs';
-import { slotPanel, gameList } from '../lib/games-ui.mjs';
+import { pragmaticStage, gameList } from '../lib/games-ui.mjs';
 import { icons } from '../lib/icons.mjs';
 
 export default function home(ctx) {
   const c = ctx.cur;
-  const slot = ctx.game('seven-systems');
   return {
     id: 'home',
     path: '/',
@@ -20,9 +19,6 @@ export default function home(ctx) {
         itemListElement: ctx.games.map((g, i) => ({ '@type': 'ListItem', position: i + 1, url: g.url, name: g.name })),
       },
     ],
-    // The hero headline is set in Bodoni roman and italic: those two fonts carry the largest paint.
-    preloadFonts: ['bodoni-moda', 'bodoni-moda-italic'],
-    budgetModules: ['/assets/js/games/seven-systems.js'],
     bodyClass: 'is-home',
     body: html`
 <section class="hero" aria-labelledby="hero-title">
@@ -32,8 +28,7 @@ export default function home(ctx) {
   </header>
   <p class="label hero__disclaimer">${esc(ctx.disclaimer)}</p>
   <div class="hero__game">
-    ${slotPanel(ctx, { variant: 'hero', headingId: 'hero-game' })}
-    <p class="hero__more"><a href="${slot.path}">Seven Systems: rules, paytable and RTP ${icons.arrow}</a></p>
+    ${ctx.featured ? pragmaticStage(ctx, ctx.featured, { featured: true }) : ''}
   </div>
   <div class="hero__text">
     <p class="hero__lede">${esc(ctx.brand)} is a free games room laid out like a Victorian mineral cabinet. Spin a slot of crystal drawings, bet on a single-zero wheel or play twenty-one. You play with virtual ${esc(c.plural)}, and they never leave your device.</p>
@@ -119,7 +114,7 @@ export default function home(ctx) {
     <details name="faq"><summary>How are results decided?</summary>
       <p>By your browser's cryptographic random number generator, <code>crypto.getRandomValues</code>. The result is fixed before any animation starts; the reels, wheel and cards only show it. Nothing changes with your balance, your history or how long you've played.</p></details>
     <details name="faq"><summary>What does RTP mean if nothing is paid out?</summary>
-      <p>Return to player is the share of staked ${esc(c.plural)} that comes back over a very long run. Seven Systems returns ${ctx.game('seven-systems').rtpLabel}, Lapidary Wheel ${ctx.game('lapidary-wheel').rtpLabel} and Brilliant Twenty-One ${ctx.game('brilliant-twenty-one').rtpLabel} with basic strategy. Each game page shows how the figure is worked out.</p></details>
+      <p>Return to player is the share of staked ${esc(c.plural)} that comes back over a very long run. Lapidary Wheel returns ${ctx.game('lapidary-wheel').rtpLabel} and Brilliant Twenty-One ${ctx.game('brilliant-twenty-one').rtpLabel} with basic strategy. Each game page shows how the figure is worked out.</p></details>
     <details name="faq"><summary>Is my balance saved?</summary>
       <p>Yes, in this browser's local storage. It isn't sent to us and doesn't follow you to other devices. Clearing your browser's site data resets it to ${num(c.startingBalance)}.</p></details>
     <details name="faq"><summary>Can I play offline or install the site?</summary>
