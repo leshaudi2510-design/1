@@ -76,6 +76,19 @@ export function mount(root) {
 
   let shoe = shuffle(freshShoe());
   let round = null;
+  // True while a hand-ending move pauses before play moves on. Moves are
+  // ignored then, so a quick key press can't run the dealer's turn (and
+  // settle the hand) twice.
+  let pausing = false;
+  async function pauseFor(ms) {
+    pausing = true;
+    updateButtons();
+    try {
+      await wait(ms);
+    } finally {
+      pausing = false;
+    }
+  }
   let sprites = []; // cards on the table, with positions for animation
 
   // ---------- layout ----------
@@ -353,7 +366,7 @@ export function mount(root) {
   }
 
   function updateButtons() {
-    const inPlay = round && round.phase === 'player';
+    const inPlay = round && round.phase === 'player' && !pausing;
     const hand = inPlay ? round.hands[round.active] : null;
     Object.values(btn).forEach((b) => (b.disabled = false));
     setOff(btn.hit, !inPlay);
@@ -433,7 +446,7 @@ export function mount(root) {
       if (n.cards.length < 2) {
         draw1(n.cards);
         layoutSprites();
-        await wait(230);
+        await pauseFor(230);
       }
       updateTotals();
       updateButtons();
@@ -445,7 +458,7 @@ export function mount(root) {
   }
 
   async function hit() {
-    if (!round || round.phase !== 'player') return;
+    if (!round || round.phase !== 'player' || pausing) return;
     const h = current();
     const card = draw1(h.cards);
     layoutSprites();
@@ -453,12 +466,12 @@ export function mount(root) {
     const t = score(h.cards).total;
     if (t > 21) {
       ui.say(`${cardName(card)}. That’s ${t}: over 21.`);
-      await wait(350);
+      await pauseFor(350);
       return next();
     }
     if (t === 21) {
       ui.say(`${cardName(card)}. That’s 21.`);
-      await wait(250);
+      await pauseFor(250);
       return next();
     }
     updateButtons();
@@ -466,12 +479,12 @@ export function mount(root) {
   }
 
   async function stand() {
-    if (!round || round.phase !== 'player') return;
+    if (!round || round.phase !== 'player' || pausing) return;
     return next();
   }
 
   async function double() {
-    if (!round || round.phase !== 'player' || isOff(btn.double)) return;
+    if (!round || round.phase !== 'player' || pausing || isOff(btn.double)) return;
     const h = current();
     if (!ui.allowed(h.stake)) return;
     wallet.stake(h.stake);
@@ -481,12 +494,12 @@ export function mount(root) {
     layoutSprites();
     updateTotals();
     ui.say(`Doubled to ${carats(h.stake)}. ${cardName(card)}: ${handText(h.cards)}.`);
-    await wait(350);
+    await pauseFor(350);
     return next();
   }
 
   async function split() {
-    if (!round || round.phase !== 'player' || isOff(btn.split)) return;
+    if (!round || round.phase !== 'player' || pausing || isOff(btn.split)) return;
     const h = current();
     if (!ui.allowed(h.stake)) return;
     wallet.stake(h.stake);
@@ -499,7 +512,7 @@ export function mount(root) {
     draw1(h.cards);
     layoutSprites();
     updateTotals();
-    await wait(230);
+    await pauseFor(230);
     if (aces) {
       ui.say('Split Aces take one card each.');
       return next();

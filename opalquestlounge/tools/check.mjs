@@ -674,10 +674,12 @@ if (want('dialogs') && PP)
         const { clientWidth: vw, clientHeight: vh } = document.documentElement;
         return { left: Math.round(r.left), right: Math.round(vw - r.right), top: Math.round(r.top), bottom: Math.round(vh - r.bottom), width: Math.round(r.width), vw };
       });
+      // SPEC 7.13: dialogs are centred cards at every width (on phones with a
+      // small gap on each side), never pinned to a corner.
       const placed = width >= 721
         ? box.left > 24 && Math.abs(box.left - box.right) <= 2 && (Math.abs(box.top - box.bottom) <= 2 || box.top <= 16)
-        : Math.abs(box.bottom) <= 1 && Math.abs(box.left - box.right) <= 2;
-      expect(placed, `${width}px: Settings is ${width >= 721 ? 'centred' : 'a bottom sheet'}`, JSON.stringify(box));
+        : box.left >= 8 && Math.abs(box.left - box.right) <= 2 && box.top >= 0 && box.bottom >= 0;
+      expect(placed, `${width}px: Settings is ${width >= 721 ? 'centred' : 'a centred card inside the screen'}`, JSON.stringify(box));
 
       // Reality-check interval: 15, 30 or 60 minutes, kept across page loads.
       for (const m of ['15', '60', '30']) {

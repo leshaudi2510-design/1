@@ -201,7 +201,7 @@ await write(
 const allFiles = (await walk(OUT)).map((f) => '/' + path.relative(OUT, f).split(path.sep).join('/'));
 const precache = allFiles
   .filter((f) => !/^\/(_headers|CNAME|robots\.txt|sitemap\.xml|sw\.js)$/.test(f))
-  .filter((f) => !/\/og-[^/]+\.png$/.test(f) && !/-960\.(avif|webp)$/.test(f))
+  .filter((f) => !/\/og-[^/]+\.png$/.test(f))
   .map((f) => f.replace(/index\.html$/, ''))
   .sort();
 const swTemplate = await fs.readFile(path.join(ROOT, 'src/sw.template.js'), 'utf8');

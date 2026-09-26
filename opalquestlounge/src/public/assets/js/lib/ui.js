@@ -45,6 +45,7 @@ export function openDialog(id) {
  * confirm() only offers OK and Cancel). Resolves true for `yes`; Escape
  * or `no` resolves false.
  */
+let asking = 0;
 export function ask({ title, body = '', yes, no }) {
   const d = document.getElementById('confirm');
   if (!d) return Promise.resolve(false);
@@ -56,7 +57,17 @@ export function ask({ title, body = '', yes, no }) {
   d.querySelector('[value="no"]').textContent = no;
   d.returnValue = '';
   d.showModal();
-  return new Promise((resolve) => d.addEventListener('close', () => resolve(d.returnValue === 'yes'), { once: true }));
+  const id = ++asking;
+  return new Promise((resolve) => {
+    // The browser fires close a frame after the dialog closes, so an earlier
+    // question's close event can arrive while this one is already open.
+    const done = () => {
+      if (d.open && id === asking) return;
+      d.removeEventListener('close', done);
+      resolve(id === asking && d.returnValue === 'yes');
+    };
+    d.addEventListener('close', done);
+  });
 }
 
 /** Run fn once the page is actually visible to the player (not prerendering). */

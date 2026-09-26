@@ -440,7 +440,7 @@ const SPECULATION = JSON.stringify({
 export function layout(ctx, page) {
   const v = ASSET_VERSION.value;
   const url = ctx.origin + page.path;
-  const ogImage = ctx.origin + (page.ogImage || '/assets/img/og-home.png');
+  const ogImage = ctx.origin + (page.ogImage || (ctx.pragmaticOn ? '/assets/img/og-home.png' : '/assets/img/og-home-house.png'));
   const ld = [...(page.jsonld || [])];
   if (page.breadcrumbs?.length) ld.push(breadcrumbLd(ctx, page.breadcrumbs));
   const modules = page.modules || [];

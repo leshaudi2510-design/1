@@ -56,7 +56,7 @@ export default function brilliant21(ctx) {
     title: `Brilliant Twenty-One: Free Blackjack · ${ctx.brand}`,
     description: `Free six-deck blackjack with virtual ${c.plural}. Full rules, pays, a basic strategy chart and how we measured its ${g.rtpLabel} RTP. 18+.`,
     ogImage: g.image,
-    ogAlt: 'Brilliant Twenty-One: two playing cards with lettered court cards on a blue table.',
+    ogAlt: 'Brilliant Twenty-One: an ace and a king on a blue sunburst.',
     breadcrumbs: crumbs,
     crumbsInBody: true,
     jsonld: [videoGameLd(ctx, g)],

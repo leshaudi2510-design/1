@@ -291,20 +291,23 @@ function gameCard(ctx, g) {
 </section>`;
 }
 
-// The home card: the hero line and a fan of three covers (two slots, one table)
+// The home cards: the hero line and a fan of three covers. og-home.png is for
+// the site with the Pragmatic demos (two slots, one table); og-home-house.png is
+// for the site on our own three games (site.config.json "pragmatic.enabled": false).
 const HOME_FAN = ['big-bass-bonanza', 'lapidary-wheel', 'gates-of-olympus'];
+const HOUSE_FAN = ['seven-systems', 'lapidary-wheel', 'brilliant-twenty-one'];
 
-function homeCard(ctx, games) {
-  const fan = HOME_FAN.map((slug) => games.find((g) => g.slug === slug)).filter(Boolean);
+function homeCard(ctx, games, { house = false } = {}) {
+  const fan = (house ? HOUSE_FAN : HOME_FAN).map((slug) => games.find((g) => g.slug === slug)).filter(Boolean);
   const [lead, ...rest] = ctx.disclaimer.split(/(?<=\.) /);
-  return `<section class="og og--home" id="og-home">
+  return `<section class="og og--home" id="${house ? 'og-home-house' : 'og-home'}">
   ${cmyk}
   <div class="og__panel">
     <div class="og__copy">
       ${brandLockup()}
       <div class="og__main">
         <p class="og__kicker"><span class="sticker">Free to play</span></p>
-        <h1 class="display og__title og__title--home">Slot demos in full colour. <span class="hl">Played for fun.</span></h1>
+        <h1 class="display og__title og__title--home">${house ? 'Slots and tables in full colour.' : 'Slot demos in full colour.'} <span class="hl">Played for fun.</span></h1>
       </div>
     </div>
     <div class="og__art og__art--fan">
@@ -429,7 +432,10 @@ async function makeCards() {
   ensureBuild();
   const { chromium } = await import('playwright');
   const { ctx, games } = allGames();
-  const cards = [{ id: 'home', file: 'og-home.png', html: homeCard(ctx, games) }].concat(
+  const cards = [
+    { id: 'home', file: 'og-home.png', html: homeCard(ctx, games) },
+    { id: 'home-house', file: 'og-home-house.png', html: homeCard(ctx, games, { house: true }) },
+  ].concat(
     games.map((g) => ({ id: g.slug, file: path.basename(g.image), html: gameCard(ctx, g) })),
   );
   for (const c of cards) if (!/^og-[a-z0-9-]+\.png$/.test(c.file)) throw new Error(`unexpected share card name ${c.file}`);

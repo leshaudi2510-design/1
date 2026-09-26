@@ -53,7 +53,7 @@ export default function cookies(ctx) {
     id: 'cookies',
     path: '/cookies/',
     title: `Cookies and Storage · ${ctx.brand}`,
-    description: `Every item ${ctx.brand} stores in your browser, what each is for and how long it lasts${pp ? ', and what a Pragmatic Play demo may set' : ''}. ${ctx.analyticsOn ? 'Analytics only with consent.' : 'No tracking cookies.'}`,
+    description: `Every item ${ctx.brand} stores in your browser, what each is for and how long it lasts${pp ? ', and what a Pragmatic Play demo may set' : ''}. ${ctx.analyticsOn ? 'Analytics are opt-in.' : 'No tracking cookies.'}`,
     breadcrumbs: [
       { name: 'Home', path: '/' },
       { name: 'Cookies and storage', path: '/cookies/' },

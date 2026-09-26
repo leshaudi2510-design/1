@@ -22,7 +22,7 @@ export default function sevenSystems(ctx) {
     title: `Seven Systems: Free Crystal Slot · ${ctx.brand}`,
     description: `Play Seven Systems free: a 3-reel, 5-line slot of bright crystals with virtual ${c.plural}. Full paytable, rules and exact ${g.rtpLabel} RTP. 18+.`,
     ogImage: g.image,
-    ogAlt: 'Seven Systems: three reels of crystals with an opal in the middle.',
+    ogAlt: 'Seven Systems: a clear crystal point between a violet and a gold one, with an opal at its foot.',
     breadcrumbs: crumbs,
     crumbsInBody: true,
     jsonld: [videoGameLd(ctx, g)],

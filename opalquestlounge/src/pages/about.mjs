@@ -116,8 +116,8 @@ ${pageHero(page, {
         <p>Results on our ${pp ? 'tables' : 'games'} come from your browser’s cryptographic random number generator. We publish the rules, the pays and the return to player for each game, with the arithmetic behind them. Nothing adjusts the odds to keep you playing.</p>
         <p>Your balance and settings live in your browser’s storage. We don’t have accounts, so we don’t know your balance and can’t change it.</p>
       </section>
-      <section aria-labelledby="age-title">
-        <h2 id="age-title">Adults only</h2>
+      <section aria-labelledby="adults-title">
+        <h2 id="adults-title">Adults only</h2>
         <p>Games that look like gambling are for adults, even when they’re free. The site is for people aged 18 and over in the United Kingdom. We ask your age on your first visit, and our artwork shows objects and places only: no characters, mascots or cartoon animals.</p>
         <p>The age question isn’t an identity check. If you share a device with children, please use its parental controls.</p>
       </section>
