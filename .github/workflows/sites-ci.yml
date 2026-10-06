@@ -1,0 +1,298 @@
+# Site builds for the factory (SPEC 11.1, MASTER-PLAN W26, D-14, D-49). Owner: partition F.
+#
+# changes  -> which targets to build: changed sites/<slug>/ (engine != none) and, when engine/,
+#             types/, tools/, schemas/, package*.json or this CI changed, every site plus every
+#             types/<type>/template-site. Inline git diff + sed until tools/changed-sites.sh (D-49).
+# scope    -> site/<slug> and wip/<slug>/* PRs may touch only sites/<slug>/ and orders/<slug>/.
+# lint     -> per target: plain build (zero problems), every pack build variant, strict build
+#             against .github/ci-allow.json (known pre-launch problems only); uploads dist-<id>.
+# uniqueness -> tools/uniqueness.mjs --post <site> --against all --fail (skip-as-success until D merges it).
+# browser  -> label qa:browser, merge queue or dispatch: engine/tools/check.mjs + engine/tools/lighthouse.mjs.
+# sites-ok -> the one required check; skipped jobs count as success, failure/cancelled do not.
+name: sites
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
+  merge_group:
+  push:
+    branches: [main, 'tooling/**']
+  workflow_dispatch:
+    inputs:
+      sites:
+        description: "'all' or a comma-separated list of slugs"
+        default: all
+      browser:
+        description: Run the browser checks (check.mjs + Lighthouse)
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sites-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      targets: ${{ steps.diff.outputs.targets }}
+      sites: ${{ steps.diff.outputs.sites }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        name: Changed sites and templates
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          MQ_BASE: ${{ github.event.merge_group.base_sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          INPUT_SITES: ${{ inputs.sites }}
+        run: |
+          set -euo pipefail
+          ALL=false
+          BASE=""
+          case "$EVENT" in
+            pull_request) BASE="$PR_BASE" ;;
+            merge_group) BASE="$MQ_BASE" ;;
+            push) BASE="$PUSH_BEFORE" ;;
+            *) ALL=true ;;
+          esac
+          : > "$RUNNER_TEMP/changed-sites.txt"
+          if [ "$ALL" = false ]; then
+            if [ -z "$BASE" ] || [ "$BASE" = 0000000000000000000000000000000000000000 ] || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+              ALL=true
+            else
+              git diff --name-only "$BASE"...HEAD > "$RUNNER_TEMP/changed.txt"
+              sed -nE 's#^sites/([^/_][^/]*)/.*#\1#p' "$RUNNER_TEMP/changed.txt" | sort -u > "$RUNNER_TEMP/changed-sites.txt"
+              if grep -qE '^(engine|types|tools|schemas)/|^package(-lock)?\.json$|^\.github/(workflows/sites-ci\.yml|scripts/|ci-allow\.json)' "$RUNNER_TEMP/changed.txt"; then
+                ALL=true
+              fi
+            fi
+          fi
+          if [ "$EVENT" = workflow_dispatch ] && [ -n "$INPUT_SITES" ] && [ "$INPUT_SITES" != all ]; then
+            ALL=false
+            echo "$INPUT_SITES" | tr ',' '\n' | sed 's/ //g' | sed '/^$/d' > "$RUNNER_TEMP/changed-sites.txt"
+            WITH_TEMPLATES=false
+          else
+            WITH_TEMPLATES="$ALL"
+          fi
+          ALL="$ALL" WITH_TEMPLATES="$WITH_TEMPLATES" LIST="$RUNNER_TEMP/changed-sites.txt" node --input-type=module -e '
+            import fs from "node:fs";
+            const all = process.env.ALL === "true";
+            const listed = fs.readFileSync(process.env.LIST, "utf8").split("\n").filter(Boolean);
+            const slugs = all ? fs.readdirSync("sites").filter((s) => !s.startsWith("_") && !s.startsWith(".")) : listed;
+            const targets = [];
+            for (const slug of [...new Set(slugs)].sort()) {
+              const file = `sites/${slug}/site.config.json`;
+              if (!fs.existsSync(file)) continue;
+              const cfg = JSON.parse(fs.readFileSync(file, "utf8"));
+              if (cfg.engine === "none") continue;
+              targets.push({ id: slug, dir: `sites/${slug}`, kind: "site", type: cfg.type || "social-casino" });
+            }
+            if (process.env.WITH_TEMPLATES === "true") {
+              for (const type of fs.readdirSync("types").sort()) {
+                const dir = `types/${type}/template-site`;
+                if (fs.existsSync(`${dir}/site.config.json`)) targets.push({ id: `template-${type}`, dir, kind: "template", type });
+              }
+            }
+            const sites = targets.filter((t) => t.kind === "site");
+            const out = [`targets=${JSON.stringify(targets)}`, `sites=${JSON.stringify(sites)}`].join("\n") + "\n";
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, out);
+            console.log(out);
+          '
+
+  scope:
+    if: github.event_name == 'pull_request' && (startsWith(github.head_ref, 'site/') || startsWith(github.head_ref, 'wip/'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Site branches touch only their own site and order
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          SLUG=$(echo "$HEAD_REF" | sed -E 's#^(site|wip)/([^/]+).*#\2#')
+          git diff --name-only "$BASE"...HEAD > "$RUNNER_TEMP/changed.txt"
+          if grep -vE "^(sites|orders)/${SLUG}/" "$RUNNER_TEMP/changed.txt" > "$RUNNER_TEMP/outside.txt"; then
+            echo "::error::$HEAD_REF may change only sites/$SLUG/ and orders/$SLUG/; outside paths:"
+            cat "$RUNNER_TEMP/outside.txt"
+            exit 1
+          fi
+          echo "scope ok: $(wc -l < "$RUNNER_TEMP/changed.txt") path(s) under sites/$SLUG/ or orders/$SLUG/"
+
+  lint:
+    needs: changes
+    if: needs.changes.outputs.targets != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        target: ${{ fromJSON(needs.changes.outputs.targets) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Build ${{ matrix.target.id }} (plain, pack variants, strict against ci-allow)
+        env:
+          PLACEHOLDERS_OK: ${{ contains(github.event.pull_request.labels.*.name, 'placeholders-ok') }}
+          TARGET_DIR: ${{ matrix.target.dir }}
+          TARGET_ID: ${{ matrix.target.id }}
+        run: |
+          FLAGS=""
+          if [ "$PLACEHOLDERS_OK" = true ]; then FLAGS="--placeholders-ok"; fi
+          node .github/scripts/ci-build.mjs "$TARGET_DIR" --id "$TARGET_ID" --out-root "$RUNNER_TEMP/build" $FLAGS
+      - name: Upload dist-${{ matrix.target.id }}
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.target.id }}
+          path: ${{ runner.temp }}/build/dist
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Upload build reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.target.id }}
+          path: |
+            ${{ runner.temp }}/build/build.json
+            ${{ runner.temp }}/build/build-report.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  uniqueness:
+    needs: changes
+    if: needs.changes.outputs.sites != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Mechanical uniqueness against every site on disk
+        env:
+          SITES: ${{ needs.changes.outputs.sites }}
+        run: |
+          set -euo pipefail
+          if [ ! -f tools/uniqueness.mjs ]; then
+            echo "::notice::tools/uniqueness.mjs is not on this branch yet (partition D); uniqueness skipped as success"
+            exit 0
+          fi
+          mkdir -p "$RUNNER_TEMP/uniqueness"
+          for dir in $(echo "$SITES" | node -e 'for (const t of JSON.parse(require("fs").readFileSync(0, "utf8"))) console.log(t.dir)'); do
+            slug=$(basename "$dir")
+            node tools/uniqueness.mjs --post "$dir" --against all --fail | tee "$RUNNER_TEMP/uniqueness/$slug.json"
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: uniqueness
+          path: ${{ runner.temp }}/uniqueness
+          if-no-files-found: ignore
+          retention-days: 14
+
+  browser:
+    needs: [changes, lint]
+    if: >-
+      needs.changes.outputs.sites != '[]' && (
+        contains(github.event.pull_request.labels.*.name, 'qa:browser') ||
+        github.event_name == 'merge_group' ||
+        (github.event_name == 'workflow_dispatch' && inputs.browser)
+      )
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.56.1-noble
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        target: ${{ fromJSON(needs.changes.outputs.sites) }}
+    concurrency:
+      group: site-${{ matrix.target.id }}-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ matrix.target.id }}
+          path: ${{ runner.temp }}/dist
+      - name: Browser checks (Playwright + axe)
+        env:
+          CHECK_TIMEOUT_MIN: '15'
+          TARGET_DIR: ${{ matrix.target.dir }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/report"
+          node engine/tools/check.mjs --site "$TARGET_DIR" --report "$RUNNER_TEMP/report/check.json"
+      - name: Lighthouse (>= 95 every category, LCP < 2.0 s, CLS < 0.05)
+        run: |
+          if [ ! -f engine/tools/lighthouse.mjs ]; then
+            echo "::warning::engine/tools/lighthouse.mjs is not on this branch yet (partition C); Lighthouse gate skipped"
+            exit 0
+          fi
+          node engine/tools/lighthouse.mjs "$RUNNER_TEMP/dist" --out "$RUNNER_TEMP/report/lighthouse"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: report-${{ matrix.target.id }}
+          path: ${{ runner.temp }}/report
+          if-no-files-found: ignore
+          retention-days: 14
+
+  labels:
+    if: github.event_name == 'pull_request' && github.event.action != 'labeled'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    continue-on-error: true
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/labeler@v5
+        with:
+          configuration-path: .github/labeler.yml
+          sync-labels: false
+
+  sites-ok:
+    if: always()
+    needs: [changes, scope, lint, uniqueness, browser]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Every needed job succeeded or was skipped
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          echo "$RESULTS" | node -e '
+            const needs = JSON.parse(require("fs").readFileSync(0, "utf8"));
+            let bad = 0;
+            for (const [job, n] of Object.entries(needs)) {
+              const ok = n.result === "success" || n.result === "skipped";
+              console.log(`${ok ? "ok  " : "FAIL"} ${job}: ${n.result}`);
+              if (!ok) bad++;
+            }
+            process.exit(bad ? 1 : 0);
+          '

@@ -4,6 +4,8 @@ on:
   pull_request:
     paths: ['engine/**', 'types/**', 'sites/opalquestlounge/**', '.github/workflows/opalquestlounge-*.yml']
   push:
+    # pull_request already runs site/** and wip/** work (SPEC 11.1; tools/ci-lint.mjs push-branches).
+    branches-ignore: ['site/**', 'wip/**']
     paths: ['engine/**', 'types/**', 'sites/opalquestlounge/**', '.github/workflows/opalquestlounge-*.yml']
 
 permissions:
@@ -17,9 +19,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    defaults:
-      run:
-        working-directory: .
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -28,7 +27,8 @@ jobs:
 
       # The build has no dependencies, so there is no npm install. Since the
       # engine/sites split the site lives in sites/opalquestlounge and the engine
-      # in engine/; this legacy workflow stays until sites-ci.yml replaces it. It fails on
+      # in engine/; this legacy workflow stays until sites-ci.yml and engine-ci.yml
+      # have one green run on GitHub, then goes in Phase 2 (D-52). It fails on
       # broken links and fragments, duplicate ids, inline styles or scripts,
       # a missing age notice or disclaimer, banned wording, American spelling,
       # SEO limits, invalid JSON-LD, missing share images, the Pragmatic Play
