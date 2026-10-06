@@ -2,9 +2,9 @@ name: Opal Quest Lounge · build and lint
 
 on:
   pull_request:
-    paths: ['opalquestlounge/**', '.github/workflows/opalquestlounge-*.yml']
+    paths: ['engine/**', 'types/**', 'sites/opalquestlounge/**', '.github/workflows/opalquestlounge-*.yml']
   push:
-    paths: ['opalquestlounge/**', '.github/workflows/opalquestlounge-*.yml']
+    paths: ['engine/**', 'types/**', 'sites/opalquestlounge/**', '.github/workflows/opalquestlounge-*.yml']
 
 permissions:
   contents: read
@@ -19,14 +19,16 @@ jobs:
     timeout-minutes: 10
     defaults:
       run:
-        working-directory: opalquestlounge
+        working-directory: .
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      # The build has no dependencies, so there is no npm install. It fails on
+      # The build has no dependencies, so there is no npm install. Since the
+      # engine/sites split the site lives in sites/opalquestlounge and the engine
+      # in engine/; this legacy workflow stays until sites-ci.yml replaces it. It fails on
       # broken links and fragments, duplicate ids, inline styles or scripts,
       # a missing age notice or disclaimer, banned wording, American spelling,
       # SEO limits, invalid JSON-LD, missing share images, the Pragmatic Play
@@ -35,7 +37,7 @@ jobs:
       # _headers, and the page and service worker budgets.
       # The browser checks (npm run check) need Playwright and run locally.
       - name: Build and lint (site.config.json as it is)
-        run: node build.mjs
+        run: node engine/build.mjs sites/opalquestlounge
         env:
           OUT_DIR: ${{ runner.temp }}/dist
 
@@ -43,7 +45,7 @@ jobs:
         run: |
           node -e '
             const fs = require("fs");
-            const base = JSON.parse(fs.readFileSync("site.config.json", "utf8"));
+            const base = JSON.parse(fs.readFileSync("sites/opalquestlounge/site.config.json", "utf8"));
             const out = process.env.RUNNER_TEMP;
             // The fallback: our own slot, Seven Systems, instead of the demos.
             fs.writeFileSync(`${out}/no-pragmatic.json`, JSON.stringify({ ...base, pragmatic: { ...base.pragmatic, enabled: false } }, null, 2));
@@ -52,13 +54,13 @@ jobs:
           '
 
       - name: Build and lint (Pragmatic Play demos off)
-        run: node build.mjs
+        run: node engine/build.mjs sites/opalquestlounge
         env:
           SITE_CONFIG: ${{ runner.temp }}/no-pragmatic.json
           OUT_DIR: ${{ runner.temp }}/dist-no-pragmatic
 
       - name: Build and lint (with a test GA4 ID)
-        run: node build.mjs
+        run: node engine/build.mjs sites/opalquestlounge
         env:
           SITE_CONFIG: ${{ runner.temp }}/analytics.json
           OUT_DIR: ${{ runner.temp }}/dist-analytics
