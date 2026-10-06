@@ -78,7 +78,7 @@ These rows come from `docs/factory/MASTER-PLAN.md` section 7.1 and D-21. None of
 
 | Source | What lands where | Phase | Licence (as recorded in the plan; confirm from the upstream LICENSE file when vendoring) |
 |---|---|---|---|
-| anthropics/skills @ sha recorded at vendoring | `skills/frontend-design/SKILL.md` + `LICENSE.txt` -> `.claude/craft/frontend-design.md` (marked pending if the fetch fails) | 1 (E) | per its `LICENSE.txt` (Apache-2.0 expected, not yet read) |
+| anthropics/skills @ 683bc88e56f3e09ba94f7055977f3d3aa499f202 | `skills/frontend-design/SKILL.md` -> `.claude/craft/frontend-design.md`; `skills/frontend-design/LICENSE.txt` -> `.claude/craft/frontend-design.LICENSE.txt` | 1 (E) | Apache-2.0 (full text in `.claude/craft/frontend-design.LICENSE.txt`; `metadata.origin` added to the frontmatter, a change noted under section 4b) |
 | coreyhaines31/marketingskills v2.11.17 | seven ads references + `evals.json` -> `.claude/skills/ppc-kit/references/` | 5 (P) | MIT |
 | google-marketing-solutions/ads-policy-monitor | `cloud_functions/ads_policy_monitor/gaql/{ad_policy_data,ad_group_asset,campaign_asset,customer_asset}.sql` -> `ppc/queries/` (Apache-2.0 headers kept in each file) | 5 (P) | Apache-2.0 |
 

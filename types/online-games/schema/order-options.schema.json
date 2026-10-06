@@ -2,35 +2,69 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://factory.invalid/types/online-games/schema/order-options.schema.json",
   "title": "order.json typeOptions for type online-games (stub)",
-  "description": "Phase 1 stub (MASTER-PLAN 6.2): the SITE-TYPES 6.2 identifiers for an online-games order, so tools/validate-order.mjs can record them. The full shape (taxonomy, curation policy, per-game userToUser, licences) arrives with the full pack in Phase 4. 'audienceSelf' is the client's own answer; the order's 'audience' is set only from the signed audience assessment (D-23).",
+  "description": "Phase 1 stub (MASTER-PLAN 6.2): the SITE-TYPES 6.2 identifiers for an online-games order, so tools/validate-order.mjs can record them. The full shape (taxonomy, curation policy, per-game userToUser, licences) arrives with the full pack in Phase 4. 'audienceSelf' is the client's own answer; the order's 'audience' is set only from the signed audience assessment (D-23). Top-level order fields (type, variant, casinoMode, locales) are validated by schemas/order.schema.json, not here.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["variant", "providers", "audienceSelf"],
+  "required": [
+    "providers",
+    "audienceSelf"
+  ],
   "properties": {
-    "variant": {
-      "enum": ["portal", "single-game", "kids"],
-      "description": "Sub-variant: a catalogue portal, one game's site, or a children's portal (child-directed)."
-    },
     "providers": {
       "type": "array",
       "description": "Catalogue providers per market, with the publisher account and the agreement's paid-traffic clause (launch gate for campaign landings).",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["key", "adapter", "publisherId", "paidSearchPermitted"],
+        "required": [
+          "key",
+          "adapter",
+          "paidSearchPermitted"
+        ],
         "properties": {
-          "key": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
-          "adapter": { "enum": ["gamedistribution", "gamepix", "gamemonetize", "playgama", "own"] },
-          "publisherId": { "type": "string" },
-          "markets": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z]{2}$" } },
-          "agreementRef": { "type": "string" },
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "adapter": {
+            "enum": [
+              "gamedistribution",
+              "gamepix",
+              "gamemonetize",
+              "playgama",
+              "own"
+            ]
+          },
+          "publisherId": {
+            "type": "string"
+          },
+          "markets": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z]{2}$"
+            }
+          },
+          "agreementRef": {
+            "type": "string"
+          },
           "paidSearchPermitted": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["permitted"],
+            "required": [
+              "permitted"
+            ],
             "properties": {
-              "permitted": { "type": ["boolean", "null"], "description": "null = not yet answered (blocks launch)." },
-              "clauseRef": { "type": "string" }
+              "permitted": {
+                "type": [
+                  "boolean",
+                  "null"
+                ],
+                "description": "null = not yet answered (blocks launch)."
+              },
+              "clauseRef": {
+                "type": "string"
+              }
             }
           }
         }
@@ -41,26 +75,87 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["slug", "name"],
+        "required": [
+          "slug",
+          "name"
+        ],
         "properties": {
-          "slug": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
-          "name": { "type": "string", "minLength": 2 },
-          "licenceScope": { "type": "string", "description": "Licensed games: the domain the licence covers (one domain each)." }
+          "slug": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 2
+          },
+          "licenceScope": {
+            "type": "string",
+            "description": "Licensed games: the domain the licence covers (one domain each)."
+          },
+          "licence": {
+            "enum": [
+              "client-owned",
+              "studio-owned",
+              "licensed"
+            ]
+          },
+          "offline": {
+            "type": "boolean"
+          }
         }
       }
     },
     "audienceSelf": {
-      "enum": ["general-adult", "mixed", "child-likely", "unknown"],
+      "enum": [
+        "general-adult",
+        "mixed",
+        "child-likely",
+        "unknown"
+      ],
       "description": "What the client says about its audience. Never copied to 'audience' without the signed assessment."
     },
-    "adsInside": { "type": "boolean", "description": "Display ads (AdSense / Ad Manager / H5 Games Ads) run on the site." },
-    "childDirected": { "type": "boolean", "description": "Child-directed treatment tag for ad requests (required when the assessment says child-likely)." },
-    "socialFeatures": { "type": "boolean", "default": false, "description": "User-to-user features (chat, comments). Default off; on brings the OSA scope check." }
+    "adsInside": {
+      "type": "boolean",
+      "description": "Display ads (AdSense / Ad Manager / H5 Games Ads) run on the site."
+    },
+    "childDirected": {
+      "type": "boolean",
+      "description": "Child-directed treatment tag for ad requests (required when the assessment says child-likely)."
+    },
+    "socialFeatures": {
+      "type": "boolean",
+      "default": false,
+      "description": "User-to-user features (chat, comments). Default off; on brings the OSA scope check."
+    },
+    "curationPolicy": {
+      "type": "string"
+    }
   },
   "allOf": [
     {
-      "if": { "properties": { "variant": { "const": "kids" } }, "required": ["variant"] },
-      "then": { "properties": { "childDirected": { "const": true }, "socialFeatures": { "const": false } }, "required": ["childDirected"] }
+      "if": {
+        "properties": {
+          "variant": {
+            "const": "kids"
+          }
+        },
+        "required": [
+          "variant"
+        ]
+      },
+      "then": {
+        "properties": {
+          "childDirected": {
+            "const": true
+          },
+          "socialFeatures": {
+            "const": false
+          }
+        },
+        "required": [
+          "childDirected"
+        ]
+      }
     }
   ]
 }

@@ -2,24 +2,16 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://factory.invalid/types/social-casino/schema/order-options.schema.json",
   "title": "order.json typeOptions for type social-casino",
-  "description": "Validated by tools/validate-order.mjs over schemas/order.schema.json (1.2) for orders with \"type\": \"social-casino\". The blocks are the intake audit's (order schema 1.0) with SPEC 4.1 amendments 1 (three house games in every mode) and 2 (demo currency FUN only). Variant demo-lobby (Pragmatic demos on) is never advertisable: validate-order rejects it with any Google Ads ID at --level draft.",
+  "description": "Validated by tools/validate-order.mjs over schemas/order.schema.json (1.2) for orders with \"type\": \"social-casino\". The blocks are the intake audit's (order schema 1.0) with SPEC 4.1 amendments 1 (three house games in every mode) and 2 (demo currency FUN only). Variant demo-lobby (Pragmatic demos on) is never advertisable: validate-order rejects it with any Google Ads ID at --level draft. Top-level order fields (type, variant, casinoMode, locales) are validated by schemas/order.schema.json, not here.",
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "variant",
     "currency",
     "games",
     "purchases",
     "ageVerification"
   ],
   "properties": {
-    "variant": {
-      "enum": [
-        "own-games",
-        "demo-lobby"
-      ],
-      "description": "own-games: our own games only (the advertisable build). demo-lobby: Pragmatic Play demos plus our own tables; needs written consent; never advertised."
-    },
     "currency": {
       "type": "object",
       "additionalProperties": false,

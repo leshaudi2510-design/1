@@ -184,7 +184,7 @@ function checkRubrics(root) {
     const text = readText(f);
     const hash = crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex');
     if (!v || !v.hash) r.errors.push(`rubrics.json: ${agent}: no hash`);
-    else if (v.hash !== hash) r.errors.push(`rubrics.json: ${agent}: hash ${String(v.hash).slice(0, 12)} differs from the file (${hash.slice(0, 12)}); bump rubricVersion and regenerate (tools/calibrate.mjs --hashes)`);
+    else if (String(v.hash).replace(/^sha256:/, '') !== hash) r.errors.push(`rubrics.json: ${agent}: hash ${String(v.hash).slice(0, 12)} differs from the file (${hash.slice(0, 12)}); bump rubricVersion and regenerate (tools/calibrate.mjs --hashes)`);
     const fm = parseFrontMatter(text);
     const first = (fm.body || text).split('\n').map((l) => l.trim()).find((l) => l);
     const m = first && first.match(/^rubricVersion:\s*([\d.]+)/);

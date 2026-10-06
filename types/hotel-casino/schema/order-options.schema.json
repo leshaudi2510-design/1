@@ -2,63 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://factory.invalid/types/hotel-casino/schema/order-options.schema.json",
   "title": "order.json typeOptions for type hotel-casino (stub)",
-  "description": "Phase 1 stub (MASTER-PLAN 6.3, 3.4): the SITE-TYPES 6.2 identifiers for a hotel-casino order, including casinoMode and locales, so tools/validate-order.mjs can record them. Mode A (default) is a casino-free domain; A+ is lawyer-gated; B needs its own domain and Google's written confirmation. The full shape (rooms, offers, venues, gallery, booking adapters, geo tables) arrives with the full pack in Phase 4.",
+  "description": "Phase 1 stub (MASTER-PLAN 6.3, 3.4): the SITE-TYPES 6.2 identifiers for a hotel-casino order, including casinoMode and locales, so tools/validate-order.mjs can record them. Mode A (default) is a casino-free domain; A+ is lawyer-gated; B needs its own domain and Google's written confirmation. The full shape (rooms, offers, venues, gallery, booking adapters, geo tables) arrives with the full pack in Phase 4. Top-level order fields (type, variant, casinoMode, locales) are validated by schemas/order.schema.json, not here.",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "variant",
-    "casinoMode",
-    "locales",
-    "venue"
-  ],
+  "required": [],
   "properties": {
-    "variant": {
-      "enum": [
-        "single-hotel",
-        "integrated-resort",
-        "resort-group"
-      ]
-    },
-    "casinoMode": {
-      "enum": [
-        "A",
-        "A+",
-        "B"
-      ],
-      "description": "A property of the domain: A = no casino reference anywhere; A+ = amenity mention only, lawyer sign-off; B = casino content on its own domain."
-    },
-    "locales": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "code",
-          "path",
-          "dir"
-        ],
-        "properties": {
-          "code": {
-            "type": "string",
-            "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
-          },
-          "path": {
-            "type": "string",
-            "pattern": "^/([a-z]{2}/)?$"
-          },
-          "default": {
-            "type": "boolean"
-          },
-          "dir": {
-            "enum": [
-              "ltr",
-              "rtl"
-            ]
-          }
-        }
-      }
-    },
     "venue": {
       "type": "object",
       "additionalProperties": false,
@@ -105,7 +53,7 @@
         },
         "engineUrlTemplate": {
           "type": "string",
-          "pattern": "^https://\\S+$"
+          "pattern": "^(https://\\S+|\\[[^\\]]+\\])$"
         },
         "hosts": {
           "type": "array",
@@ -165,6 +113,52 @@
             "null"
           ],
           "description": "Mode A+: the lawyer who signed off the amenity wording."
+        }
+      }
+    },
+    "amenityWhitelist": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "venues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "casinoLinked"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "casinoLinked": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "reviews": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "shown": {
+          "type": "boolean"
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^https://\\S+$"
+          }
         }
       }
     }
