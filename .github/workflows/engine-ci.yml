@@ -4,8 +4,8 @@
 # changes     -> did anything shared change (engine/, types/, tools/, schemas/, .claude/, .github/,
 #                sites/_fixtures/, ppc/, CLAUDE.md, .mcp.json, package*.json)? No workflow-level
 #                paths filter, so engine-ok always reports and can be a required check.
-# engine-lint -> tools/engine-lint.mjs (every check: engine, strings, agents, skills, context, packs,
-#                schemas), labels/labeler freshness, ci-lint of these workflows.
+# engine-lint -> tools/engine-lint.mjs (Phase 1 gate: strings, agents, skills, rubrics, context, packs, schemas;
+#                --engine as a warning until Phase 2), notices, labels/labeler freshness, ci-lint.
 # regression  -> rebuild every recorded site and compare with engine/dist-hashes.json; a changed hash
 #                passes only with "hash: <slug> intended: <reason>" in the PR body.
 # hook-tests  -> node --test .claude/hooks/tests + check-hooks-schema-keys.
@@ -87,7 +87,11 @@ jobs:
             echo "::notice::tools/engine-lint.mjs is not on this branch yet (partition D); skipped"
             exit 0
           fi
-          node tools/engine-lint.mjs
+          # Phase 1 gate (MASTER-PLAN 9.3). --engine blocks from Phase 2, when the legacy pages leave
+          # engine/pages for the social-casino pack (D-28, D-51); until then its findings are a warning count.
+          node tools/engine-lint.mjs --strings --agents --skills --rubrics --context --packs --schemas
+          n=$(node tools/engine-lint.mjs --engine --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).checks.engine.errors.length))')
+          [ "$n" = 0 ] || echo "::warning::engine-lint --engine: $n finding(s), blocking from Phase 2 (D-51)"
           if [ -f .claude/VENDORED.json ] && [ -f THIRD_PARTY_NOTICES.md ]; then
             node tools/engine-lint.mjs --notices .claude/VENDORED.json THIRD_PARTY_NOTICES.md
           fi
