@@ -59,7 +59,7 @@ export async function runMain(main, help) {
       process.stderr.write(`error: ${e.message}\n\n${help || ''}`);
       process.exitCode = 2;
     } else {
-      process.stderr.write(`error: ${e && e.stack ? e.stack : e}\n`);
+      process.stderr.write(`error: ${process.env.FACTORY_DEBUG && e && e.stack ? e.stack : (e && e.message) || e}\n`);
       process.exitCode = 2;
     }
   }
