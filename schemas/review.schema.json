@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://studio.local/factory/schemas/review.schema.json",
+  "title": "Judge verdicts and the round merge",
+  "description": "Shapes of a uniqueness-skeptic verdict (SPEC 6.9), a compliance-judge verdict (SPEC 6.10) and the review-panel round merge (SPEC 7.3, ECC A-06/A-92/A-100) mirrored to orders/<slug>/reviews/round-N.json and the Board reviews/<slug>:<round>. Severity model: blocking = compliance/legal (implied winning, characters, unconsented third-party requests, misrepresented operator) and sameProduct votes > 1; advisory = copy/SEO/style; machine gates (a11y, Lighthouse, game flows) are not judge items. A blocking item must carry a quote or a selector (fail closed). A sameProduct=true skeptic verdict must cite at least one copy, structure or art pair, otherwise the merge rejects it and reruns the judge once. Policy-backed findings cite policyId; an unverified policy entry makes the item advisory (D-13).",
+  "oneOf": [
+    { "$ref": "#/$defs/skepticVerdict" },
+    { "$ref": "#/$defs/complianceVerdict" },
+    { "$ref": "#/$defs/round" }
+  ],
+  "$defs": {
+    "rubricVersion": { "type": "string", "pattern": "^\\d+\\.\\d+$" },
+    "proof": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "quote": { "type": "string", "minLength": 1 },
+        "selector": { "type": "string", "minLength": 1 },
+        "policyId": { "type": "string", "description": "A types/<type>/policy-urls.json id or an invariant id from engine/docs/invariants.md." }
+      },
+      "anyOf": [ { "required": ["quote"] }, { "required": ["selector"] } ]
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["judge", "page", "rule", "why", "severity"],
+      "properties": {
+        "judge": { "type": "string", "enum": ["uniqueness-skeptic", "compliance-judge", "compliance-auditor", "machine"] },
+        "page": { "type": "string" },
+        "quote": { "type": "string" },
+        "selector": { "type": "string" },
+        "rule": { "type": "string" },
+        "why": { "type": "string" },
+        "fix": { "type": "string" },
+        "severity": { "type": "string", "enum": ["blocking", "advisory"] },
+        "proof": { "$ref": "#/$defs/proof" },
+        "policyId": { "type": "string" },
+        "policyVerified": { "type": ["boolean", "null"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "fixedBy": {
+          "type": "object",
+          "properties": { "commit": { "type": "string" }, "url": { "type": "string" } }
+        }
+      },
+      "allOf": [
+        {
+          "$comment": "fail closed: a blocking item needs a quote or a selector",
+          "if": { "properties": { "severity": { "const": "blocking" } }, "required": ["severity"] },
+          "then": { "anyOf": [ { "required": ["quote"] }, { "required": ["selector"] }, { "required": ["proof"] } ] }
+        },
+        {
+          "$comment": "an item resting on an unverified policy entry is advisory (D-13)",
+          "if": { "properties": { "policyVerified": { "const": false } }, "required": ["policyVerified"] },
+          "then": { "properties": { "severity": { "const": "advisory" } } }
+        }
+      ]
+    },
+    "skepticEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["page", "kind", "why"],
+      "properties": {
+        "page": { "type": "string" },
+        "siblingPage": { "type": "string" },
+        "kind": { "type": "string", "enum": ["copy", "structure", "layout", "art", "vocabulary", "roster"] },
+        "quote": { "type": "string" },
+        "why": { "type": "string" }
+      }
+    },
+    "skepticVerdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["judge", "rubricVersion", "sameProduct", "confidence", "evidence", "visualDifferences", "fixes"],
+      "properties": {
+        "judge": { "const": "uniqueness-skeptic" },
+        "rubricVersion": { "$ref": "#/$defs/rubricVersion" },
+        "sibling": { "type": "string" },
+        "sameProduct": { "type": "boolean" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/skepticEvidence" } },
+        "visualDifferences": { "type": "array", "items": { "type": "string" } },
+        "fixes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["lane", "page", "instruction"],
+            "properties": { "lane": { "type": "string", "enum": ["copy", "art", "theme", "games", "catalogue", "media"] }, "page": { "type": "string" }, "instruction": { "type": "string" } }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "$comment": "citation rule: sameProduct=true must cite a copy, structure or art pair",
+          "if": { "properties": { "sameProduct": { "const": true } }, "required": ["sameProduct"] },
+          "then": { "properties": { "evidence": { "contains": { "properties": { "kind": { "enum": ["copy", "structure", "art"] } }, "required": ["kind", "siblingPage"] } } } }
+        }
+      ]
+    },
+    "complianceFinding": {
+      "type": "object",
+      "required": ["page", "rule", "why"],
+      "properties": {
+        "page": { "type": "string" },
+        "quote": { "type": "string" },
+        "selector": { "type": "string" },
+        "rule": { "type": "string" },
+        "policyId": { "type": "string" },
+        "why": { "type": "string" },
+        "fix": { "type": "string" },
+        "severity": { "type": "string", "enum": ["blocking", "advisory"] }
+      }
+    },
+    "complianceVerdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["judge", "rubricVersion", "pass", "blocking", "advisory", "confidence"],
+      "properties": {
+        "judge": { "const": "compliance-judge" },
+        "rubricVersion": { "$ref": "#/$defs/rubricVersion" },
+        "typeRubricVersion": { "$ref": "#/$defs/rubricVersion" },
+        "pass": { "type": "boolean" },
+        "blocking": {
+          "type": "array",
+          "items": { "allOf": [ { "$ref": "#/$defs/complianceFinding" }, { "anyOf": [ { "required": ["quote"] }, { "required": ["selector"] } ] } ] }
+        },
+        "advisory": { "type": "array", "items": { "$ref": "#/$defs/complianceFinding" } },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "allOf": [
+        { "if": { "properties": { "blocking": { "minItems": 1 } }, "required": ["blocking"] }, "then": { "properties": { "pass": { "const": false } } } }
+      ]
+    },
+    "round": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slug", "round", "sha", "rubricVersions", "verdict", "uniqueness", "compliance", "items", "at"],
+      "properties": {
+        "slug": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,39}$" },
+        "pr": { "type": ["integer", "null"] },
+        "sha": { "type": "string" },
+        "round": { "type": "integer", "minimum": 1, "maximum": 4 },
+        "rubricVersions": {
+          "type": "object",
+          "required": ["uniqueness-skeptic", "compliance-judge"],
+          "properties": {
+            "uniqueness-skeptic": { "$ref": "#/$defs/rubricVersion" },
+            "compliance-judge": { "$ref": "#/$defs/rubricVersion" },
+            "typeRubric": { "$ref": "#/$defs/rubricVersion" }
+          }
+        },
+        "verdict": { "type": "string", "enum": ["ready", "fix", "blocked"] },
+        "blockingCount": { "type": "integer", "minimum": 0 },
+        "uniqueness": {
+          "type": "object",
+          "required": ["sameProductVotes", "pass"],
+          "properties": { "sameProductVotes": { "type": "integer", "minimum": 0, "maximum": 3 }, "votes": { "type": "array", "items": { "type": "boolean" } }, "pass": { "type": "boolean" }, "mechanical": { "type": "boolean" } }
+        },
+        "compliance": {
+          "type": "object",
+          "required": ["pass", "blocking"],
+          "properties": { "pass": { "type": "boolean" }, "blocking": { "type": "integer", "minimum": 0 } }
+        },
+        "machine": {
+          "type": "object",
+          "properties": { "ciOk": { "type": "boolean" }, "uniquenessJson": { "type": "boolean" }, "report": { "type": "string" } }
+        },
+        "items": { "type": "array", "items": { "$ref": "#/$defs/item" } },
+        "integrationIssues": { "type": "array", "items": { "type": "string" } },
+        "missingItems": { "type": "array", "items": { "type": "string" } },
+        "at": { "type": "string" }
+      },
+      "allOf": [
+        {
+          "$comment": "fail closed: ready needs no blocking item, <= 1 sameProduct vote and a compliance pass",
+          "if": { "properties": { "verdict": { "const": "ready" } }, "required": ["verdict"] },
+          "then": {
+            "properties": {
+              "uniqueness": { "properties": { "sameProductVotes": { "maximum": 1 }, "pass": { "const": true } } },
+              "compliance": { "properties": { "pass": { "const": true }, "blocking": { "const": 0 } } },
+              "items": { "items": { "properties": { "severity": { "const": "advisory" } } } }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "round": { "const": 4 } }, "required": ["round"] },
+          "then": { "properties": { "verdict": { "enum": ["ready", "blocked"] } } }
+        }
+      ]
+    }
+  }
+}

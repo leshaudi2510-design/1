@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://factory.local/engine/tools/checks.schema.json",
+  "title": "sites/<slug>/checks.json",
+  "description": "Site fixtures for engine/tools/check.mjs and the type pack's check sections: what the checks used to hardcode for one site. Every key is optional where the check can derive it from site.config.json (storage prefix, currency words); the rest name pages, games and selectors of this site.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "checksVersion": { "const": 1 },
+    "storagePrefix": {
+      "description": "Prefix of every localStorage/sessionStorage key the site writes, separator included (\"oql.\" for \"oql.wallet\"). Default: site.config.json storagePrefix + \".\".",
+      "type": "string",
+      "pattern": "^[a-z0-9]{2,8}[.:_-]$"
+    },
+    "currency": {
+      "description": "The play currency's words as the pages print them. Default: site.config.json currency.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "singular": { "type": "string", "minLength": 1 },
+        "plural": { "type": "string", "minLength": 1 },
+        "abbr": { "type": "string" }
+      }
+    },
+    "embedHost": {
+      "description": "Regular expression for the hostname of the third-party embed the stage loads (stubbed in the checks, refused elsewhere). Omit when the site embeds nothing.",
+      "type": "string",
+      "minLength": 1
+    },
+    "embedLabel": {
+      "description": "How a check line names the embed host (\"*.pragmaticplay.net\"). Omit to skip the 'nothing requested from the embed host' line.",
+      "type": "string"
+    },
+    "stageSelector": {
+      "description": "CSS selector of the embed stage on a demo page.",
+      "type": "string",
+      "minLength": 1
+    },
+    "demoPages": {
+      "description": "Pages with an embed stage that the stage section walks through (Play, Close, the lobby message, a break).",
+      "type": "array",
+      "items": { "$ref": "#/$defs/route" },
+      "uniqueItems": true
+    },
+    "pages": {
+      "description": "Single pages the sections use.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "demo": { "$ref": "#/$defs/route", "description": "A demo game page (stage failures, breaks, the age lock, axe with the stage ready)." },
+        "demoAfterReject": { "$ref": "#/$defs/route", "description": "The demo page opened after 'Reject all'." },
+        "demoBar": { "$ref": "#/$defs/route", "description": "A second demo page whose stage bar is compared with the home page's." },
+        "safer": { "$ref": "#/$defs/route", "description": "The safer-play (responsible gaming) page." },
+        "offlineLanding": { "$ref": "#/$defs/route", "description": "The page a visitor lands on in the offline section." },
+        "offlineUnvisited": { "$ref": "#/$defs/route", "description": "A page the visitor never opened, in a build with the embeds on." },
+        "offlineUnvisitedNoDemos": { "$ref": "#/$defs/route", "description": "The same, in a build with the embeds off." }
+      }
+    },
+    "games": {
+      "description": "Our own games, one per engine id: the page is /games/<slug>/ and the root [data-game=\"<slug>\"] unless given.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "roulette": {
+          "allOf": [{ "$ref": "#/$defs/game" }],
+          "properties": {
+            "result": { "type": "string", "description": "Regular expression a finished spin's result line matches." },
+            "settled": { "type": "string", "description": "Regular expression a settled spin's result line matches (reduced motion)." },
+            "colourBet": { "type": "string", "description": "data-bet of an even-money colour bet." }
+          }
+        },
+        "blackjack": { "$ref": "#/$defs/game" },
+        "slot": { "$ref": "#/$defs/game" }
+      }
+    },
+    "lobby": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "page": { "$ref": "#/$defs/route" },
+        "groups": {
+          "description": "The lobby's groups in order (slots first, tables second): the section id and how the nav and the dock name it.",
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "nav", "dock"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "nav": { "type": "string" },
+              "dock": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "images": {
+      "description": "engine/tools/make-images.mjs: the game slugs fanned out on the home share cards (demos on, and our own games only).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "homeFan": { "type": "array", "items": { "type": "string" }, "maxItems": 3 },
+        "houseFan": { "type": "array", "items": { "type": "string" }, "maxItems": 3 }
+      }
+    },
+    "extraPages": {
+      "description": "Routes outside the sitemap that the pages section also loads.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/route" }
+    }
+  },
+  "$defs": {
+    "route": { "type": "string", "pattern": "^/([^\\s]*/)?$" },
+    "game": {
+      "type": "object",
+      "required": ["slug"],
+      "properties": {
+        "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "page": { "$ref": "#/$defs/route" },
+        "selector": { "type": "string" }
+      }
+    }
+  }
+}

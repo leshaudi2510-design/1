@@ -1,0 +1,5 @@
+{
+  "name": "factory-tools-tests",
+  "private": true,
+  "main": "index.cjs"
+}

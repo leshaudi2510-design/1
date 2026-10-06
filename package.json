@@ -1,0 +1,28 @@
+{
+  "name": "site-factory",
+  "private": true,
+  "description": "Site factory: one engine (engine/), type packs (types/<type>/) and many static sites (sites/<slug>/).",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node engine/build.mjs",
+    "build:strict": "node engine/build.mjs --strict",
+    "check": "node engine/tools/check.mjs",
+    "lighthouse": "node engine/tools/lighthouse.mjs",
+    "test:hooks": "node --test .claude/hooks/tests",
+    "test:tools": "node tools/ci-lint.mjs --self-test && node tools/ci-lint.mjs .github/workflows && node tools/labels.mjs --check",
+    "lint:engine": "node tools/engine-lint.mjs",
+    "lint:ci": "node tools/ci-lint.mjs .github/workflows"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "axe-core": "^4.13.0",
+    "lighthouse": "^12.8.2",
+    "playwright": "1.56.1",
+    "sharp": "^0.34.4",
+    "yaml": "^2.8.1"
+  }
+}

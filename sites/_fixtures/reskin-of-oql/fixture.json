@@ -1,0 +1,23 @@
+{
+  "fixture": "reskin-of-oql",
+  "purpose": "Calibration (SPEC 15.6): one product with swapped names. tools/uniqueness.mjs --post must fail it against sites/opalquestlounge; at least two uniqueness skeptics must say sameProduct: true.",
+  "generatedBy": "node tools/fixtures/make-reskin.mjs",
+  "from": "opalquestlounge",
+  "layout": "legacy (mapped per SPEC 3.1)",
+  "swaps": {
+    "Opal Quest Lounge": "Topaz Quest Lounge",
+    "Opal Lounge": "Topaz Lounge",
+    "opalquestlounge.com": "topazquestlounge.com",
+    "OPAL QUEST LOUNGE": "TOPAZ QUEST LOUNGE",
+    "Seven Systems": "Seven Settings",
+    "Lapidary Wheel": "Facet Wheel",
+    "Brilliant Twenty-One": "Cushion Twenty-One"
+  },
+  "storagePrefix": "rsk",
+  "hueRotation": 30,
+  "coloursRotated": 153,
+  "expect": {
+    "uniquenessPost": "fail",
+    "skeptics": "sameProduct >= 2 of 3"
+  }
+}

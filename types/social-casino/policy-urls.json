@@ -1,0 +1,181 @@
+[
+  {
+    "id": "google.social-casino",
+    "url": "https://support.google.com/adspolicy/answer/15132179",
+    "answerId": "15132179",
+    "quote": "online simulated gambling-style games where there is no opportunity to win something of value",
+    "quotedFrom": "search-index extract, 2026-10-05 (SITE-TYPES rev 2, 1.1)",
+    "verified": null,
+    "pageUpdated": null,
+    "checkedBy": null,
+    "usedBy": [
+      "sc.required-statements",
+      "sc.iap-disclosure"
+    ]
+  },
+  {
+    "id": "google.social-casino.brand-marks",
+    "url": "https://support.google.com/adspolicy/answer/15132179",
+    "answerId": "15132179",
+    "quote": "Ads, sites, or apps must not use logos, names, or marks associated with real-money gambling brands",
+    "quotedFrom": "search-index extract, 2026-10-05 (SITE-TYPES rev 2, 1.1)",
+    "verified": null,
+    "pageUpdated": null,
+    "checkedBy": null,
+    "usedBy": [
+      "sc.no-rmg-brands",
+      "sc.ads-with-demos"
+    ]
+  },
+  {
+    "id": "google.social-casino.aggregators",
+    "url": "https://support.google.com/adspolicy/answer/15132179",
+    "answerId": "15132179",
+    "quote": "Promotion of content which itself directly promotes engagement in social casino games, such as aggregators or affiliates, is not allowed.",
+    "quotedFrom": "search-index extract, 2026-10-05 (SITE-TYPES rev 2, 1.1)",
+    "verified": null,
+    "pageUpdated": null,
+    "checkedBy": null,
+    "usedBy": []
+  },
+  {
+    "id": "google.social-casino.countries",
+    "url": null,
+    "answerId": null,
+    "quote": null,
+    "quotedFrom": "not on file: the Google Ads social casino allowed-country list has not been located or read (not the Authorized Buyers page 7450776)",
+    "verified": null,
+    "pageUpdated": null,
+    "checkedBy": null,
+    "usedBy": [
+      "ppc.geo-allowlist"
+    ]
+  },
+  {
+    "id": "google.sweepstakes-clarification",
+    "url": "https://support.google.com/adspolicy/answer/16641934",
+    "answerId": "16641934",
+    "quote": null,
+    "quotedFrom": "paraphrase only (SITE-TYPES rev 2, 1.1): on 28 October 2025 Google clarified that sweepstake casinos are not social casino games",
+    "verified": null,
+    "pageUpdated": null,
+    "checkedBy": null,
+    "usedBy": [
+      "sc.forbidden-terms"
+    ]
+  },
+  {
+    "id": "google.15342645",
+    "url": "https://support.google.com/adspolicy/answer/15342645",
+    "answerId": "15342645",
+    "quote": null,
+    "quotedFrom": "listed for re-check only (SITE-TYPES rev 2, 2.1); no extract wording on file",
+    "verified": null,
+    "pageUpdated": null,
+    "checkedBy": null,
+    "usedBy": []
+  },
+  {
+    "id": "google.certification-every-category",
+    "url": "https://support.google.com/adspolicy/answer/17199930",
+    "answerId": "17199930",
+    "quote": "certification required in every gambling and games category from 14 September 2026",
+    "quotedFrom": "search-index extract, post-cutoff claim (SITE-TYPES rev 2, 3.1)",
+    "verified": null,
+    "pageUpdated": null,
+    "checkedBy": null,
+    "usedBy": []
+  },
+  {
+    "id": "google.policy-health",
+    "url": "https://support.google.com/adspolicy/answer/16786233",
+    "answerId": "16786233",
+    "quote": "from 23 March 2026 accounts need good policy health; certification refused for free platforms, third-party subdomains or domains not owned by the advertiser",
+    "quotedFrom": "search-index extract, post-cutoff claim (SITE-TYPES rev 2, 3.1)",
+    "verified": null,
+    "pageUpdated": null,
+    "checkedBy": null,
+    "usedBy": [
+      "sc.own-domain"
+    ]
+  },
+  {
+    "id": "google.application-forms",
+    "url": "https://support.google.com/adspolicy/answer/17258294",
+    "answerId": "17258294",
+    "quote": "revised application forms from 26 August 2026",
+    "quotedFrom": "search-index extract, post-cutoff claim (SITE-TYPES rev 2, 3.1)",
+    "verified": null,
+    "pageUpdated": null,
+    "checkedBy": null,
+    "usedBy": []
+  },
+  {
+    "id": "google.certification-apply",
+    "url": "https://support.google.com/adspolicy/answer/16908635",
+    "answerId": "16908635",
+    "quote": null,
+    "quotedFrom": "cited as the application page (SITE-TYPES rev 2, 3.1); no extract wording on file",
+    "verified": null,
+    "pageUpdated": null,
+    "checkedBy": null,
+    "usedBy": []
+  },
+  {
+    "id": "google.uk-country-page",
+    "url": "https://support.google.com/adspolicy/answer/6107510",
+    "answerId": "6107510",
+    "quote": null,
+    "quotedFrom": "listed for re-check only (SITE-TYPES rev 2, 2.1); no extract wording on file",
+    "verified": null,
+    "pageUpdated": null,
+    "checkedBy": null,
+    "usedBy": []
+  },
+  {
+    "id": "google.personalised-advertising",
+    "url": "https://support.google.com/adspolicy/answer/16701250",
+    "answerId": "16701250",
+    "quote": null,
+    "quotedFrom": "not on file: revision 1's sensitive-category claim was withdrawn as unverified (SITE-TYPES rev 2, 3.1)",
+    "verified": null,
+    "pageUpdated": null,
+    "checkedBy": null,
+    "usedBy": []
+  },
+  {
+    "id": "asa.under-18-guidance",
+    "url": "https://www.asa.org.uk/resource/protecting-children-and-young-people-gambling-guidance-2022.html",
+    "answerId": null,
+    "quote": null,
+    "quotedFrom": "CAP 16.3.12 strong appeal to under-18s, from 1 October 2022, as summarised in SITE-TYPES rev 2, 3.4; no verbatim extract on file",
+    "verified": null,
+    "pageUpdated": null,
+    "checkedBy": null,
+    "usedBy": [
+      "sc.pragmatic-data"
+    ]
+  },
+  {
+    "id": "gc.social-casino-2015",
+    "url": "https://assets.ctfassets.net/j16ev64qyf6l/4A644HIpG1g2ymq11HdPOT/ca6272c45f1b2874d09eabe39515a527/Virtual-currencies-eSports-and-social-casino-gaming.pdf",
+    "answerId": null,
+    "quote": null,
+    "quotedFrom": "Gambling Commission, Virtual currencies, eSports and social casino gaming (2015), as summarised in SITE-TYPES rev 2, 1.1 and 3.5",
+    "verified": null,
+    "pageUpdated": null,
+    "checkedBy": null,
+    "usedBy": []
+  },
+  {
+    "id": "gambling-act-2005.s6",
+    "url": "https://www.legislation.gov.uk/ukpga/2005/19/section/6",
+    "answerId": null,
+    "quote": null,
+    "quotedFrom": "Gambling Act 2005 s.6 (gaming: a prize of money or money's worth), as summarised in SITE-TYPES rev 2, 3.5",
+    "verified": null,
+    "pageUpdated": null,
+    "checkedBy": null,
+    "usedBy": []
+  }
+]

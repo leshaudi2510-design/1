@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "1.2",
+  "orderId": "seaglass-terrace-hotel",
+  "type": "hotel-casino",
+  "variant": "single-hotel",
+  "casinoMode": "A",
+  "status": "questions-sent",
+  "client": { "name": "Studio client 11 (fictional example)", "contact": { "telegram": "@client11" }, "language": "ru", "notes": "Fictional example order for a hotel with a casino, advertised as hospitality in Mode A (a casino-free domain). The casino is never mentioned on this domain." },
+  "brief": { "path": "orders/seaglass-terrace-hotel/brief.md", "receivedAt": "2026-10-06", "language": "ru",
+             "summary": "Marketing site for a seaside hotel in Batumi with rooms, dining, spa and offers; booking through the hotel's own engine; English and Georgian; Mode A domain." },
+  "brand": { "name": "Seaglass Terrace Hotel", "shortName": "Seaglass", "wordmarkTag": false,
+             "trademarkSearch": { "done": false } },
+  "domain": "seaglassterrace.com",
+  "dns": { "registrar": "Namecheap", "managedBy": "registrar", "accessConfirmed": false },
+  "markets": ["GE", "GB"],
+  "locales": [
+    { "code": "en-GB", "path": "/", "default": true, "dir": "ltr", "fonts": ["young-serif", "figtree"], "dictionary": "en-GB" },
+    { "code": "ka", "path": "/ka/", "default": false, "dir": "ltr", "fonts": ["noto-serif-georgian", "noto-sans-georgian"] }
+  ],
+  "geo": { "market": "GE", "adsExclude": [], "minAge": 0, "rg": "off", "priceRules": "ge-default", "accessibilityStatement": true },
+  "concept": {
+    "title": "The Terrace Light",
+    "family": "landscape-coast",
+    "era": "1930s",
+    "place": "Black Sea promenade",
+    "craft": "sea-glass jewellery",
+    "world": "A 1930s promenade hotel above the Black Sea: frosted sea-glass, terrazzo floors, striped awnings and evening light on the water. The site reads like a printed hotel folder from the seafront.",
+    "boldMove": "Room photographs sit in sea-glass frames that tint with the time of day, and every page ends on the terrace at dusk.",
+    "vocabulary": [
+      { "term": "Terrace", "meaning": "The hotel's signature space", "usedFor": ["nav", "copy"] },
+      { "term": "Sea glass", "meaning": "The palette and frame motif", "usedFor": ["palette-name", "copy"] },
+      { "term": "Promenade rooms", "meaning": "Sea-view rooms", "usedFor": ["room-name"] },
+      { "term": "Awning", "meaning": "The striped header motif", "usedFor": ["copy", "section-name"] },
+      { "term": "Dusk table", "meaning": "The restaurant's evening menu", "usedFor": ["copy"] },
+      { "term": "Tide hour", "meaning": "The spa's quiet hour", "usedFor": ["copy", "ui-state"] }
+    ],
+    "artwork": { "rule": "objects-and-places-only",
+                 "subjects": ["sea-glass pebbles", "striped awning", "terrazzo floor", "promenade lamp", "terrace table at dusk"],
+                 "avoid": ["playing cards", "chips", "roulette wheels", "any casino imagery"] },
+    "antiReferences": []
+  },
+  "palette": { "model": "oklch",
+    "colours": [
+      { "role": "ink", "name": "Deep water", "oklch": { "l": 0.25, "c": 0.04, "h": 210 }, "hex": "#162A30" },
+      { "role": "paper", "name": "Terrazzo", "oklch": { "l": 0.96, "c": 0.01, "h": 80 }, "hex": "#F6F2EA" },
+      { "role": "primary", "name": "Sea glass", "oklch": { "l": 0.78, "c": 0.08, "h": 170 }, "hex": "#8FCFB7" },
+      { "role": "secondary", "name": "Awning coral", "oklch": { "l": 0.68, "c": 0.14, "h": 35 }, "hex": "#E57D62" },
+      { "role": "accent", "name": "Dusk violet", "oklch": { "l": 0.5, "c": 0.1, "h": 300 }, "hex": "#76599A" }
+    ],
+    "themes": { "light": { "background": "#FBF8F2", "surface": "#F6F2EA", "text": "#162A30", "themeColor": "#F6F2EA" },
+                "dark":  { "background": "#0E1C21", "surface": "#162A30", "text": "#F6F2EA", "themeColor": "#0E1C21" } },
+    "contrastChecked": false },
+  "typography": {
+    "display": { "family": "Young Serif", "licence": "OFL", "axes": ["wght"], "weightRange": [400, 400], "selfHosted": true },
+    "body":    { "family": "Figtree", "licence": "OFL", "axes": ["wght"], "weightRange": [400, 700], "selfHosted": true } },
+  "operator": { "name": "[Hotel operating company] LLC", "registrationNumber": "[Identification code]", "registry": "National Agency of Public Registry (Georgia)",
+                "address": "[Registered address], Batumi, Georgia", "country": "GE", "email": "stay@seaglassterrace.com" },
+  "analytics": { "ga4": "", "adsConversionId": "", "mode": "gtag", "consentMode": "basic", "personalisation": false, "crossDomain": [] },
+  "contactEndpoint": "",
+  "dates": { "received": "2026-10-06", "launchTarget": "2027-01-15", "lastUpdated": "2026-10-06",
+             "legalUpdated": { "terms": "2026-10-06", "privacy": "2026-10-06", "cookies": "2026-10-06" } },
+  "hosting": { "provider": "cloudflare-pages", "repo": { "owner": "studio-org", "name": "factory", "branch": "main", "path": "sites/seaglass-terrace-hotel" },
+               "cloudflare": { "projectName": "seaglassterrace" }, "searchConsole": { "verification": "none-yet" } },
+  "structure": { "heroStyle": "photo-first", "homeSections": ["hero", "rooms", "dining", "spa", "offers", "location", "faq"],
+                 "navLabels": { "rooms": "Rooms", "dining": "Dining", "offers": "Offers", "location": "Getting here" },
+                 "faq": ["faq-check-in-times", "faq-parking", "faq-airport-transfer", "faq-pets", "faq-accessibility"],
+                 "extraPages": ["rooms", "dining", "spa", "offers", "location"] },
+  "copy": { "spelling": "en-GB", "voice": { "register": "editorial", "notes": "Calm, factual, no superlatives that are not in the hotel facts; prices are always total prices." },
+            "heroH1": "A terrace above the Black Sea.",
+            "tagline": "Sea-view rooms, a dusk table and a quiet spa on the Batumi promenade.",
+            "buttons": { "book": "Check availability", "call": "Call the front desk" } },
+  "typeOptions": {
+    "booking": { "provider": "own-engine", "engineUrlTemplate": "[booking engine URL template]", "hosts": [], "affiliatePaidSearch": { "permitted": null, "clauseRef": "" } },
+    "amenityWhitelist": ["rooms", "restaurant", "spa", "pool", "terrace", "meeting room"],
+    "venues": [
+      { "id": "restaurant", "name": "Dusk Table", "casinoLinked": false },
+      { "id": "spa", "name": "Tide Hour Spa", "casinoLinked": false }
+    ],
+    "reviews": { "shown": false }
+  },
+  "legal": { "scope": ["terms", "privacy", "cookies", "accessibility", "booking-terms"], "notes": "Mode A: no casino entity, media, amenity line or casino-linked event on this domain." },
+  "uniqueness": { "comparedAgainst": [], "passed": false },
+  "ppc": { "primaryConversion": "", "certification": "none", "paymentProfileOwner": "client" },
+  "provenance": {
+    "brand.name": { "source": "brief", "quote": "Отель Seaglass Terrace", "confidence": 1 },
+    "type": { "source": "brief", "quote": "отель с казино, рекламируем как отель", "confidence": 0.9 },
+    "casinoMode": { "source": "default", "by": "intake agent: Mode A is the default until the owner decides (ST 1.3)" },
+    "operator": { "source": "asked", "askedOn": "2026-10-06", "by": "operator" },
+    "typeOptions.booking": { "source": "asked", "askedOn": "2026-10-06", "by": "operator" },
+    "ppc.primaryConversion": { "source": "default", "by": "intake agent: owner placeholder until Q11 is answered" }
+  },
+  "approvals": [
+    { "item": "concept", "status": "pending" }, { "item": "palette", "status": "pending" }, { "item": "typography", "status": "pending" },
+    { "item": "structure", "status": "pending" }, { "item": "copy", "status": "pending" }, { "item": "operator", "status": "pending" },
+    { "item": "legal", "status": "pending" }, { "item": "facts", "status": "pending" }, { "item": "offers", "status": "pending" },
+    { "item": "media", "status": "pending" }, { "item": "booking", "status": "pending" }, { "item": "launch", "status": "pending" }
+  ],
+  "launch": { "checklist": {
+    "orderValidated": { "done": false }, "operatorDetails": { "done": false }, "mailboxWorks": { "done": false }, "legalReview": { "done": false },
+    "affiliatePaidSearchChecked": { "done": false }, "policyUrlsVerified": { "done": false }, "hotelFacts": { "done": false },
+    "strictBuild": { "done": false }, "e2eChecks": { "done": false }, "lighthouse": { "done": false }, "dns": { "done": false } } }
+}

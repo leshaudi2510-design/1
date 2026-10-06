@@ -1,0 +1,38 @@
+{
+  "type": "hotel-casino",
+  "storagePrefix": "tpl",
+  "brand": "[Brand Name]",
+  "shortName": "[Brand]",
+  "domain": "example.com",
+  "concept": "[One-paragraph visual direction from concept.json; the hotel's facts come from the client.]",
+  "currency": {
+    "singular": "Point",
+    "plural": "Points",
+    "abbr": "pt",
+    "startingBalance": 1000,
+    "topUpAmount": 1000,
+    "topUpBelow": 100
+  },
+  "operator": {
+    "companyName": "[Operator company name]",
+    "companyNumber": "[Registration number]",
+    "registeredIn": "[Registry and country]",
+    "address": "[Registered office address]",
+    "email": "[reservations]@example.com"
+  },
+  "analytics": {
+    "ga4": "",
+    "adsConversionId": ""
+  },
+  "contactEndpoint": "",
+  "lastUpdated": "2026-10-06",
+  "legalUpdated": {
+    "terms": "2026-10-06",
+    "privacy": "2026-10-06",
+    "cookies": "2026-10-06"
+  },
+  "themeColor": {
+    "light": "#3A3A3A",
+    "dark": "#1C1C1C"
+  }
+}

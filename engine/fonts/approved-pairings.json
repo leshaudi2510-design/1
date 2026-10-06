@@ -1,0 +1,3661 @@
+{
+  "_about": "Curated OFL families the theme lane may choose from (SPEC 3.2 item 4, D-40). Metadata read from google/fonts METADATA.pb on the main branch on 2026-10-06 (the commit could not be pinned from this environment: googleFontsCommit stays null until tools/fonts-fetch.mjs --pin runs with GitHub API access). source is a committed variable TTF under engine/fonts/sources/ for the families in use today; every other family is fetched (and its OFL header verified) by tools/fonts-fetch.mjs when a site first picks it (Phase 2). A family not in this list, or one whose source is missing when a site uses it, fails the build (font-source-missing, Phase 2); the banned four fail font-banned.",
+  "schemaVersion": 1,
+  "googleFontsRef": "main",
+  "googleFontsCommit": null,
+  "readOn": "2026-10-06",
+  "budgetMb": 25,
+  "banned": [
+    "Inter",
+    "Poppins",
+    "Montserrat",
+    "Space Grotesk"
+  ],
+  "families": [
+    {
+      "family": "Archivo",
+      "slug": "archivo",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body",
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Omnibus-Type",
+      "variable": true,
+      "axes": {
+        "wdth": [
+          62,
+          125
+        ],
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/archivo",
+        "files": [
+          "Archivo[wdth,wght].ttf",
+          "Archivo-Italic[wdth,wght].ttf"
+        ]
+      },
+      "source": "sources/Archivo[wdth,wght].ttf",
+      "licenceFile": "sources/Archivo/OFL.txt",
+      "sourceSha256": "0e094a7d3c7c4c25cf1310c4b30014f1dae9332220b1c2c88f4fa996f0b05053",
+      "sourceVersion": "2.001",
+      "inUse": [
+        "sites/opalquestlounge",
+        "types/*/template-site"
+      ]
+    },
+    {
+      "family": "Radio Canada",
+      "slug": "radio-canada",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body",
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Charles Daoud, Coppers and Brasses, Alexandre Saumier Demers, Jacques Le Bailly",
+      "variable": true,
+      "axes": {
+        "wdth": [
+          75,
+          100
+        ],
+        "wght": [
+          300,
+          700
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "canadian-aboriginal",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/radiocanada",
+        "files": [
+          "RadioCanada[wdth,wght].ttf",
+          "RadioCanada-Italic[wdth,wght].ttf"
+        ]
+      },
+      "source": "sources/RadioCanada[wdth,wght].ttf",
+      "licenceFile": "sources/RadioCanada/OFL.txt",
+      "sourceSha256": "54918d2c5fadb4436e8fd304f97fa0c7bc7a5d504e9a37773fb4df0f33d42056",
+      "sourceVersion": "2.104",
+      "inUse": [
+        "sites/opalquestlounge",
+        "types/*/template-site"
+      ]
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "slug": "bricolage-grotesque",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body",
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Mathieu Triay",
+      "variable": true,
+      "axes": {
+        "opsz": [
+          12,
+          96
+        ],
+        "wdth": [
+          75,
+          100
+        ],
+        "wght": [
+          200,
+          800
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/bricolagegrotesque",
+        "files": [
+          "BricolageGrotesque[opsz,wdth,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Familjen Grotesk",
+      "slug": "familjen-grotesk",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Familjen STHLM AB",
+      "variable": true,
+      "axes": {
+        "wght": [
+          400,
+          700
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/familjengrotesk",
+        "files": [
+          "FamiljenGrotesk[wght].ttf",
+          "FamiljenGrotesk-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Hanken Grotesk",
+      "slug": "hanken-grotesk",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Alfredo Marco Pradil, Hanken Design Co.",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/hankengrotesk",
+        "files": [
+          "HankenGrotesk[wght].ttf",
+          "HankenGrotesk-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Schibsted Grotesk",
+      "slug": "schibsted-grotesk",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Bakken & Bæck, Henrik Kongsvoll",
+      "variable": true,
+      "axes": {
+        "wght": [
+          400,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/schibstedgrotesk",
+        "files": [
+          "SchibstedGrotesk[wght].ttf",
+          "SchibstedGrotesk-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Instrument Sans",
+      "slug": "instrument-sans",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body",
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Rodrigo Fuenzalida, Jordan Egstad",
+      "variable": true,
+      "axes": {
+        "wdth": [
+          75,
+          100
+        ],
+        "wght": [
+          400,
+          700
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/instrumentsans",
+        "files": [
+          "InstrumentSans[wdth,wght].ttf",
+          "InstrumentSans-Italic[wdth,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Onest",
+      "slug": "onest",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Dmitri Voloshin, Andrey Kudryavtsev",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "math",
+        "symbols",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/onest",
+        "files": [
+          "Onest[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Manrope",
+      "slug": "manrope",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body",
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Mikhail Sharanda",
+      "variable": true,
+      "axes": {
+        "wght": [
+          200,
+          800
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/manrope",
+        "files": [
+          "Manrope[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Plus Jakarta Sans",
+      "slug": "plus-jakarta-sans",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Tokotype",
+      "variable": true,
+      "axes": {
+        "wght": [
+          200,
+          800
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/plusjakartasans",
+        "files": [
+          "PlusJakartaSans[wght].ttf",
+          "PlusJakartaSans-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Outfit",
+      "slug": "outfit",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Smartsheet Inc, Rodrigo Fuenzalida",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/outfit",
+        "files": [
+          "Outfit[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Sora",
+      "slug": "sora",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Jonathan Barnbrook, Julián Moncada",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          800
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/sora",
+        "files": [
+          "Sora[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Figtree",
+      "slug": "figtree",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Erik Kennedy",
+      "variable": true,
+      "axes": {
+        "wght": [
+          300,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/figtree",
+        "files": [
+          "Figtree[wght].ttf",
+          "Figtree-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Urbanist",
+      "slug": "urbanist",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Corey Hu",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/urbanist",
+        "files": [
+          "Urbanist[wght].ttf",
+          "Urbanist-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Lexend",
+      "slug": "lexend",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Bonnie Shaver-Troup, Thomas Jockin, Santiago Orozco, Héctor Gómez, Superunion",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/lexend",
+        "files": [
+          "Lexend[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Red Hat Display",
+      "slug": "red-hat-display",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "MCKL",
+      "variable": true,
+      "axes": {
+        "wght": [
+          300,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/redhatdisplay",
+        "files": [
+          "RedHatDisplay[wght].ttf",
+          "RedHatDisplay-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Red Hat Text",
+      "slug": "red-hat-text",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "MCKL",
+      "variable": true,
+      "axes": {
+        "wght": [
+          300,
+          700
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/redhattext",
+        "files": [
+          "RedHatText[wght].ttf",
+          "RedHatText-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Public Sans",
+      "slug": "public-sans",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body",
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "USWDS, Dan Williams, Pablo Impallari, Rodrigo Fuenzalida",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/publicsans",
+        "files": [
+          "PublicSans[wght].ttf",
+          "PublicSans-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Work Sans",
+      "slug": "work-sans",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body",
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Wei Huang",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/worksans",
+        "files": [
+          "WorkSans[wght].ttf",
+          "WorkSans-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Rubik",
+      "slug": "rubik",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Hubert and Fischer, Meir Sadan, Cyreal, Daniel Grumer, Omaima Dajani",
+      "variable": true,
+      "axes": {
+        "wght": [
+          300,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "arabic",
+        "cyrillic",
+        "cyrillic-ext",
+        "hebrew",
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/rubik",
+        "files": [
+          "Rubik[wght].ttf",
+          "Rubik-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Karla",
+      "slug": "karla",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Jonny Pinhorn",
+      "variable": true,
+      "axes": {
+        "wght": [
+          200,
+          800
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/karla",
+        "files": [
+          "Karla[wght].ttf",
+          "Karla-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Mulish",
+      "slug": "mulish",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Vernon Adams, Cyreal, Jacques Le Bailly",
+      "variable": true,
+      "axes": {
+        "wght": [
+          200,
+          1000
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/mulish",
+        "files": [
+          "Mulish[wght].ttf",
+          "Mulish-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Nunito Sans",
+      "slug": "nunito-sans",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body",
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Vernon Adams, Jacques Le Bailly, Manvel Shmavonyan, Alexei Vanyashin",
+      "variable": true,
+      "axes": {
+        "YTLC": [
+          440,
+          540
+        ],
+        "opsz": [
+          6,
+          12
+        ],
+        "wdth": [
+          75,
+          125
+        ],
+        "wght": [
+          200,
+          1000
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/nunitosans",
+        "files": [
+          "NunitoSans[YTLC,opsz,wdth,wght].ttf",
+          "NunitoSans-Italic[YTLC,opsz,wdth,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Raleway",
+      "slug": "raleway",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Matt McInerney, Pablo Impallari, Rodrigo Fuenzalida",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/raleway",
+        "files": [
+          "Raleway[wght].ttf",
+          "Raleway-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Epilogue",
+      "slug": "epilogue",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Tyler Finck, ETC",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/epilogue",
+        "files": [
+          "Epilogue[wght].ttf",
+          "Epilogue-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Syne",
+      "slug": "syne",
+      "category": "display",
+      "roles": [
+        "display"
+      ],
+      "licence": "OFL",
+      "designer": "Bonjour Monde, Lucas Descroix, George Triantafyllakos",
+      "variable": true,
+      "axes": {
+        "wght": [
+          400,
+          800
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "greek",
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/syne",
+        "files": [
+          "Syne[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Unbounded",
+      "slug": "unbounded",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "NaN",
+      "variable": true,
+      "axes": {
+        "wght": [
+          200,
+          900
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/unbounded",
+        "files": [
+          "Unbounded[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Big Shoulders Display",
+      "slug": "big-shoulders-display",
+      "category": "display",
+      "roles": [
+        "display"
+      ],
+      "licence": "OFL",
+      "designer": "Patric King",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/bigshouldersdisplay",
+        "files": [
+          "BigShouldersDisplay[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Anybody",
+      "slug": "anybody",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body",
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Tyler Finck",
+      "variable": true,
+      "axes": {
+        "wdth": [
+          50,
+          150
+        ],
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/anybody",
+        "files": [
+          "Anybody[wdth,wght].ttf",
+          "Anybody-Italic[wdth,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Fraunces",
+      "slug": "fraunces",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Undercase Type, Phaedra Charles, Flavia Zimbardi",
+      "variable": true,
+      "axes": {
+        "SOFT": [
+          0,
+          100
+        ],
+        "WONK": [
+          0,
+          1
+        ],
+        "opsz": [
+          9,
+          144
+        ],
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/fraunces",
+        "files": [
+          "Fraunces[SOFT,WONK,opsz,wght].ttf",
+          "Fraunces-Italic[SOFT,WONK,opsz,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Newsreader",
+      "slug": "newsreader",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Production Type",
+      "variable": true,
+      "axes": {
+        "opsz": [
+          6,
+          72
+        ],
+        "wght": [
+          200,
+          800
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/newsreader",
+        "files": [
+          "Newsreader[opsz,wght].ttf",
+          "Newsreader-Italic[opsz,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Literata",
+      "slug": "literata",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "TypeTogether",
+      "variable": true,
+      "axes": {
+        "opsz": [
+          7,
+          72
+        ],
+        "wght": [
+          200,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/literata",
+        "files": [
+          "Literata[opsz,wght].ttf",
+          "Literata-Italic[opsz,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Source Serif 4",
+      "slug": "source-serif-4",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Frank Grießhammer",
+      "variable": true,
+      "axes": {
+        "opsz": [
+          8,
+          60
+        ],
+        "wght": [
+          200,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/sourceserif4",
+        "files": [
+          "SourceSerif4[opsz,wght].ttf",
+          "SourceSerif4-Italic[opsz,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Bitter",
+      "slug": "bitter",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Sol Matas",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/bitter",
+        "files": [
+          "Bitter[wght].ttf",
+          "Bitter-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Playfair Display",
+      "slug": "playfair-display",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Claus Eggers Sørensen",
+      "variable": true,
+      "axes": {
+        "wght": [
+          400,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/playfairdisplay",
+        "files": [
+          "PlayfairDisplay[wght].ttf",
+          "PlayfairDisplay-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Cormorant",
+      "slug": "cormorant",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Christian Thalmann",
+      "variable": true,
+      "axes": {
+        "wght": [
+          300,
+          700
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/cormorant",
+        "files": [
+          "Cormorant[wght].ttf",
+          "Cormorant-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "EB Garamond",
+      "slug": "eb-garamond",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Georg Duffner, Octavio Pardo",
+      "variable": true,
+      "axes": {
+        "wght": [
+          400,
+          800
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/ebgaramond",
+        "files": [
+          "EBGaramond[wght].ttf",
+          "EBGaramond-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Crimson Pro",
+      "slug": "crimson-pro",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Jacques Le Bailly",
+      "variable": true,
+      "axes": {
+        "wght": [
+          200,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/crimsonpro",
+        "files": [
+          "CrimsonPro[wght].ttf",
+          "CrimsonPro-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Lora",
+      "slug": "lora",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Cyreal",
+      "variable": true,
+      "axes": {
+        "wght": [
+          400,
+          700
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "math",
+        "symbols",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/lora",
+        "files": [
+          "Lora[wght].ttf",
+          "Lora-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Merriweather",
+      "slug": "merriweather",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Sorkin Type",
+      "variable": true,
+      "axes": {
+        "opsz": [
+          18,
+          144
+        ],
+        "wdth": [
+          87,
+          112
+        ],
+        "wght": [
+          300,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/merriweather",
+        "files": [
+          "Merriweather[opsz,wdth,wght].ttf",
+          "Merriweather-Italic[opsz,wdth,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Libre Franklin",
+      "slug": "libre-franklin",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Impallari Type",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/librefranklin",
+        "files": [
+          "LibreFranklin[wght].ttf",
+          "LibreFranklin-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Alegreya",
+      "slug": "alegreya",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Juan Pablo del Peral, HT Fonts",
+      "variable": true,
+      "axes": {
+        "wght": [
+          400,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/alegreya",
+        "files": [
+          "Alegreya[wght].ttf",
+          "Alegreya-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Petrona",
+      "slug": "petrona",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Ringo R. Seeber",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/petrona",
+        "files": [
+          "Petrona[wght].ttf",
+          "Petrona-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Brygada 1918",
+      "slug": "brygada-1918",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Capitalics, Mateusz Machalski, Borys Kosmynka, Ania Wieluńska, Przemysław Hoffer",
+      "variable": true,
+      "axes": {
+        "wght": [
+          400,
+          700
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/brygada1918",
+        "files": [
+          "Brygada1918[wght].ttf",
+          "Brygada1918-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "DM Sans",
+      "slug": "dm-sans",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body",
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Colophon Foundry",
+      "variable": true,
+      "axes": {
+        "opsz": [
+          9,
+          40
+        ],
+        "wght": [
+          100,
+          1000
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/dmsans",
+        "files": [
+          "DMSans[opsz,wght].ttf",
+          "DMSans-Italic[opsz,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "JetBrains Mono",
+      "slug": "jetbrains-mono",
+      "category": "monospace",
+      "roles": [
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "JetBrains, Philipp Nurullin, Konstantin Bulenkov",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          800
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/jetbrainsmono",
+        "files": [
+          "JetBrainsMono[wght].ttf",
+          "JetBrainsMono-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Azeret Mono",
+      "slug": "azeret-mono",
+      "category": "monospace",
+      "roles": [
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Displaay, Martin Vácha",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/azeretmono",
+        "files": [
+          "AzeretMono[wght].ttf",
+          "AzeretMono-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Martian Mono",
+      "slug": "martian-mono",
+      "category": "sans-serif",
+      "roles": [
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Roman Shamin, Evil Martians",
+      "variable": true,
+      "axes": {
+        "wdth": [
+          75,
+          112.5
+        ],
+        "wght": [
+          100,
+          800
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/martianmono",
+        "files": [
+          "MartianMono[wdth,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Red Hat Mono",
+      "slug": "red-hat-mono",
+      "category": "sans-serif",
+      "roles": [
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "MCKL",
+      "variable": true,
+      "axes": {
+        "wght": [
+          300,
+          700
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/redhatmono",
+        "files": [
+          "RedHatMono[wght].ttf",
+          "RedHatMono-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Recursive",
+      "slug": "recursive",
+      "category": "sans-serif",
+      "roles": [
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Arrow Type, Stephen Nixon",
+      "variable": true,
+      "axes": {
+        "CASL": [
+          0,
+          1
+        ],
+        "CRSV": [
+          0,
+          1
+        ],
+        "MONO": [
+          0,
+          1
+        ],
+        "wght": [
+          300,
+          1000
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/recursive",
+        "files": [
+          "Recursive[CASL,CRSV,MONO,slnt,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Commissioner",
+      "slug": "commissioner",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Kostas Bartsokas",
+      "variable": true,
+      "axes": {
+        "FLAR": [
+          0,
+          100
+        ],
+        "VOLM": [
+          0,
+          100
+        ],
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/commissioner",
+        "files": [
+          "Commissioner[FLAR,VOLM,slnt,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Exo 2",
+      "slug": "exo-2",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Natanael Gama",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/exo2",
+        "files": [
+          "Exo2[wght].ttf",
+          "Exo2-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Saira",
+      "slug": "saira",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body",
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Omnibus-Type",
+      "variable": true,
+      "axes": {
+        "wdth": [
+          50,
+          125
+        ],
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/saira",
+        "files": [
+          "Saira[wdth,wght].ttf",
+          "Saira-Italic[wdth,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Oxanium",
+      "slug": "oxanium",
+      "category": "display",
+      "roles": [
+        "display"
+      ],
+      "licence": "OFL",
+      "designer": "Severin Meyer",
+      "variable": true,
+      "axes": {
+        "wght": [
+          200,
+          800
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/oxanium",
+        "files": [
+          "Oxanium[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Orbitron",
+      "slug": "orbitron",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Matt McInerney",
+      "variable": true,
+      "axes": {
+        "wght": [
+          400,
+          900
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "latin"
+      ],
+      "googleFonts": {
+        "path": "ofl/orbitron",
+        "files": [
+          "Orbitron[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Tilt Warp",
+      "slug": "tilt-warp",
+      "category": "display",
+      "roles": [
+        "display"
+      ],
+      "licence": "OFL",
+      "designer": "Andy Clymer",
+      "variable": false,
+      "axes": {},
+      "italic": false,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/tiltwarp",
+        "files": [
+          "TiltWarp[XROT,YROT].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Golos Text",
+      "slug": "golos-text",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Alexandra Korolkova, Vitaly Kuzmin",
+      "variable": true,
+      "axes": {
+        "wght": [
+          400,
+          900
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/golostext",
+        "files": [
+          "GolosText[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Wix Madefor Display",
+      "slug": "wix-madefor-display",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Dalton Maag",
+      "variable": true,
+      "axes": {
+        "wght": [
+          400,
+          800
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/wixmadefordisplay",
+        "files": [
+          "WixMadeforDisplay[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Geologica",
+      "slug": "geologica",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Monokrom, Sindre Bremnes, Frode Helland",
+      "variable": true,
+      "axes": {
+        "CRSV": [
+          0,
+          1
+        ],
+        "SHRP": [
+          0,
+          100
+        ],
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/geologica",
+        "files": [
+          "Geologica[CRSV,SHRP,slnt,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Noto Sans",
+      "slug": "noto-sans",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body",
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Google",
+      "variable": true,
+      "axes": {
+        "wdth": [
+          62.5,
+          100
+        ],
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "devanagari",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/notosans",
+        "files": [
+          "NotoSans[wdth,wght].ttf",
+          "NotoSans-Italic[wdth,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Noto Serif",
+      "slug": "noto-serif",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Google",
+      "variable": true,
+      "axes": {
+        "wdth": [
+          62.5,
+          100
+        ],
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "math",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/notoserif",
+        "files": [
+          "NotoSerif[wdth,wght].ttf",
+          "NotoSerif-Italic[wdth,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Noto Sans Georgian",
+      "slug": "noto-sans-georgian",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body",
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Google",
+      "variable": true,
+      "axes": {
+        "wdth": [
+          62.5,
+          100
+        ],
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "cyrillic-ext",
+        "georgian",
+        "greek-ext",
+        "latin",
+        "latin-ext",
+        "math",
+        "symbols"
+      ],
+      "locales": [
+        "ka"
+      ],
+      "googleFonts": {
+        "path": "ofl/notosansgeorgian",
+        "files": [
+          "NotoSansGeorgian[wdth,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Noto Sans Arabic",
+      "slug": "noto-sans-arabic",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body",
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Google",
+      "variable": true,
+      "axes": {
+        "wdth": [
+          62.5,
+          100
+        ],
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "arabic",
+        "latin",
+        "latin-ext",
+        "math",
+        "symbols"
+      ],
+      "locales": [
+        "ar"
+      ],
+      "googleFonts": {
+        "path": "ofl/notosansarabic",
+        "files": [
+          "NotoSansArabic[wdth,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Noto Naskh Arabic",
+      "slug": "noto-naskh-arabic",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Google",
+      "variable": true,
+      "axes": {
+        "wght": [
+          400,
+          700
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "arabic",
+        "latin",
+        "latin-ext",
+        "math",
+        "symbols"
+      ],
+      "locales": [
+        "ar"
+      ],
+      "googleFonts": {
+        "path": "ofl/notonaskharabic",
+        "files": [
+          "NotoNaskhArabic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Noto Kufi Arabic",
+      "slug": "noto-kufi-arabic",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Google",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "arabic",
+        "latin",
+        "latin-ext",
+        "math",
+        "symbols"
+      ],
+      "locales": [
+        "ar"
+      ],
+      "googleFonts": {
+        "path": "ofl/notokufiarabic",
+        "files": [
+          "NotoKufiArabic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Space Mono",
+      "slug": "space-mono",
+      "category": "monospace",
+      "roles": [
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Colophon Foundry",
+      "variable": false,
+      "axes": {},
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/spacemono",
+        "files": [
+          "SpaceMono-Regular.ttf",
+          "SpaceMono-Italic.ttf",
+          "SpaceMono-Bold.ttf",
+          "SpaceMono-BoldItalic.ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "IBM Plex Sans",
+      "slug": "ibm-plex-sans",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body",
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Mike Abbink, Bold Monday",
+      "variable": true,
+      "axes": {
+        "wdth": [
+          75,
+          100
+        ],
+        "wght": [
+          100,
+          700
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/ibmplexsans",
+        "files": [
+          "IBMPlexSans[wdth,wght].ttf",
+          "IBMPlexSans-Italic[wdth,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "IBM Plex Serif",
+      "slug": "ibm-plex-serif",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Mike Abbink, Bold Monday",
+      "variable": false,
+      "axes": {},
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/ibmplexserif",
+        "files": [
+          "IBMPlexSerif-Thin.ttf",
+          "IBMPlexSerif-ThinItalic.ttf",
+          "IBMPlexSerif-ExtraLight.ttf",
+          "IBMPlexSerif-ExtraLightItalic.ttf",
+          "IBMPlexSerif-Light.ttf",
+          "IBMPlexSerif-LightItalic.ttf",
+          "IBMPlexSerif-Regular.ttf",
+          "IBMPlexSerif-Italic.ttf",
+          "IBMPlexSerif-Medium.ttf",
+          "IBMPlexSerif-MediumItalic.ttf",
+          "IBMPlexSerif-SemiBold.ttf",
+          "IBMPlexSerif-SemiBoldItalic.ttf",
+          "IBMPlexSerif-Bold.ttf",
+          "IBMPlexSerif-BoldItalic.ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Albert Sans",
+      "slug": "albert-sans",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Andreas Rasmussen",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/albertsans",
+        "files": [
+          "AlbertSans[wght].ttf",
+          "AlbertSans-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Be Vietnam Pro",
+      "slug": "be-vietnam-pro",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Lâm Bảo, Tony Le, ViệtAnh Nguyễn",
+      "variable": false,
+      "axes": {},
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/bevietnampro",
+        "files": [
+          "BeVietnamPro-Thin.ttf",
+          "BeVietnamPro-ThinItalic.ttf",
+          "BeVietnamPro-ExtraLight.ttf",
+          "BeVietnamPro-ExtraLightItalic.ttf",
+          "BeVietnamPro-Light.ttf",
+          "BeVietnamPro-LightItalic.ttf",
+          "BeVietnamPro-Regular.ttf",
+          "BeVietnamPro-Italic.ttf",
+          "BeVietnamPro-Medium.ttf",
+          "BeVietnamPro-MediumItalic.ttf",
+          "BeVietnamPro-SemiBold.ttf",
+          "BeVietnamPro-SemiBoldItalic.ttf",
+          "BeVietnamPro-Bold.ttf",
+          "BeVietnamPro-BoldItalic.ttf",
+          "BeVietnamPro-ExtraBold.ttf",
+          "BeVietnamPro-ExtraBoldItalic.ttf",
+          "BeVietnamPro-Black.ttf",
+          "BeVietnamPro-BlackItalic.ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Chivo",
+      "slug": "chivo",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Omnibus-Type",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/chivo",
+        "files": [
+          "Chivo[wght].ttf",
+          "Chivo-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Encode Sans",
+      "slug": "encode-sans",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body",
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Impallari Type, Andres Torresi, Jacques Le Bailly",
+      "variable": true,
+      "axes": {
+        "wdth": [
+          75,
+          125
+        ],
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/encodesans",
+        "files": [
+          "EncodeSans[wdth,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Inconsolata",
+      "slug": "inconsolata",
+      "category": "sans-serif",
+      "roles": [
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Raph Levien",
+      "variable": true,
+      "axes": {
+        "wdth": [
+          50,
+          200
+        ],
+        "wght": [
+          200,
+          900
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/inconsolata",
+        "files": [
+          "Inconsolata[wdth,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Josefin Sans",
+      "slug": "josefin-sans",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Santiago Orozco",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          700
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/josefinsans",
+        "files": [
+          "JosefinSans[wght].ttf",
+          "JosefinSans-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Jost",
+      "slug": "jost",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Owen Earl",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/jost",
+        "files": [
+          "Jost[wght].ttf",
+          "Jost-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Kanit",
+      "slug": "kanit",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Cadson Demak",
+      "variable": false,
+      "axes": {},
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "thai",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/kanit",
+        "files": [
+          "Kanit-Thin.ttf",
+          "Kanit-ThinItalic.ttf",
+          "Kanit-ExtraLight.ttf",
+          "Kanit-ExtraLightItalic.ttf",
+          "Kanit-Light.ttf",
+          "Kanit-LightItalic.ttf",
+          "Kanit-Regular.ttf",
+          "Kanit-Italic.ttf",
+          "Kanit-Medium.ttf",
+          "Kanit-MediumItalic.ttf",
+          "Kanit-SemiBold.ttf",
+          "Kanit-SemiBoldItalic.ttf",
+          "Kanit-Bold.ttf",
+          "Kanit-BoldItalic.ttf",
+          "Kanit-ExtraBold.ttf",
+          "Kanit-ExtraBoldItalic.ttf",
+          "Kanit-Black.ttf",
+          "Kanit-BlackItalic.ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "League Spartan",
+      "slug": "league-spartan",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Matt Bailey, Tyler Finck",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/leaguespartan",
+        "files": [
+          "LeagueSpartan[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Lexend Deca",
+      "slug": "lexend-deca",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Bonnie Shaver-Troup, Thomas Jockin, Santiago Orozco, Héctor Gómez, Superunion",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/lexenddeca",
+        "files": [
+          "LexendDeca[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Libre Baskerville",
+      "slug": "libre-baskerville",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Impallari Type",
+      "variable": true,
+      "axes": {
+        "wght": [
+          400,
+          700
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/librebaskerville",
+        "files": [
+          "LibreBaskerville[wght].ttf",
+          "LibreBaskerville-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Mona Sans",
+      "slug": "mona-sans",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body",
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Tobias Bjerrome Ahlin, GitHub, Degarism Studio, Sebastian Carewe",
+      "variable": true,
+      "axes": {
+        "wdth": [
+          75,
+          125
+        ],
+        "wght": [
+          200,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/monasans",
+        "files": [
+          "MonaSans[wdth,wght].ttf",
+          "MonaSans-Italic[wdth,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Overpass",
+      "slug": "overpass",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Delve Withrington, Dave Bailey, Thomas Jockin",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/overpass",
+        "files": [
+          "Overpass[wght].ttf",
+          "Overpass-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Quicksand",
+      "slug": "quicksand",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Andrew Paglinawan",
+      "variable": true,
+      "axes": {
+        "wght": [
+          300,
+          700
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/quicksand",
+        "files": [
+          "Quicksand[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Roboto Flex",
+      "slug": "roboto-flex",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body",
+        "num"
+      ],
+      "licence": "OFL",
+      "designer": "Font Bureau, David Berlow, Santiago Orozco, Irene Vlachou, Ilya Ruderman, Yury Ostromentsky, Mikhail Strukov",
+      "variable": true,
+      "axes": {
+        "XOPQ": [
+          27,
+          175
+        ],
+        "XTRA": [
+          323,
+          603
+        ],
+        "YOPQ": [
+          25,
+          135
+        ],
+        "YTAS": [
+          649,
+          854
+        ],
+        "YTFI": [
+          560,
+          788
+        ],
+        "YTLC": [
+          416,
+          570
+        ],
+        "YTUC": [
+          528,
+          760
+        ],
+        "opsz": [
+          8,
+          144
+        ],
+        "wdth": [
+          25,
+          151
+        ],
+        "wght": [
+          100,
+          1000
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "cyrillic",
+        "cyrillic-ext",
+        "greek",
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/robotoflex",
+        "files": [
+          "RobotoFlex[GRAD,XOPQ,XTRA,YOPQ,YTAS,YTDE,YTFI,YTLC,YTUC,opsz,slnt,wdth,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Rethink Sans",
+      "slug": "rethink-sans",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Hans Thiessen",
+      "variable": true,
+      "axes": {
+        "wght": [
+          400,
+          800
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/rethinksans",
+        "files": [
+          "RethinkSans[wght].ttf",
+          "RethinkSans-Italic[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Spline Sans",
+      "slug": "spline-sans",
+      "category": "sans-serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Eben Sorkin, Mirko Velimirović",
+      "variable": true,
+      "axes": {
+        "wght": [
+          300,
+          700
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/splinesans",
+        "files": [
+          "SplineSans[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Young Serif",
+      "slug": "young-serif",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Bastien Sozeau",
+      "variable": false,
+      "axes": {},
+      "italic": false,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/youngserif",
+        "files": [
+          "YoungSerif-Regular.ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Gloock",
+      "slug": "gloock",
+      "category": "display",
+      "roles": [
+        "display"
+      ],
+      "licence": "OFL",
+      "designer": "Duarte Pinto",
+      "variable": false,
+      "axes": {},
+      "italic": false,
+      "subsets": [
+        "cyrillic-ext",
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/gloock",
+        "files": [
+          "Gloock-Regular.ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Instrument Serif",
+      "slug": "instrument-serif",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Rodrigo Fuenzalida, Jordan Egstad",
+      "variable": false,
+      "axes": {},
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/instrumentserif",
+        "files": [
+          "InstrumentSerif-Regular.ttf",
+          "InstrumentSerif-Italic.ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Bodoni Moda",
+      "slug": "bodoni-moda",
+      "category": "serif",
+      "roles": [
+        "display",
+        "body"
+      ],
+      "licence": "OFL",
+      "designer": "Owen Earl",
+      "variable": true,
+      "axes": {
+        "opsz": [
+          6,
+          96
+        ],
+        "wght": [
+          400,
+          900
+        ]
+      },
+      "italic": true,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "math",
+        "symbols"
+      ],
+      "googleFonts": {
+        "path": "ofl/bodonimoda",
+        "files": [
+          "BodoniModa[opsz,wght].ttf",
+          "BodoniModa-Italic[opsz,wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Petit Formal Script",
+      "slug": "petit-formal-script",
+      "category": "handwriting",
+      "roles": [
+        "display"
+      ],
+      "licence": "OFL",
+      "designer": "Impallari Type",
+      "variable": false,
+      "axes": {},
+      "italic": false,
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "googleFonts": {
+        "path": "ofl/petitformalscript",
+        "files": [
+          "PetitFormalScript-Regular.ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    },
+    {
+      "family": "Big Shoulders Text",
+      "slug": "big-shoulders-text",
+      "category": "display",
+      "roles": [
+        "display"
+      ],
+      "licence": "OFL",
+      "designer": "Patric King",
+      "variable": true,
+      "axes": {
+        "wght": [
+          100,
+          900
+        ]
+      },
+      "italic": false,
+      "subsets": [
+        "latin",
+        "latin-ext",
+        "vietnamese"
+      ],
+      "googleFonts": {
+        "path": "ofl/bigshoulderstext",
+        "files": [
+          "BigShouldersText[wght].ttf"
+        ]
+      },
+      "source": null,
+      "licenceFile": null,
+      "sourceSha256": null,
+      "sourceVersion": null,
+      "inUse": []
+    }
+  ],
+  "pairings": [
+    {
+      "id": "archivo-radio-canada",
+      "display": "Archivo",
+      "body": "Radio Canada",
+      "numeric": "Archivo",
+      "mood": "poster, pop-print, condensed display over a friendly grotesque (opalquestlounge)"
+    },
+    {
+      "id": "bricolage-instrument",
+      "display": "Bricolage Grotesque",
+      "body": "Instrument Sans",
+      "numeric": "Azeret Mono",
+      "mood": "editorial grotesque with ink traps"
+    },
+    {
+      "id": "fraunces-newsreader",
+      "display": "Fraunces",
+      "body": "Newsreader",
+      "numeric": "Red Hat Mono",
+      "mood": "soft old-style serif, bookish"
+    },
+    {
+      "id": "syne-figtree",
+      "display": "Syne",
+      "body": "Figtree",
+      "numeric": "JetBrains Mono",
+      "mood": "wide modern display, clean body"
+    },
+    {
+      "id": "playfair-source-serif",
+      "display": "Playfair Display",
+      "body": "Source Serif 4",
+      "mood": "high-contrast luxury serif"
+    },
+    {
+      "id": "unbounded-onest",
+      "display": "Unbounded",
+      "body": "Onest",
+      "numeric": "Martian Mono",
+      "mood": "rounded geometric, techno"
+    },
+    {
+      "id": "big-shoulders-public-sans",
+      "display": "Big Shoulders Display",
+      "body": "Public Sans",
+      "numeric": "IBM Plex Sans",
+      "mood": "industrial condensed, civic"
+    },
+    {
+      "id": "cormorant-lora",
+      "display": "Cormorant",
+      "body": "Lora",
+      "mood": "classical, hospitality"
+    },
+    {
+      "id": "epilogue-literata",
+      "display": "Epilogue",
+      "body": "Literata",
+      "numeric": "DM Sans",
+      "mood": "grotesque display over a reading serif"
+    },
+    {
+      "id": "anybody-karla",
+      "display": "Anybody",
+      "body": "Karla",
+      "numeric": "Space Mono",
+      "mood": "stretchy retro-futurist"
+    },
+    {
+      "id": "brygada-hanken",
+      "display": "Brygada 1918",
+      "body": "Hanken Grotesk",
+      "mood": "early-modern book serif, calm"
+    },
+    {
+      "id": "oxanium-exo",
+      "display": "Oxanium",
+      "body": "Exo 2",
+      "numeric": "Azeret Mono",
+      "mood": "arcade, sci-fi"
+    },
+    {
+      "id": "bodoni-crimson",
+      "display": "Bodoni Moda",
+      "body": "Crimson Pro",
+      "mood": "fashion, high contrast"
+    },
+    {
+      "id": "schibsted-merriweather",
+      "display": "Schibsted Grotesk",
+      "body": "Merriweather",
+      "numeric": "Red Hat Mono",
+      "mood": "newsroom"
+    },
+    {
+      "id": "tilt-warp-urbanist",
+      "display": "Tilt Warp",
+      "body": "Urbanist",
+      "numeric": "JetBrains Mono",
+      "mood": "playful 3-D display"
+    },
+    {
+      "id": "young-serif-albert",
+      "display": "Young Serif",
+      "body": "Albert Sans",
+      "mood": "warm vintage serif, Scandinavian sans"
+    },
+    {
+      "id": "noto-ka",
+      "display": "Noto Sans Georgian",
+      "body": "Noto Sans",
+      "mood": "Georgian + Latin (hotel-casino locales)"
+    },
+    {
+      "id": "noto-ar",
+      "display": "Noto Kufi Arabic",
+      "body": "Noto Naskh Arabic",
+      "mood": "Arabic display + reading (RTL)"
+    }
+  ]
+}

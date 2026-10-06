@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://studio.local/factory/schemas/direction.schema.json",
+  "title": "Concept direction",
+  "description": "The object a concept-designer returns (one of three per order) and that tools/uniqueness.mjs --pre and registry.mjs reserve --from-proposal consume (SPEC 4.7). Blocks reuse the order schema's $defs so a chosen direction merges into order.json unchanged. Per-type fields (currency/games for social-casino, catalogue positioning for online-games, visual direction only for hotel-casino) are refined by types/<type>/direction.schema.json when the pack ships one (MASTER-PLAN 4.5).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "seed", "concept", "palette", "typography", "structure", "copy", "forcing"],
+  "properties": {
+    "id": { "type": "string", "enum": ["A", "B", "C"] },
+    "type": { "type": "string", "enum": ["social-casino", "online-games", "hotel-casino"], "default": "social-casino" },
+    "variant": { "type": "string" },
+    "orderId": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,39}$" },
+    "seed": { "type": ["string", "integer"], "description": "The forcing tuple's seed; re-running concept-designer with the same seed and forcing must reproduce the direction's dimensions." },
+    "title": { "type": "string" },
+    "concept": { "$ref": "order.schema.json#/$defs/concept" },
+    "palette": { "$ref": "order.schema.json#/$defs/palette" },
+    "typography": { "$ref": "order.schema.json#/$defs/typography" },
+    "currency": { "$ref": "order.schema.json#/$defs/socialCasinoOptions/properties/currency" },
+    "games": {
+      "type": "object",
+      "required": ["house"],
+      "properties": {
+        "house": { "type": "array", "minItems": 3, "items": { "$ref": "order.schema.json#/$defs/houseGame" } },
+        "pragmatic": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "structure": { "$ref": "order.schema.json#/$defs/structure" },
+    "copy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["register", "heroH1", "tagline"],
+      "properties": {
+        "register": { "type": "string", "enum": ["plain", "warm", "precise", "dry-wit", "editorial"] },
+        "heroH1": { "type": "string", "minLength": 8, "maxLength": 90 },
+        "heroHighlight": { "type": "string", "maxLength": 40 },
+        "tagline": { "type": "string", "maxLength": 120 },
+        "buttons": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    },
+    "typeOptions": { "type": "object", "description": "Type-specific direction fields (catalogue positioning for online-games); validated by the pack overlay." },
+    "forcing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "displayFont", "bodyFont", "structureTuple", "register", "mustAddEngine", "requiresSignoff", "reason"],
+      "properties": {
+        "family": { "$ref": "order.schema.json#/$defs/family" },
+        "era": { "type": "string" },
+        "place": { "type": "string" },
+        "craft": { "type": "string" },
+        "displayFont": { "type": "string" },
+        "bodyFont": { "type": "string" },
+        "structureTuple": {
+          "type": "object",
+          "properties": {
+            "heroStyle": { "type": "string" },
+            "lobbyLayout": { "type": "string" },
+            "gamePageLayout": { "type": "string" },
+            "homeSections": { "type": "array", "items": { "type": "string" } },
+            "extraPages": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "register": { "type": "string" },
+        "mustAddEngine": { "type": "boolean" },
+        "requiresSignoff": { "type": "boolean" },
+        "reason": { "type": "string" }
+      }
+    },
+    "scores": {
+      "type": "object",
+      "properties": { "compliance": { "type": "number", "minimum": 0, "maximum": 1 }, "uniqueness": { "type": "number", "minimum": 0, "maximum": 1 } }
+    },
+    "pre": { "type": ["object", "null"], "description": "The tools/uniqueness.mjs --pre output for this direction (shape: SPEC 15.4 uniqueness.json)." }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "type": { "const": "social-casino" } } },
+      "then": { "required": ["currency", "games"] }
+    }
+  ]
+}

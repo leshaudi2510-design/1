@@ -1,0 +1,4 @@
+dist/
+dist-check/
+check-shots/
+site.config.check.json

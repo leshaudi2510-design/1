@@ -1,0 +1,1116 @@
+{
+ "capturedFrom": "opalquestlounge/tools/check.mjs @ 492dec5",
+ "passed": 277,
+ "failed": 0,
+ "seconds": 408,
+ "checks": [
+  {
+   "section": "Builds",
+   "name": "pragmatic build ends with \"Lint: no problems found.\""
+  },
+  {
+   "section": "Builds",
+   "name": "fallback build ends with \"Lint: no problems found.\""
+  },
+  {
+   "section": "Builds",
+   "name": "ga build ends with \"Lint: no problems found.\""
+  },
+  {
+   "section": "Pages at 360, 768 and 1440 px, both modes: no sideways scroll, no errors, nothing from other origins",
+   "name": "pragmatic: 23 pages at 360px: one h1, no sideways scroll, no console or page errors"
+  },
+  {
+   "section": "Pages at 360, 768 and 1440 px, both modes: no sideways scroll, no errors, nothing from other origins",
+   "name": "pragmatic: 23 pages at 768px: one h1, no sideways scroll, no console or page errors"
+  },
+  {
+   "section": "Pages at 360, 768 and 1440 px, both modes: no sideways scroll, no errors, nothing from other origins",
+   "name": "pragmatic: 23 pages at 1440px: one h1, no sideways scroll, no console or page errors"
+  },
+  {
+   "section": "Pages at 360, 768 and 1440 px, both modes: no sideways scroll, no errors, nothing from other origins",
+   "name": "pragmatic: no request to another origin on any page before interaction (69 page loads)"
+  },
+  {
+   "section": "Pages at 360, 768 and 1440 px, both modes: no sideways scroll, no errors, nothing from other origins",
+   "name": "pragmatic: nothing requested from *.pragmaticplay.net before Play is pressed"
+  },
+  {
+   "section": "Pages at 360, 768 and 1440 px, both modes: no sideways scroll, no errors, nothing from other origins",
+   "name": "fallback: 13 pages at 360px: one h1, no sideways scroll, no console or page errors"
+  },
+  {
+   "section": "Pages at 360, 768 and 1440 px, both modes: no sideways scroll, no errors, nothing from other origins",
+   "name": "fallback: 13 pages at 768px: one h1, no sideways scroll, no console or page errors"
+  },
+  {
+   "section": "Pages at 360, 768 and 1440 px, both modes: no sideways scroll, no errors, nothing from other origins",
+   "name": "fallback: 13 pages at 1440px: one h1, no sideways scroll, no console or page errors"
+  },
+  {
+   "section": "Pages at 360, 768 and 1440 px, both modes: no sideways scroll, no errors, nothing from other origins",
+   "name": "fallback: no request to another origin on any page before interaction (39 page loads)"
+  },
+  {
+   "section": "Pages at 360, 768 and 1440 px, both modes: no sideways scroll, no errors, nothing from other origins",
+   "name": "fallback: nothing requested from *.pragmaticplay.net before Play is pressed"
+  },
+  {
+   "section": "Home first screen on phones (both modes): the play control above the dock; demo credits by one name",
+   "name": "pragmatic 360×780: the hero's play control ends above the dock (612 ≤ 709 − 4)"
+  },
+  {
+   "section": "Home first screen on phones (both modes): the play control above the dock; demo credits by one name",
+   "name": "pragmatic 390×844: the hero's play control ends above the dock (638 ≤ 773 − 4)"
+  },
+  {
+   "section": "Home first screen on phones (both modes): the play control above the dock; demo credits by one name",
+   "name": "pragmatic: no page or script calls demo credits \"practice credits\" (51 files)"
+  },
+  {
+   "section": "Home first screen on phones (both modes): the play control above the dock; demo credits by one name",
+   "name": "fallback 360×780: the hero's play control ends above the dock (674 ≤ 709 − 4)"
+  },
+  {
+   "section": "Home first screen on phones (both modes): the play control above the dock; demo credits by one name",
+   "name": "fallback 390×844: the hero's play control ends above the dock (704 ≤ 773 − 4)"
+  },
+  {
+   "section": "Home first screen on phones (both modes): the play control above the dock; demo credits by one name",
+   "name": "fallback: no page or script calls demo credits \"practice credits\" (39 files)"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): idle, with Play shown, no iframe and nothing asked of Pragmatic Play"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): fullscreen is aria-disabled before the demo loads"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): loading: focus moves to Close demo and fullscreen stays aria-disabled"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): Play creates exactly one iframe and the stage becomes ready"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): iframe src has gameSymbol, lang=en, cur=FUN, jurisdiction=UK and websiteUrl"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): iframe loads from Pragmatic Play's demo host"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): iframe allow includes fullscreen"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): iframe has a title"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): ready: focus is on Close demo"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): fullscreen is enabled once ready"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): the status region says the demo opened"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): the stage keeps its height from idle through loading to ready"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): Close demo returns to idle, removes the iframe and puts focus back on Play"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): omni-api.goTo from our own origin is ignored"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): the demo's {\"action\":\"omni-api.goTo\",\"actionData\":\"lobby\"} message closes it"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): a 5-minute break removes the iframe and shows the blocked state"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): closing Settings returns focus to the page"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): focus never fell to <body>"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): no console or page errors"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ (vs20olympgate): no other origin contacted"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): idle, with Play shown, no iframe and nothing asked of Pragmatic Play"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): fullscreen is aria-disabled before the demo loads"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): loading: focus moves to Close demo and fullscreen stays aria-disabled"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): Play creates exactly one iframe and the stage becomes ready"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): iframe src has gameSymbol, lang=en, cur=FUN, jurisdiction=UK and websiteUrl"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): iframe loads from Pragmatic Play's demo host"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): iframe allow includes fullscreen"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): iframe has a title"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): ready: focus is on Close demo"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): fullscreen is enabled once ready"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): the status region says the demo opened"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): the stage keeps its height from idle through loading to ready"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): Close demo returns to idle, removes the iframe and puts focus back on Play"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): omni-api.goTo from our own origin is ignored"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): the demo's {\"action\":\"omni-api.goTo\",\"actionData\":\"lobby\"} message closes it"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): a 5-minute break removes the iframe and shows the blocked state"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): closing Settings returns focus to the page"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): focus never fell to <body>"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): no console or page errors"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/ (vs20olympgate): no other origin contacted"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): idle, with Play shown, no iframe and nothing asked of Pragmatic Play"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): fullscreen is aria-disabled before the demo loads"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): loading: focus moves to Close demo and fullscreen stays aria-disabled"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): Play creates exactly one iframe and the stage becomes ready"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): iframe src has gameSymbol, lang=en, cur=FUN, jurisdiction=UK and websiteUrl"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): iframe loads from Pragmatic Play's demo host"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): iframe allow includes fullscreen"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): iframe has a title"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): ready: focus is on Close demo"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): fullscreen is enabled once ready"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): the status region says the demo opened"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): the stage keeps its height from idle through loading to ready"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): Close demo returns to idle, removes the iframe and puts focus back on Play"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): omni-api.goTo from our own origin is ignored"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): the demo's {\"action\":\"omni-api.goTo\",\"actionData\":\"lobby\"} message closes it"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): a 5-minute break removes the iframe and shows the blocked state"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): closing Settings returns focus to the page"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): focus never fell to <body>"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): no console or page errors"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/big-bass-bonanza/ (vs10bbbonanza): no other origin contacted"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): idle, with Play shown, no iframe and nothing asked of Pragmatic Play"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): fullscreen is aria-disabled before the demo loads"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): loading: focus moves to Close demo and fullscreen stays aria-disabled"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): Play creates exactly one iframe and the stage becomes ready"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): iframe src has gameSymbol, lang=en, cur=FUN, jurisdiction=UK and websiteUrl"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): iframe loads from Pragmatic Play's demo host"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): iframe allow includes fullscreen"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): iframe has a title"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): ready: focus is on Close demo"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): fullscreen is enabled once ready"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): the status region says the demo opened"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): the stage keeps its height from idle through loading to ready"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): Close demo returns to idle, removes the iframe and puts focus back on Play"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): omni-api.goTo from our own origin is ignored"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): the demo's {\"action\":\"omni-api.goTo\",\"actionData\":\"lobby\"} message closes it"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): a 5-minute break removes the iframe and shows the blocked state"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): closing Settings returns focus to the page"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): focus never fell to <body>"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): no console or page errors"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/wolf-gold/ (vs25wolfgold): no other origin contacted"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "Play is blocked with the age not confirmed, even when clicked by script"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "answering \"Yes\" to the age question opens the stage"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "no console or page errors with the age not confirmed"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "Play is blocked after answering \"No\" to the age question, even when clicked by script"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "no console or page errors after answering \"No\" to the age question"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/: the stage is named by the game and described by its caption, which describes Play too: the demo and Google Analytics inside it may set cookies (linked to /cookies/#third-party)"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/: the stage links nowhere on Pragmatic Play's site (a demo there would escape the limits and breaks)"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/: the stage is named by the game and described by its caption, which describes Play too: the demo and Google Analytics inside it may set cookies (linked to /cookies/#third-party)"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/gates-of-olympus/: the stage links nowhere on Pragmatic Play's site (a demo there would escape the limits and breaks)"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "failed when the connection is refused: no iframe, \"Try again\" shown with focus, and the status says so"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "failed when a filter blocks the host: no iframe, \"Try again\" shown with focus, and the status says so"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "failed when the host redirects somewhere the CSP does not allow: no iframe, \"Try again\" shown with focus, and the status says so"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "failed when the browser is offline: no iframe, \"Try again\" shown with focus, and the status says so"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "Cookie settings say what the demos may set and what \"Reject all\" does to them"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "\"Reject all\" is kept (demos: false) and confirmed with \"Saved.\""
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "after \"Reject all\", Play asks first (focus on \"Don’t load it\") and nothing has been asked of Pragmatic Play"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "\"Don’t load it\" leaves the stage idle, with focus back on Play and no request made"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "\"Load demo and allow its cookies\" loads it, with focus on Close demo"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "no console or page errors around \"Reject all\" and the demo"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "expanded stage: the fullscreen button keeps the name \"Fullscreen\" and is pressed"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "expanded stage: Tab from fullscreen goes through the game and back round to Close demo, never leaving the stage"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "expanded stage: Shift+Tab from Close demo wraps to the game"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "expanded stage: Escape on our controls leaves it, with focus on the fullscreen button"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "no console or page errors in the expanded stage"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "reality check over a demo, \"break\" with focus on Close demo: focus ends on \"About breaks and limits\""
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "reality check over a demo, \"break\" with focus in the game: focus ends on \"About breaks and limits\""
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "reality check over a demo, \"continue\" with focus in the game: focus ends on the game"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "reality check over a demo, Escape with focus in the game: focus ends on the game"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ at 390px: the stage doesn't jump when Play is pressed"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/zeus-vs-hades-gods-of-war/ at 390px: the stage doesn't jump when Play is pressed"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/ at 1024px: the stage doesn't jump when Play is pressed"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "/games/zeus-vs-hades-gods-of-war/ at 1024px: the stage doesn't jump when Play is pressed"
+  },
+  {
+   "section": "Pragmatic Play demo stage (host stubbed)",
+   "name": "Night: \"Close demo\" on the home stage has the same border and shadow as on a game page"
+  },
+  {
+   "section": "Keyboard-only play",
+   "name": "wheel: arrows move around the board, Enter places chips, Backspace lifts one"
+  },
+  {
+   "section": "Keyboard-only play",
+   "name": "wheel: S spins, and the result is announced in a polite live region"
+  },
+  {
+   "section": "Keyboard-only play",
+   "name": "wheel: focus stays in the game"
+  },
+  {
+   "section": "Keyboard-only play",
+   "name": "wheel: focus never fell to <body>, no errors"
+  },
+  {
+   "section": "Keyboard-only play",
+   "name": "twenty-one: four hands dealt and played by keyboard (D, H, S)"
+  },
+  {
+   "section": "Keyboard-only play",
+   "name": "twenty-one: focus is back on Deal after the last hand"
+  },
+  {
+   "section": "Keyboard-only play",
+   "name": "twenty-one: S pressed in the pause after a hand-ending hit is ignored; the hand settles once"
+  },
+  {
+   "section": "Keyboard-only play",
+   "name": "twenty-one: focus never fell to <body>, no errors"
+  },
+  {
+   "section": "Keyboard-only play",
+   "name": "slot: 3 picks the third stake, then three spins by keyboard with focus kept on Spin"
+  },
+  {
+   "section": "Keyboard-only play",
+   "name": "slot: focus never fell to <body>, no errors"
+  },
+  {
+   "section": "Our tables: the betting board, the Twenty-One canvas, Space, stake focus and locks mid-round",
+   "name": "wheel: the dozen and even-money bets line up with the number columns (1440, 1024, 768 px) and sit three across on a phone (390 px)"
+  },
+  {
+   "section": "Our tables: the betting board, the Twenty-One canvas, Space, stake focus and locks mid-round",
+   "name": "twenty-one: no layout shift when the game starts (390, 600, 1280 px), and the table is drawn at its box's shape"
+  },
+  {
+   "section": "Our tables: the betting board, the Twenty-One canvas, Space, stake focus and locks mid-round",
+   "name": "slot (slot page): Space activates Spin, Paytable and Close; S still spins"
+  },
+  {
+   "section": "Our tables: the betting board, the Twenty-One canvas, Space, stake focus and locks mid-round",
+   "name": "slot (home hero): Space activates Spin, Paytable and Close; S still spins"
+  },
+  {
+   "section": "Our tables: the betting board, the Twenty-One canvas, Space, stake focus and locks mid-round",
+   "name": "slot page: with focus on a stake, S plays, focus stays off <body>, the stake holds mid-round and S plays again"
+  },
+  {
+   "section": "Our tables: the betting board, the Twenty-One canvas, Space, stake focus and locks mid-round",
+   "name": "home hero: with focus on a stake, S plays, focus stays off <body>, the stake holds mid-round and S plays again"
+  },
+  {
+   "section": "Our tables: the betting board, the Twenty-One canvas, Space, stake focus and locks mid-round",
+   "name": "twenty-one: with focus on a stake, D plays, focus stays off <body>, the stake holds mid-round and D plays again"
+  },
+  {
+   "section": "Our tables: the betting board, the Twenty-One canvas, Space, stake focus and locks mid-round",
+   "name": "wheel, mid-spin: a daily limit reached then leaves the round's result in place, with the reason after it"
+  },
+  {
+   "section": "Our tables: the betting board, the Twenty-One canvas, Space, stake focus and locks mid-round",
+   "name": "slot, mid-spin: a daily limit reached then leaves the round's result in place, with the reason after it"
+  },
+  {
+   "section": "Our tables: the betting board, the Twenty-One canvas, Space, stake focus and locks mid-round",
+   "name": "twenty-one, mid-hand: a daily limit reached then leaves the round's result in place, with the reason after it"
+  },
+  {
+   "section": "Our tables: the betting board, the Twenty-One canvas, Space, stake focus and locks mid-round",
+   "name": "slot, just after a spin: a daily limit reached then leaves the round's result in place, with the reason after it"
+  },
+  {
+   "section": "Lobby filters on /games/",
+   "name": "pragmatic: starts on All with every tile shown (all, tumble, megaways, freespins, table)"
+  },
+  {
+   "section": "Lobby filters on /games/",
+   "name": "pragmatic: \"tumble\" chip pressed: tiles, groups and the live count follow its tag"
+  },
+  {
+   "section": "Lobby filters on /games/",
+   "name": "pragmatic: \"megaways\" chip pressed: tiles, groups and the live count follow its tag (reached with the arrow key)"
+  },
+  {
+   "section": "Lobby filters on /games/",
+   "name": "pragmatic: \"freespins\" chip pressed: tiles, groups and the live count follow its tag"
+  },
+  {
+   "section": "Lobby filters on /games/",
+   "name": "pragmatic: \"table\" chip pressed: tiles, groups and the live count follow its tag (reached with the arrow key)"
+  },
+  {
+   "section": "Lobby filters on /games/",
+   "name": "pragmatic: pressing the pressed chip again goes back to All"
+  },
+  {
+   "section": "Lobby filters on /games/",
+   "name": "pragmatic: no errors on the lobby"
+  },
+  {
+   "section": "Lobby filters on /games/",
+   "name": "fallback: starts on All with every tile shown (all, table)"
+  },
+  {
+   "section": "Lobby filters on /games/",
+   "name": "fallback: \"table\" chip pressed: tiles, groups and the live count follow its tag"
+  },
+  {
+   "section": "Lobby filters on /games/",
+   "name": "fallback: pressing the pressed chip again goes back to All"
+  },
+  {
+   "section": "Lobby filters on /games/",
+   "name": "fallback: no errors on the lobby"
+  },
+  {
+   "section": "Lobby on /games/: nav and dock links into a group the filter has hidden",
+   "name": "pragmatic: \"tumble\" chip, then the nav's Table games: #tables is shown and scrolled to, and the filter is back on All (\"Showing all 13 games\")"
+  },
+  {
+   "section": "Lobby on /games/: nav and dock links into a group the filter has hidden",
+   "name": "pragmatic: \"tumble\" chip, then Table games again with #tables already in the address: #tables is shown and scrolled to, and the filter is back on All (\"Showing all 13 games\")"
+  },
+  {
+   "section": "Lobby on /games/: nav and dock links into a group the filter has hidden",
+   "name": "pragmatic: \"table\" chip, then Enter on the nav's Slots: #slots is shown and scrolled to, and the filter is back on All (\"Showing all 13 games\")"
+  },
+  {
+   "section": "Lobby on /games/: nav and dock links into a group the filter has hidden",
+   "name": "pragmatic: \"tumble\" chip, then Back to #tables: #tables is shown and scrolled to, and the filter is back on All (\"Showing all 13 games\")"
+  },
+  {
+   "section": "Lobby on /games/: nav and dock links into a group the filter has hidden",
+   "name": "pragmatic: Back from a game page to /games/#tables keeps the \"tumble\" filter"
+  },
+  {
+   "section": "Lobby on /games/: nav and dock links into a group the filter has hidden",
+   "name": "pragmatic: no errors"
+  },
+  {
+   "section": "Lobby on /games/: nav and dock links into a group the filter has hidden",
+   "name": "pragmatic 390px: \"tumble\" chip, then the dock's Tables: #tables is shown and scrolled to"
+  },
+  {
+   "section": "Lobby on /games/: nav and dock links into a group the filter has hidden",
+   "name": "fallback: \"table\" chip, then the nav's Slots: #slots is shown and scrolled to, and the filter is back on All (\"Showing all 3 games\")"
+  },
+  {
+   "section": "Lobby on /games/: nav and dock links into a group the filter has hidden",
+   "name": "fallback: \"table\" chip, then Slots again with #slots already in the address: #slots is shown and scrolled to, and the filter is back on All (\"Showing all 3 games\")"
+  },
+  {
+   "section": "Lobby on /games/: nav and dock links into a group the filter has hidden",
+   "name": "fallback: \"table\" chip, then Enter on the nav's Slots: #slots is shown and scrolled to, and the filter is back on All (\"Showing all 3 games\")"
+  },
+  {
+   "section": "Lobby on /games/: nav and dock links into a group the filter has hidden",
+   "name": "fallback: the nav's Table games: #tables is shown and scrolled to, and the filter is back on All (\"Showing all 3 games\")"
+  },
+  {
+   "section": "Lobby on /games/: nav and dock links into a group the filter has hidden",
+   "name": "fallback: \"table\" chip, then Back to #slots: #slots is shown and scrolled to, and the filter is back on All (\"Showing all 3 games\")"
+  },
+  {
+   "section": "Lobby on /games/: nav and dock links into a group the filter has hidden",
+   "name": "fallback: Back from a game page to /games/#slots keeps the \"table\" filter"
+  },
+  {
+   "section": "Lobby on /games/: nav and dock links into a group the filter has hidden",
+   "name": "fallback: no errors"
+  },
+  {
+   "section": "Lobby on /games/: nav and dock links into a group the filter has hidden",
+   "name": "fallback 390px: \"table\" chip, then the dock's Slots: #slots is shown and scrolled to"
+  },
+  {
+   "section": "Lobby layout on / and /games/, 320–1440 px in 1 px steps: whole tags, bodies inside tiles, rows that close",
+   "name": "fallback /games/: 1,121 widths: every tag whole, every tile body inside its tile, every row closed"
+  },
+  {
+   "section": "Lobby layout on / and /games/, 320–1440 px in 1 px steps: whole tags, bodies inside tiles, rows that close",
+   "name": "pragmatic /games/: 1,121 widths: every tag whole, every tile body inside its tile, every row closed"
+  },
+  {
+   "section": "Lobby layout on / and /games/, 320–1440 px in 1 px steps: whole tags, bodies inside tiles, rows that close",
+   "name": "fallback /: 1,121 widths: every tag whole, every tile body inside its tile, every row closed"
+  },
+  {
+   "section": "Lobby layout on / and /games/, 320–1440 px in 1 px steps: whole tags, bodies inside tiles, rows that close",
+   "name": "pragmatic /: 1,121 widths: every tag whole, every tile body inside its tile, every row closed"
+  },
+  {
+   "section": "Consent with a test GA4 ID",
+   "name": "the cookie banner shows on the first visit"
+  },
+  {
+   "section": "Consent with a test GA4 ID",
+   "name": "Consent Mode v2 defaults are all \"denied\" (7 signals)"
+  },
+  {
+   "section": "Consent with a test GA4 ID",
+   "name": "nothing from Google (or anyone else) before a choice"
+  },
+  {
+   "section": "Consent with a test GA4 ID",
+   "name": "no cookies before a choice"
+  },
+  {
+   "section": "Consent with a test GA4 ID",
+   "name": "\"Reject all\" and \"Accept all\" carry equal visual weight in the banner"
+  },
+  {
+   "section": "Consent with a test GA4 ID",
+   "name": "nothing loads after \"Reject all\""
+  },
+  {
+   "section": "Consent with a test GA4 ID",
+   "name": "\"Reject all\" and \"Accept all\" carry equal visual weight in Cookie settings"
+  },
+  {
+   "section": "Consent with a test GA4 ID",
+   "name": "gtag.js loads only after \"Accept all\""
+  },
+  {
+   "section": "Consent with a test GA4 ID",
+   "name": "no other origin contacted"
+  },
+  {
+   "section": "Consent with a test GA4 ID",
+   "name": "no console or page errors"
+  },
+  {
+   "section": "Consent with a test GA4 ID",
+   "name": "1280px: the cookie banner comes first in the Tab order and never covers a focused control"
+  },
+  {
+   "section": "Consent with a test GA4 ID",
+   "name": "1280px: \"Reject all\" in the banner hides it, moves focus to the content and says what was saved"
+  },
+  {
+   "section": "Consent with a test GA4 ID",
+   "name": "1280px: \"Save choices\" in Manage (opened from the banner) moves focus to the content, not <body>"
+  },
+  {
+   "section": "Consent with a test GA4 ID",
+   "name": "390px: the cookie banner comes first in the Tab order and never covers a focused control"
+  },
+  {
+   "section": "Consent with a test GA4 ID",
+   "name": "390px: \"Reject all\" in the banner hides it, moves focus to the content and says what was saved"
+  },
+  {
+   "section": "Consent with a test GA4 ID",
+   "name": "390px: \"Save choices\" in Manage (opened from the banner) moves focus to the content, not <body>"
+  },
+  {
+   "section": "Dialogs",
+   "name": "1280px: Settings opens from the header, with focus inside it"
+  },
+  {
+   "section": "Dialogs",
+   "name": "1280px: Settings is centred"
+  },
+  {
+   "section": "Dialogs",
+   "name": "1280px: a 15-minute reality check is kept after a reload"
+  },
+  {
+   "section": "Dialogs",
+   "name": "1280px: a 60-minute reality check is kept after a reload"
+  },
+  {
+   "section": "Dialogs",
+   "name": "1280px: a 30-minute reality check is kept after a reload"
+  },
+  {
+   "section": "Dialogs",
+   "name": "1280px: Reset asks first, names the action, and starts on \"Keep my balance\""
+  },
+  {
+   "section": "Dialogs",
+   "name": "1280px: Escape keeps the balance and leaves Settings open"
+  },
+  {
+   "section": "Dialogs",
+   "name": "1280px: Shift+Tab, Enter on \"Reset to 1,000 Carats\" resets the balance"
+  },
+  {
+   "section": "Dialogs",
+   "name": "1280px: no native dialogs, console or page errors"
+  },
+  {
+   "section": "Dialogs",
+   "name": "390px: Settings opens from the dock, with focus inside it"
+  },
+  {
+   "section": "Dialogs",
+   "name": "390px: Settings is a centred card inside the screen"
+  },
+  {
+   "section": "Dialogs",
+   "name": "390px: a 15-minute reality check is kept after a reload"
+  },
+  {
+   "section": "Dialogs",
+   "name": "390px: a 60-minute reality check is kept after a reload"
+  },
+  {
+   "section": "Dialogs",
+   "name": "390px: a 30-minute reality check is kept after a reload"
+  },
+  {
+   "section": "Dialogs",
+   "name": "390px: Reset asks first, names the action, and starts on \"Keep my balance\""
+  },
+  {
+   "section": "Dialogs",
+   "name": "390px: Escape keeps the balance and leaves Settings open"
+  },
+  {
+   "section": "Dialogs",
+   "name": "390px: Shift+Tab, Enter on \"Reset to 1,000 Carats\" resets the balance"
+  },
+  {
+   "section": "Dialogs",
+   "name": "390px: no native dialogs, console or page errors"
+  },
+  {
+   "section": "Dialogs",
+   "name": "a confirmation asked again at once gets its own answer (a stale close event does not settle it)"
+  },
+  {
+   "section": "Dialogs",
+   "name": "the age question opens on the first visit, with focus inside it"
+  },
+  {
+   "section": "Dialogs",
+   "name": "Escape does not skip the age question"
+  },
+  {
+   "section": "Dialogs",
+   "name": "closed without an answer: nothing is stored, the stage stays locked and offers \"Confirm my age\""
+  },
+  {
+   "section": "Dialogs",
+   "name": "\"Confirm my age\" asks the question again, with focus inside it"
+  },
+  {
+   "section": "Dialogs",
+   "name": "answering \"Yes\" then opens the stage, with focus on Play"
+  },
+  {
+   "section": "Dialogs",
+   "name": "once answered, the age question is not asked again"
+  },
+  {
+   "section": "Dialogs",
+   "name": "no console or page errors around the age question"
+  },
+  {
+   "section": "Dialogs",
+   "name": "after \"No\", no \"Confirm my age\" is shown, and even a scripted click on it doesn't reopen the question"
+  },
+  {
+   "section": "Dialogs",
+   "name": "pragmatic /games/lapidary-wheel/: closed unanswered, the table offers \"Confirm my age\", which asks again; once answered it goes, and focus stays in the game"
+  },
+  {
+   "section": "Dialogs",
+   "name": "fallback /: closed unanswered, the table offers \"Confirm my age\", which asks again; once answered it goes, and focus stays in the game"
+  },
+  {
+   "section": "Preferences: reduced motion and the dark theme",
+   "name": "pragmatic: reduced motion: a wheel spin settles at once"
+  },
+  {
+   "section": "Preferences: reduced motion and the dark theme",
+   "name": "pragmatic: no errors with reduced motion"
+  },
+  {
+   "section": "Preferences: reduced motion and the dark theme",
+   "name": "pragmatic: the dark theme (device setting) loads cleanly on 5 pages"
+  },
+  {
+   "section": "Preferences: reduced motion and the dark theme",
+   "name": "pragmatic: Night chosen in Settings on a light device is kept after a reload"
+  },
+  {
+   "section": "Preferences: reduced motion and the dark theme",
+   "name": "fallback: reduced motion: a wheel spin settles at once"
+  },
+  {
+   "section": "Preferences: reduced motion and the dark theme",
+   "name": "fallback: no errors with reduced motion"
+  },
+  {
+   "section": "Preferences: reduced motion and the dark theme",
+   "name": "fallback: the dark theme (device setting) loads cleanly on 5 pages"
+  },
+  {
+   "section": "Preferences: reduced motion and the dark theme",
+   "name": "fallback: Night chosen in Settings on a light device is kept after a reload"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "/games/gates-of-olympus/: a 5-minute break locks the game, and 5 minutes later it opens again by itself with a toast"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "/games/gates-of-olympus/: no errors while the break runs out"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "/games/lapidary-wheel/: a 5-minute break locks the game, and 5 minutes later it opens again by itself with a toast"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "/games/lapidary-wheel/: no errors while the break runs out"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "a daily limit reached before midnight lifts at midnight in an open tab, with no reload"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "the next day, reaching the limit again closes the open demo"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "no errors around midnight"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "Settings: arrowing to \"2 hours\" saves nothing, and the button says what saving will do"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "Settings: \"Save limit\" applies 2 hours a day"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "Settings: arrowing up to \"No limit\" and closing unsaved keeps 2 hours; reopening shows it"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "Settings: \"Take a 5-minute break\" is confirmed in a status line inside the dialog (not the inert toast)"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "no errors in Settings"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "/responsible-gaming/: \"Today\" keeps counting, and a limit set in Settings shows in the sentence, the pill and the form"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "the header fits 1,234,567 Carats (\"1.23M\", read out in full) and a 10-hour session from 320 to 460px"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "pragmatic 390×844: no Tab stop is hidden under the dock (204 stops on 4 pages)"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "pragmatic 640×400: no Tab stop is hidden under the dock (204 stops on 4 pages)"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "fallback 390×844: no Tab stop is hidden under the dock (170 stops on 4 pages)"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "320×256: the dock scrolls with the page and the sticky header is compact"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "with WCAG 1.4.12 text spacing the header fits at 1024–1366px and Settings stays on screen"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "Night: the current nav item’s marker sits under the text, not across its descenders"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "the age question opens before app.js loads, starts on the question, and a \"Yes\" pressed that early is saved once app.js runs"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "no errors when the age question is answered early"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "the age question shows its disclaimer at 320×256, and \"No\" focuses its explanation in view at 844×390"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "pragmatic: with JavaScript off, the notice is on the first screen of 6 pages and no dead button shows"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "fallback: with JavaScript off, the notice is on the first screen of 6 pages and no dead button shows"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "with the web fonts held back 1.2 s, CLS stays under 0.05 on 3 pages at 390 and 1440px"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "the reality check says demo credits aren’t counted only when the Pragmatic Play demos are on"
+  },
+  {
+   "section": "Site chrome: the header, the dock, Settings, breaks and limits over time, the age question, no JavaScript",
+   "name": "no console warnings or errors when a demo loads"
+  },
+  {
+   "section": "axe-core: WCAG 2.2 AA and best practice, both themes, 1440 and 390 px",
+   "name": "no violations in 168 axe runs"
+  },
+  {
+   "section": "Offline: the saved copy of the home page, our own games, the safer-play tools and the page a visitor landed on",
+   "name": "pragmatic: the service worker saves /, /responsible-gaming/, /games/lapidary-wheel/, /games/brilliant-twenty-one/, /offline/ and the landing page /about/"
+  },
+  {
+   "section": "Offline: the saved copy of the home page, our own games, the safer-play tools and the page a visitor landed on",
+   "name": "pragmatic: offline, 6 pages load from the saved copy and our games start, with no errors"
+  },
+  {
+   "section": "Offline: the saved copy of the home page, our own games, the safer-play tools and the page a visitor landed on",
+   "name": "pragmatic: offline, an unvisited page (/games/wolf-gold/) shows the offline page"
+  },
+  {
+   "section": "Offline: the saved copy of the home page, our own games, the safer-play tools and the page a visitor landed on",
+   "name": "fallback: the service worker saves /, /responsible-gaming/, /games/seven-systems/, /games/lapidary-wheel/, /games/brilliant-twenty-one/, /offline/ and the landing page /about/"
+  },
+  {
+   "section": "Offline: the saved copy of the home page, our own games, the safer-play tools and the page a visitor landed on",
+   "name": "fallback: offline, 7 pages load from the saved copy and our games start, with no errors"
+  },
+  {
+   "section": "Offline: the saved copy of the home page, our own games, the safer-play tools and the page a visitor landed on",
+   "name": "fallback: offline, an unvisited page (/contact/) shows the offline page"
+  },
+  {
+   "section": "Deploys: a returning visitor runs the new scripts and styles from the first view, with or without the service worker",
+   "name": "the changed copy of the project builds"
+  },
+  {
+   "section": "Deploys: a returning visitor runs the new scripts and styles from the first view, with or without the service worker",
+   "name": "a changed script and stylesheet give new asset and service worker versions (vb972cd2f14 → v7cf6774b5a)"
+  },
+  {
+   "section": "Deploys: a returning visitor runs the new scripts and styles from the first view, with or without the service worker",
+   "name": "a config-only change (contactEndpoint) gives new asset and service worker versions (vb972cd2f14 → v156acef73f)"
+  },
+  {
+   "section": "Deploys: a returning visitor runs the new scripts and styles from the first view, with or without the service worker",
+   "name": "before the deploy: the service worker is in control and has saved the site"
+  },
+  {
+   "section": "Deploys: a returning visitor runs the new scripts and styles from the first view, with or without the service worker",
+   "name": "after a deploy, with the service worker: the new stylesheet and scripts from the first view, in the same tab and a new one, with no errors"
+  },
+  {
+   "section": "Deploys: a returning visitor runs the new scripts and styles from the first view, with or without the service worker",
+   "name": "after a deploy, without a service worker (HTTP cache only): the new stylesheet and scripts from the first view, in the same tab and a new one, with no errors"
+  }
+ ]
+}

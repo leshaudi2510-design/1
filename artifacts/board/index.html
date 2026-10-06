@@ -1,0 +1,571 @@
+<title>Site Factory Board</title>
+<meta name="description" content="Operator board for the site factory: every order and site by stage, the latest events, gates and capacity.">
+<style>
+/* Layout: a production-floor board. Header + capacity strip + events strip on top, then the stage Kanban
+   (horizontal on wide screens, stacked on phones); clicking a card opens the site drawer. */
+:root {
+  --bg: #e9eeec;          /* floor: cool grey with a green bias */
+  --surface: #fbfcfb;     /* job tickets */
+  --surface-2: #f1f4f3;   /* column wells */
+  --ink: #15201d;
+  --muted: #5b6965;
+  --line: #c9d2cf;
+  --accent: #1d5bc8;      /* signal blue: links, focus, selection */
+  --accent-ink: #ffffff;
+  --ok: #1f7a4c;
+  --warn: #a35c00;
+  --red: #b42318;
+  --info: #49606b;
+  --ok-bg: #e2f2e9;
+  --warn-bg: #fbeed9;
+  --red-bg: #fbe4e1;
+  --info-bg: #e5ecef;
+  --t-social: #9a2b6a;    /* type chips */
+  --t-games: #0f6e73;
+  --t-hotel: #7a5a12;
+  --shadow: 0 1px 0 rgba(21, 32, 29, .06), 0 2px 8px rgba(21, 32, 29, .06);
+  --scrim: rgba(12, 18, 16, .42);
+  --font-ui: ui-sans-serif, "Segoe UI", "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+  --font-data: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  --r: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1514; --surface: #182120; --surface-2: #131b1a; --ink: #e4ebe8; --muted: #93a29d; --line: #2b3734;
+    --accent: #7ea8ff; --accent-ink: #0b1220; --ok: #5cc98f; --warn: #f0b155; --red: #ff8a7e; --info: #9bb3be;
+    --ok-bg: #173226; --warn-bg: #3a2a12; --red-bg: #3d1c19; --info-bg: #1d2a30;
+    --t-social: #f08cc4; --t-games: #6fd3d8; --t-hotel: #e6c26e;
+    --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 2px 10px rgba(0, 0, 0, .25); --scrim: rgba(0, 0, 0, .6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1514; --surface: #182120; --surface-2: #131b1a; --ink: #e4ebe8; --muted: #93a29d; --line: #2b3734;
+  --accent: #7ea8ff; --accent-ink: #0b1220; --ok: #5cc98f; --warn: #f0b155; --red: #ff8a7e; --info: #9bb3be;
+  --ok-bg: #173226; --warn-bg: #3a2a12; --red-bg: #3d1c19; --info-bg: #1d2a30;
+  --t-social: #f08cc4; --t-games: #6fd3d8; --t-hotel: #e6c26e;
+  --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 2px 10px rgba(0, 0, 0, .25); --scrim: rgba(0, 0, 0, .6);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 14px/1.45 var(--font-ui); margin: 0; }
+.page { padding-inline: 16px; padding-block: 16px 40px; max-width: 1680px; margin: 0 auto; display: grid; gap: 16px; }
+a { color: var(--accent); }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.mono, .num { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+.label { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+
+/* header */
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.brand { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.brand h1 { margin: 0; font-size: 20px; letter-spacing: -.01em; text-wrap: balance; }
+.brand .mono { color: var(--muted); font-size: 12px; }
+.top .spacer { flex: 1 1 auto; }
+.pill { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-size: 12px; background: var(--surface); white-space: nowrap; }
+.pill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.pill[data-state="live"] .dot { background: var(--ok); }
+.pill[data-state="demo"] .dot { background: var(--warn); }
+.pill[data-state="error"] .dot { background: var(--red); }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.chipbtn { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 3px 10px; font-size: 12px; cursor: pointer; }
+.chipbtn[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.iconbtn { border: 1px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 4px 10px; font-size: 12px; cursor: pointer; }
+
+.banner { border: 1px dashed var(--warn); background: var(--warn-bg); border-radius: var(--r); padding: 8px 12px; font-size: 13px; }
+
+/* capacity strip */
+.capacity { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.cap { background: var(--surface); padding: 10px 12px; display: grid; gap: 2px; min-width: 0; align-content: start; }
+@media (min-width: 721px) { .capacity { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 1280px) { .capacity { grid-template-columns: repeat(8, 1fr); } }
+.cap .v { font-family: var(--font-data); font-variant-numeric: tabular-nums; font-size: 22px; font-weight: 600; line-height: 1.1; }
+.cap .v small { font-size: 13px; color: var(--muted); font-weight: 400; }
+.cap .s { font-size: 12px; color: var(--muted); }
+.cap[data-tone="warn"] .v { color: var(--warn); }
+.cap[data-tone="red"] .v { color: var(--red); }
+
+/* events strip */
+.events { display: grid; gap: 8px; }
+.events-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.events-head h2 { margin: 0; font-size: 13px; }
+.strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x proximity; }
+.ev { flex: 0 0 auto; width: min(300px, 80vw); background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--info); border-radius: var(--r); padding: 8px 10px; scroll-snap-align: start; display: grid; gap: 3px; }
+.ev[data-sev="red"] { border-left-color: var(--red); }
+.ev[data-sev="warn"] { border-left-color: var(--warn); }
+.ev[data-sev="green"] { border-left-color: var(--ok); }
+.ev .meta { display: flex; gap: 8px; font-size: 11px; color: var(--muted); font-family: var(--font-data); }
+.ev .txt { font-size: 13px; overflow-wrap: anywhere; }
+.empty-line { color: var(--muted); font-size: 13px; padding: 6px 0; margin: 0; }
+
+/* kanban */
+.board { overflow-x: auto; border-radius: var(--r); }
+.cols { display: flex; gap: 8px; align-items: stretch; min-width: min-content; }
+.cols > .col { flex: 1 0 236px; max-width: 360px; }
+.cols > .col[data-empty="true"] { flex: 0 0 40px; padding: 8px 4px; }
+.col { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r); padding: 8px; display: grid; gap: 8px; align-content: start; min-height: 120px; }
+.col-head { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; padding: 2px 2px 4px; border-bottom: 1px solid var(--line); }
+.col-head .name { font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+.col-head .count { font-family: var(--font-data); font-size: 12px; color: var(--muted); }
+.col[data-empty="true"] .col-head { border-bottom: 0; flex-direction: column; align-items: center; justify-content: flex-start; gap: 8px; padding: 2px 0; }
+.col[data-empty="true"] .col-head .name { writing-mode: vertical-rl; transform: rotate(180deg); color: var(--muted); white-space: nowrap; }
+.col[data-empty="true"] { min-height: 180px; }
+
+.card { all: unset; box-sizing: border-box; display: grid; gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 10px; box-shadow: var(--shadow); cursor: pointer; position: relative; min-width: 0; }
+.card:hover { border-color: var(--accent); }
+.card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.card .row1 { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.card .brandname { font-weight: 650; font-size: 14px; line-height: 1.25; overflow-wrap: anywhere; }
+.card .sub { font-family: var(--font-data); font-size: 11px; color: var(--muted); overflow-wrap: anywhere; }
+.card .incident { width: 9px; height: 9px; border-radius: 50%; background: var(--red); flex: 0 0 auto; margin-top: 4px; }
+.typechip { display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 1px 6px; border-radius: 3px; border: 1px solid currentColor; white-space: nowrap; }
+.typechip[data-type="social-casino"] { color: var(--t-social); }
+.typechip[data-type="online-games"] { color: var(--t-games); }
+.typechip[data-type="hotel-casino"] { color: var(--t-hotel); }
+.gates { display: flex; flex-wrap: wrap; gap: 4px; }
+.gate { font-family: var(--font-data); font-size: 10.5px; padding: 1px 6px; border-radius: 3px; background: var(--info-bg); color: var(--info); white-space: nowrap; }
+.gate[data-s="ok"] { background: var(--ok-bg); color: var(--ok); }
+.gate[data-s="warn"] { background: var(--warn-bg); color: var(--warn); }
+.gate[data-s="red"] { background: var(--red-bg); color: var(--red); }
+.card .foot { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; color: var(--muted); flex-wrap: wrap; }
+
+.onboarding { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: grid; gap: 8px; max-width: 72ch; }
+.onboarding h2 { margin: 0; font-size: 16px; }
+.onboarding p { margin: 0; color: var(--muted); }
+.onboarding code { font-family: var(--font-data); font-size: 12px; background: var(--surface-2); padding: 1px 4px; border-radius: 3px; overflow-wrap: anywhere; }
+
+/* drawer */
+dialog.drawer { margin: 0 0 0 auto; height: 100%; max-height: 100%; overflow-y: auto; overscroll-behavior: contain; width: min(560px, 100%); max-width: 100%; border: 0; border-left: 1px solid var(--line); padding: 0; background: var(--surface); color: var(--ink); box-shadow: -8px 0 24px rgba(0, 0, 0, .18); }
+dialog.drawer::backdrop { background: var(--scrim); }
+.drawer-inner { display: grid; gap: 16px; padding-inline: 18px; padding-block: calc(16px + env(safe-area-inset-top, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)); }
+.drawer-head { display: flex; align-items: flex-start; gap: 12px; }
+.drawer-head h2 { margin: 0; font-size: 18px; text-wrap: balance; }
+.drawer-head .grow { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.sec { display: grid; gap: 6px; }
+.sec h3 { margin: 0; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+dl.kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; font-size: 13px; }
+dl.kv dt { color: var(--muted); }
+dl.kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.tablewrap { overflow-x: auto; }
+table.t { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+table.t th, table.t td { text-align: left; padding: 4px 8px 4px 0; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.t th { color: var(--muted); font-weight: 600; font-size: 11px; }
+table.t td.num, table.t th.num { text-align: right; }
+.v-ok { color: var(--ok); } .v-warn { color: var(--warn); } .v-red { color: var(--red); }
+.list { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.list li { font-size: 13px; border-left: 3px solid var(--line); padding-left: 8px; overflow-wrap: anywhere; }
+.list li[data-sev="red"] { border-left-color: var(--red); }
+.list li[data-sev="warn"] { border-left-color: var(--warn); }
+.list li[data-sev="green"] { border-left-color: var(--ok); }
+.list .meta { font-family: var(--font-data); font-size: 11px; color: var(--muted); display: block; }
+
+@media (max-width: 720px) {
+  .board { overflow-x: visible; }
+  .cols { flex-direction: column; min-width: 0; }
+  .cols > .col { flex: 0 0 auto; max-width: none; min-height: 0; }
+  .col[data-empty="true"] { display: none; }
+  .emptycols { display: block; }
+}
+.emptycols { display: none; font-size: 12px; color: var(--muted); }
+@media (prefers-reduced-motion: no-preference) {
+  .card { transition: border-color .12s ease; }
+}
+</style>
+
+<div class="page">
+  <header class="top">
+    <div class="brand">
+      <h1>Site Factory Board</h1>
+      <span class="mono" id="boardVersion">v1</span>
+    </div>
+    <span class="pill" id="source" data-state="pending" role="status"><span class="dot"></span><span id="sourceText">Connecting to the Board database…</span></span>
+    <span class="spacer"></span>
+    <div class="filters" id="typeFilters" role="group" aria-label="Filter by order type"></div>
+    <button class="iconbtn" id="themeBtn" type="button" aria-label="Switch colour theme">Theme: system</button>
+  </header>
+
+  <div class="banner" id="demoBanner" hidden>Demo data: this view has no Board database, so it shows one example row built from the opalquestlounge site. Nothing here is live.</div>
+
+  <section class="capacity" id="capacity" aria-label="Capacity"></section>
+
+  <section class="events" aria-labelledby="eventsTitle">
+    <div class="events-head">
+      <h2 id="eventsTitle" class="label">Events</h2>
+      <button class="chipbtn" id="alertsOnly" type="button" aria-pressed="false">Alerts only</button>
+    </div>
+    <div class="strip" id="events" tabindex="0" aria-label="Latest events, newest first"></div>
+  </section>
+
+  <section aria-labelledby="kanbanTitle" style="display:grid;gap:8px">
+    <h2 id="kanbanTitle" class="label" style="margin:0">Stages</h2>
+    <div id="onboarding" hidden></div>
+    <div class="board" id="boardWrap">
+      <div class="cols" id="cols"></div>
+    </div>
+    <div class="emptycols" id="emptyCols"></div>
+  </section>
+</div>
+
+<dialog class="drawer" id="drawer" aria-labelledby="drawerTitle">
+  <div class="drawer-inner" id="drawerBody"></div>
+</dialog>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---------- constants (schemas/stages.json and schemas/board.schema.json, partition G) ----------
+  const STAGES = ['intake', 'questions-sent', 'proposal', 'approved', 'building', 'review', 'fix', 'ready-for-launch', 'ready', 'live-pending', 'live', 'maintenance', 'blocked', 'paused', 'retired'];
+  const STOPPED = ['blocked', 'paused', 'retired'];
+  const TYPES = ['social-casino', 'online-games', 'hotel-casino'];
+  const LH_MIN = { perf: 95, a11y: 95, bp: 95, seo: 95, lcpMs: 2000, cls: 0.05 };
+  const STAGE_LABEL = { 'questions-sent': 'Questions sent', 'ready-for-launch': 'Ready for launch', 'live-pending': 'Live pending' };
+  const label = (s) => STAGE_LABEL[s] || s.charAt(0).toUpperCase() + s.slice(1);
+
+  // Demo dataset: used only when this view has no Board database (a local file, a preview).
+  // One row in the shape tools/board.mjs builds for sites/opalquestlounge (Phase 1 local build).
+  const DEMO = {
+    sites: [{
+      id: 'opalquestlounge',
+      data: {
+        slug: 'opalquestlounge', brand: 'Opal Quest Lounge', domain: 'opalquestlounge.com', type: 'social-casino', variant: 'demo-lobby',
+        locales: ['en-GB'], status: 'live', stage: 'live', cfProject: null, deployed: null, ci: null,
+        reports: { at: '2026-10-06T11:16:46Z', buildVersion: 'b972cd2f14', lint: { problems: 0, warnings: 6 } },
+        health: null, lhBaseline: null, lh: null, nearestSibling: null, incidents: 0, monitoring: { routines: [] },
+      },
+    }],
+    orders: [], runs: [], sessions: [],
+    events: [{
+      id: 'demo0001',
+      data: { at: '2026-10-06T11:16:46Z', slug: 'opalquestlounge', kind: 'ci', severity: 'info', text: 'Example event: local build of opalquestlounge, 23 pages, 0 problems, 6 warnings (strict build still blocked on operator details and Pragmatic consent).', ref: null },
+    }],
+    config: { boardVersion: '1.0', capacity: { maxInFlight: 6 } },
+  };
+
+  // ---------- state ----------
+  const state = { mode: 'pending', sites: new Map(), orders: new Map(), events: [], runs: [], sessions: [], config: null, typeFilter: 'all', alertsOnly: false, openSlug: null };
+
+  // ---------- small DOM helpers (all data is untrusted: textContent only, http(s) links only) ----------
+  const $ = (id) => document.getElementById(id);
+  function h(tag, attrs, ...kids) {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (v === null || v === undefined || v === false) continue;
+      if (k === 'class') el.className = v;
+      else if (k === 'text') el.textContent = v;
+      else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? '' : String(v));
+    }
+    for (const kid of kids.flat()) if (kid !== null && kid !== undefined && kid !== false) el.append(kid instanceof Node ? kid : document.createTextNode(String(kid)));
+    return el;
+  }
+  const safeUrl = (u) => (typeof u === 'string' && /^https?:\/\//i.test(u) ? u : null);
+  const link = (u, text) => (safeUrl(u) ? h('a', { href: safeUrl(u), target: '_blank', rel: 'noopener noreferrer', text: text || u }) : document.createTextNode(text || '—'));
+  const str = (v) => (v === null || v === undefined || v === '' ? '—' : String(v));
+  const num = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+  function ago(iso) {
+    const t = Date.parse(iso);
+    if (Number.isNaN(t)) return '';
+    const s = Math.max(0, (Date.now() - t) / 1000);
+    if (s < 90) return 'just now';
+    if (s < 5400) return `${Math.round(s / 60)} min ago`;
+    if (s < 129600) return `${Math.round(s / 3600)} h ago`;
+    return `${Math.round(s / 86400)} d ago`;
+  }
+  const fmtDate = (iso) => { const t = Date.parse(iso); return Number.isNaN(t) ? str(iso) : new Date(t).toISOString().replace('T', ' ').slice(0, 16) + ' UTC'; };
+
+  // ---------- derived rows ----------
+  function rows() {
+    const by = new Map();
+    for (const [id, s] of state.sites) by.set(id, { slug: id, site: s, order: null });
+    for (const [id, o] of state.orders) {
+      const r = by.get(o.slug || id) || { slug: o.slug || id, site: null, order: null };
+      r.order = o;
+      by.set(r.slug, r);
+    }
+    const out = [];
+    for (const r of by.values()) {
+      const s = r.site || {}, o = r.order || {};
+      out.push({
+        slug: r.slug, site: r.site, order: r.order,
+        brand: s.brand || o.brand || r.slug, domain: s.domain || o.domain || null,
+        type: s.type || o.type || null, variant: s.variant || o.variant || null,
+        stage: STAGES.includes(o.stage) ? o.stage : STAGES.includes(s.stage) ? s.stage : 'intake',
+        updatedAt: o.updatedAt || (s.reports && s.reports.at) || null,
+        incidents: num(s.incidents) || 0, pr: o.pr || null,
+      });
+    }
+    return out.sort((a, b) => String(a.brand).localeCompare(String(b.brand)));
+  }
+  const visible = (list) => (state.typeFilter === 'all' ? list : list.filter((r) => r.type === state.typeFilter));
+
+  function gatesOf(r) {
+    const rep = (r.site && r.site.reports) || {};
+    const g = [];
+    const lint = rep.lint;
+    if (lint) g.push(['lint', num(lint.problems) > 0 ? 'red' : num(lint.warnings) > 0 ? 'warn' : 'ok', num(lint.problems) > 0 ? `lint ${lint.problems} err` : `lint ${num(lint.warnings) || 0} warn`]);
+    else g.push(['lint', 'none', 'lint –']);
+    const ck = rep.check;
+    if (ck && (num(ck.passed) !== null || num(ck.failed) !== null)) g.push(['check', num(ck.failed) > 0 ? 'red' : 'ok', num(ck.failed) > 0 ? `check ${ck.failed} fail` : `check ${num(ck.passed) ?? ''}✓`]);
+    else g.push(['check', 'none', 'check –']);
+    const axe = rep.axe;
+    const axeN = typeof axe === 'number' ? axe : Array.isArray(axe) ? axe.length : null;
+    g.push(['axe', axeN === null ? 'none' : axeN > 0 ? 'red' : 'ok', axeN === null ? 'axe –' : `axe ${axeN}`]);
+    const lh = rep.lighthouse;
+    if (lh && (lh.mobile || lh.desktop)) {
+      const rowsLh = [lh.mobile, lh.desktop].filter(Boolean);
+      const min = Math.min(...rowsLh.flatMap((x) => ['perf', 'a11y', 'bp', 'seo'].map((k) => num(x[k])).filter((v) => v !== null)).map((v) => (v <= 1 ? Math.round(v * 100) : v)));
+      g.push(['lighthouse', min >= LH_MIN.perf ? 'ok' : 'warn', `LH ${Number.isFinite(min) ? min : '–'}`]);
+    } else g.push(['lighthouse', 'none', 'LH –']);
+    const u = rep.uniqueness;
+    g.push(['uniqueness', u ? (u.passed ? 'ok' : 'red') : 'none', u ? (u.passed ? 'uniq ✓' : 'uniq ✗') : 'uniq –']);
+    return g;
+  }
+
+  // ---------- render: capacity ----------
+  function renderCapacity(list) {
+    const count = (stages) => list.filter((r) => stages.includes(r.stage)).length;
+    const inFlight = count(['approved', 'building', 'review', 'fix']);
+    const maxIn = state.config && state.config.capacity && num(state.config.capacity.maxInFlight);
+    const now = Date.now();
+    const recentRuns = state.runs.filter((x) => now - Date.parse(x.at) < 30 * 864e5);
+    const failedRuns = recentRuns.filter((x) => !/^(success|green|ok)$/i.test(String(x.result || ''))).length;
+    const activeSessions = state.sessions.filter((x) => /work|running|active/i.test(String(x.statusBucket || x.status || ''))).length;
+    const cost = state.sessions.reduce((sum, x) => sum + (x.cost && num(x.cost.usdEstimate) ? x.cost.usdEstimate : 0), 0);
+    const cells = [
+      ['In flight', maxIn ? [String(inFlight), h('small', {}, ` / ${maxIn}`)] : [String(inFlight)], 'approved, building, review, fix', maxIn && inFlight > maxIn ? 'warn' : ''],
+      ['With the client', [String(count(['intake', 'questions-sent', 'proposal']))], 'intake, questions, proposal', ''],
+      ['Ready to launch', [String(count(['ready-for-launch', 'ready', 'live-pending']))], 'launch approval and ship', ''],
+      ['Live', [String(count(['live', 'maintenance']))], 'live and in maintenance', ''],
+      ['Stopped', [String(count(STOPPED))], 'blocked, paused, retired', count(['blocked']) ? 'warn' : ''],
+      ['Sessions', [String(activeSessions), h('small', {}, ` / ${state.sessions.length}`)], 'working / recorded', ''],
+      ['CI runs, 30 days', [String(recentRuns.length)], failedRuns ? `${failedRuns} not green` : 'all green or none', failedRuns ? 'warn' : ''],
+      ['Session cost', [cost ? `$${cost.toFixed(2)}` : '$0'], 'estimate from transcripts', ''],
+    ];
+    $('capacity').replaceChildren(...cells.map(([k, v, s, tone]) => h('div', { class: 'cap', 'data-tone': tone || null }, h('span', { class: 'label', text: k }), h('span', { class: 'v' }, ...v), h('span', { class: 's', text: s }))));
+  }
+
+  // ---------- render: events ----------
+  function renderEvents() {
+    let ev = state.events.slice().sort((a, b) => String(b.at).localeCompare(String(a.at)));
+    if (state.typeFilter !== 'all') {
+      const slugs = new Set(visible(rows()).map((r) => r.slug));
+      ev = ev.filter((e) => !e.slug || slugs.has(e.slug));
+    }
+    if (state.alertsOnly) ev = ev.filter((e) => e.severity === 'red' || e.severity === 'warn');
+    ev = ev.slice(0, 30);
+    const box = $('events');
+    if (!ev.length) {
+      box.replaceChildren(h('div', { class: 'empty-line', text: state.alertsOnly ? 'No red or amber events.' : 'No events yet. CI results, reviews, health probes and ships appear here, newest first.' }));
+      return;
+    }
+    box.replaceChildren(...ev.map((e) => h('article', { class: 'ev', 'data-sev': e.severity || 'info' },
+      h('div', { class: 'meta' }, h('span', { text: e.kind || 'event' }), h('span', { text: e.slug || 'factory' }), h('span', { text: ago(e.at), title: fmtDate(e.at) })),
+      h('div', { class: 'txt', text: e.text || '' }),
+      safeUrl(e.ref) ? h('div', { class: 'meta' }, link(e.ref, 'details')) : null)));
+  }
+
+  // ---------- render: kanban ----------
+  function card(r) {
+    return h('button', { class: 'card', type: 'button', 'data-slug': r.slug, 'aria-label': `${r.brand}, ${label(r.stage)}. Open details`, onclick: () => openDrawer(r.slug) },
+      h('div', { class: 'row1' },
+        h('span', { class: 'brandname', text: r.brand }),
+        r.incidents ? h('span', { class: 'incident', title: `${r.incidents} open incident(s)` }) : null),
+      h('div', { class: 'sub', text: [r.domain, r.variant].filter(Boolean).join(' · ') || r.slug }),
+      h('div', { class: 'gates' }, r.type ? h('span', { class: 'typechip', 'data-type': r.type, text: r.type }) : null,
+        STOPPED.includes(r.stage) ? h('span', { class: 'gate', 'data-s': 'warn', text: r.stage }) : null),
+      h('div', { class: 'gates' }, ...gatesOf(r).map(([, s, t]) => h('span', { class: 'gate', 'data-s': s, text: t }))),
+      h('div', { class: 'foot' }, h('span', { class: 'mono', text: r.pr && r.pr.number ? `PR #${r.pr.number}` : r.slug }), h('span', { text: r.updatedAt ? ago(r.updatedAt) : '' })));
+  }
+
+  function renderKanban(list) {
+    const columns = STAGES.filter((s) => !STOPPED.includes(s)).map((s) => ({ key: s, name: label(s), match: [s] }));
+    columns.push({ key: 'stopped', name: 'Stopped', match: STOPPED });
+    const empty = [];
+    $('cols').replaceChildren(...columns.map((c) => {
+      const items = list.filter((r) => c.match.includes(r.stage));
+      if (!items.length) empty.push(c.name);
+      return h('section', { class: 'col', 'data-stage': c.key, 'data-empty': items.length ? 'false' : 'true', 'aria-label': `${c.name}: ${items.length}` },
+        h('div', { class: 'col-head' }, h('span', { class: 'name', text: c.name }), h('span', { class: 'count', text: String(items.length) })),
+        ...items.map(card));
+    }));
+    $('emptyCols').textContent = empty.length ? `Empty stages: ${empty.join(', ')}` : '';
+  }
+
+  function renderOnboarding(total) {
+    const box = $('onboarding');
+    if (total > 0 || state.mode === 'pending') { box.hidden = true; return; }
+    box.hidden = false;
+    box.replaceChildren(h('div', { class: 'onboarding' },
+      h('h2', { text: 'No orders or sites on the Board yet' }),
+      h('p', {}, 'Rows arrive from the hub: ', h('code', { text: 'node tools/board.mjs row <slug> --envelope' }), ' builds a document, and the hub writes it here with ArtifactData. Sites, events and CI runs appear as soon as they are written.'),
+      h('p', {}, 'New orders start with ', h('code', { text: '/order' }), ' in a factory session.')));
+  }
+
+  function renderFilters(all) {
+    const counts = Object.fromEntries(TYPES.map((t) => [t, all.filter((r) => r.type === t).length]));
+    const opts = [['all', `All types ${all.length}`], ...TYPES.map((t) => [t, `${t} ${counts[t]}`])];
+    $('typeFilters').replaceChildren(...opts.map(([k, text]) => h('button', { class: 'chipbtn', type: 'button', 'aria-pressed': String(state.typeFilter === k), onclick: () => { state.typeFilter = k; remember('typeFilter', k); render(); } }, text)));
+  }
+
+  // ---------- drawer ----------
+  function kv(pairs) {
+    return h('dl', { class: 'kv' }, ...pairs.filter(Boolean).flatMap(([k, v]) => [h('dt', { text: k }), h('dd', {}, v instanceof Node ? v : str(v))]));
+  }
+  function lhTable(lh) {
+    const rowsLh = [['mobile', lh && lh.mobile], ['desktop', lh && lh.desktop]].filter(([, x]) => x);
+    if (!rowsLh.length) return h('p', { class: 'empty-line', text: 'No Lighthouse run recorded.' });
+    const cls = (k, v) => {
+      if (v === null) return '';
+      if (k === 'lcp' || k === 'lcpMs') return v <= LH_MIN.lcpMs ? 'v-ok' : 'v-red';
+      if (k === 'cls') return v < LH_MIN.cls ? 'v-ok' : 'v-red';
+      return (v <= 1 ? v * 100 : v) >= 95 ? 'v-ok' : 'v-warn';
+    };
+    const cell = (x, k) => { const v = num(x[k]); return h('td', { class: `num ${cls(k, v)}`, text: v === null ? '–' : String(v <= 1 && k !== 'cls' ? Math.round(v * 100) : v) }); };
+    return h('div', { class: 'tablewrap' }, h('table', { class: 't' },
+      h('thead', {}, h('tr', {}, h('th', { text: 'preset' }), ...['perf', 'a11y', 'bp', 'seo', 'LCP ms', 'CLS'].map((t) => h('th', { class: 'num', text: t })))),
+      h('tbody', {}, ...rowsLh.map(([p, x]) => h('tr', {}, h('td', { text: p }), cell(x, 'perf'), cell(x, 'a11y'), cell(x, 'bp'), cell(x, 'seo'), cell(x, x.lcpMs !== undefined ? 'lcpMs' : 'lcp'), cell(x, 'cls'))))));
+  }
+
+  function openDrawer(slug) {
+    const r = rows().find((x) => x.slug === slug);
+    if (!r) return;
+    state.openSlug = slug;
+    const s = r.site || {}, o = r.order || {}, rep = s.reports || {};
+    const runs = state.runs.filter((x) => x.slug === slug).sort((a, b) => String(b.at).localeCompare(String(a.at))).slice(0, 8);
+    const evs = state.events.filter((x) => x.slug === slug).sort((a, b) => String(b.at).localeCompare(String(a.at))).slice(0, 12);
+    const body = $('drawerBody');
+    const parts = [
+      h('div', { class: 'drawer-head' },
+        h('div', { class: 'grow' },
+          h('h2', { id: 'drawerTitle', text: r.brand }),
+          h('div', { class: 'gates' }, r.type ? h('span', { class: 'typechip', 'data-type': r.type, text: r.type }) : null, h('span', { class: 'gate', text: label(r.stage) }), r.variant ? h('span', { class: 'gate', text: r.variant }) : null)),
+        h('button', { class: 'iconbtn', type: 'button', onclick: closeDrawer, text: 'Close' })),
+      h('section', { class: 'sec' }, h('h3', { text: 'Site' }), kv([
+        ['Slug', h('span', { class: 'mono', text: r.slug })],
+        ['Domain', r.domain ? link(`https://${r.domain}/`, r.domain) : '—'],
+        ['Locales', (s.locales || []).join(', ')],
+        ['Registry status', s.status],
+        ['Hosting project', s.cfProject],
+        ['Nearest sibling', s.nearestSibling],
+        ['Updated', r.updatedAt ? `${fmtDate(r.updatedAt)} (${ago(r.updatedAt)})` : null],
+      ])),
+      h('section', { class: 'sec' }, h('h3', { text: 'Gates' }), h('div', { class: 'gates' }, ...gatesOf(r).map(([, st, t]) => h('span', { class: 'gate', 'data-s': st, text: t }))), kv([
+        ['Build version', rep.buildVersion ? h('span', { class: 'mono', text: rep.buildVersion }) : null],
+        ['Lint', rep.lint ? `${num(rep.lint.problems) ?? 0} problems, ${num(rep.lint.warnings) ?? 0} warnings` : null],
+        ['Browser check', rep.check ? `${str(rep.check.passed)} passed, ${str(rep.check.failed)} failed` : null],
+        ['Uniqueness', rep.uniqueness ? `${rep.uniqueness.passed ? 'passed' : 'failed'}${num(rep.uniqueness.max) !== null ? `, max ${rep.uniqueness.max}` : ''}` : null],
+        ['Policy', rep.policy ? `unverified ${Array.isArray(rep.policy.unverified) ? rep.policy.unverified.length : str(rep.policy.unverified)}` : null],
+        ['Reports from', rep.at ? fmtDate(rep.at) : null],
+      ])),
+      h('section', { class: 'sec' }, h('h3', { text: 'Lighthouse (minimum 95, LCP under 2 s, CLS under 0.05)' }), lhTable(rep.lighthouse)),
+      h('section', { class: 'sec' }, h('h3', { text: 'Deploy and CI' }), kv([
+        ['Deployed', s.deployed ? `${str(s.deployed.version)} at ${fmtDate(s.deployed.at)}` : 'not deployed'],
+        ['Last CI', s.ci ? h('span', {}, `${str(s.ci.result)} on `, h('span', { class: 'mono', text: String(s.ci.sha || '').slice(0, 7) }), ' ', link(s.ci.runUrl, 'run')) : null],
+        ['Health', s.health ? `${s.health.ok ? 'all probes green' : `failing: ${(s.health.failing || []).join(', ') || 'yes'}`}${num(s.health.cert) !== null ? `; certificate ${s.health.cert} days` : ''}` : 'no probe yet'],
+        ['Incidents', String(r.incidents)],
+      ])),
+      r.order ? h('section', { class: 'sec' }, h('h3', { text: 'Order' }), kv([
+        ['Client', o.client ? [o.client.name, o.client.language].filter(Boolean).join(', ') : null],
+        ['Launch target', o.launchTarget],
+        ['Pull request', o.pr && o.pr.number ? link(o.pr.url, `#${o.pr.number}${o.pr.state ? ` (${o.pr.state})` : ''}`) : null],
+        ['Proposal', o.proposalUrl ? link(o.proposalUrl, 'proposal page') : null],
+        ['Evidence', o.evidenceUrl ? link(o.evidenceUrl, 'evidence page') : null],
+        ['Questions open', o.questions ? `${num(o.questions.beforeBuild) ?? 0} before build, ${num(o.questions.beforeLaunch) ?? 0} before launch` : null],
+      ]), h('div', { class: 'gates' }, ...Object.entries(o.approvals || {}).map(([item, st]) => h('span', { class: 'gate', 'data-s': st === 'approved' ? 'ok' : st === 'pending' ? 'none' : 'warn', text: `${item}: ${st}` })))) : null,
+      h('section', { class: 'sec' }, h('h3', { text: 'CI runs' }), runs.length
+        ? h('ul', { class: 'list' }, ...runs.map((x) => h('li', { 'data-sev': /^(success|green|ok)$/i.test(String(x.result)) ? 'green' : 'red' }, h('span', { class: 'meta', text: `${fmtDate(x.at)} · ${String(x.sha || '').slice(0, 7)}${x.pr ? ` · PR #${x.pr}` : ''}` }), `${str(x.result)} `, link(x.runUrl, 'run'))))
+        : h('p', { class: 'empty-line', text: 'No CI runs recorded for this site.' })),
+      h('section', { class: 'sec' }, h('h3', { text: 'Events' }), evs.length
+        ? h('ul', { class: 'list' }, ...evs.map((x) => h('li', { 'data-sev': x.severity }, h('span', { class: 'meta', text: `${fmtDate(x.at)} · ${x.kind}` }), x.text)))
+        : h('p', { class: 'empty-line', text: 'No events for this site.' })),
+    ];
+    body.replaceChildren(...parts.filter(Boolean));
+    const d = $('drawer');
+    if (!d.open) { if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', ''); }
+  }
+  function closeDrawer() {
+    const d = $('drawer');
+    state.openSlug = null;
+    if (typeof d.close === 'function') d.close(); else d.removeAttribute('open');
+  }
+  $('drawer').addEventListener('click', (e) => { if (e.target === e.currentTarget) closeDrawer(); });
+  $('drawer').addEventListener('close', () => { state.openSlug = null; });
+
+  // ---------- render all ----------
+  function render() {
+    const all = rows();
+    const list = visible(all);
+    renderFilters(all);
+    renderCapacity(list);
+    renderEvents();
+    renderKanban(list);
+    renderOnboarding(all.length);
+    if (state.config && state.config.boardVersion) $('boardVersion').textContent = `v${state.config.boardVersion}`;
+    if (state.openSlug && $('drawer').open) openDrawer(state.openSlug);
+  }
+
+  function setSource(mode, text) {
+    state.mode = mode;
+    $('source').dataset.state = mode;
+    $('sourceText').textContent = text;
+    $('demoBanner').hidden = mode !== 'demo';
+  }
+
+  // ---------- per-viewer conveniences (browser storage, optional) ----------
+  function remember(k, v) { try { localStorage.setItem(`board.${k}`, v); } catch { /* storage unavailable */ } }
+  function recall(k) { try { return localStorage.getItem(`board.${k}`); } catch { return null; } }
+  const THEMES = ['system', 'light', 'dark'];
+  function applyTheme(t) {
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    else document.documentElement.removeAttribute('data-theme');
+    $('themeBtn').textContent = `Theme: ${t}`;
+  }
+  let theme = THEMES.includes(recall('theme')) ? recall('theme') : 'system';
+  if (theme !== 'system') applyTheme(theme); else $('themeBtn').textContent = 'Theme: system';
+  $('themeBtn').addEventListener('click', () => { theme = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]; applyTheme(theme); remember('theme', theme); });
+  const tf = recall('typeFilter');
+  if (tf && (tf === 'all' || TYPES.includes(tf))) state.typeFilter = tf;
+  $('alertsOnly').addEventListener('click', (e) => { state.alertsOnly = !state.alertsOnly; e.currentTarget.setAttribute('aria-pressed', String(state.alertsOnly)); renderEvents(); });
+
+  // ---------- data sources ----------
+  function loadDemo(reason) {
+    state.sites = new Map(DEMO.sites.map((d) => [d.id, d.data]));
+    state.orders = new Map();
+    state.events = DEMO.events.map((d) => d.data);
+    state.runs = []; state.sessions = [];
+    state.config = DEMO.config;
+    setSource('demo', reason);
+    render();
+  }
+
+  async function connect() {
+    const runtime = window.claude && typeof window.claude.use === 'function' ? window.claude : null;
+    if (!runtime) { loadDemo('Demo data (no Board runtime)'); return; }
+    let db = null;
+    try { db = await runtime.use('db'); } catch { db = null; }
+    if (!db) { loadDemo('Demo data (Board database unavailable in this view)'); return; }
+    setSource('live', 'Live: Board database');
+    render();
+    const fail = (what) => (err) => {
+      setSource('error', `Board database: ${what} stopped (${(err && err.code) || 'unavailable'}); reload to retry`);
+    };
+    const toMap = (snap) => new Map(snap.docs.filter((d) => d.exists).map((d) => [d.id, d.data()]));
+    const toList = (snap) => snap.docs.filter((d) => d.exists).map((d) => ({ ...d.data(), _id: d.id }));
+    try {
+      db.collection('sites').onSnapshot((snap) => { state.sites = toMap(snap); render(); }, fail('sites'));
+      db.collection('orders').onSnapshot((snap) => { state.orders = toMap(snap); render(); }, fail('orders'));
+      db.collection('events').orderBy('at', 'desc').limit(200).onSnapshot((snap) => { state.events = toList(snap); render(); }, fail('events'));
+      db.collection('runs').orderBy('at', 'desc').limit(300).onSnapshot((snap) => { state.runs = toList(snap); render(); }, fail('runs'));
+      db.collection('sessions').limit(200).onSnapshot((snap) => { state.sessions = toList(snap); render(); }, fail('sessions'));
+      db.doc('config/factory').onSnapshot((snap) => { state.config = snap.exists ? snap.data() : null; render(); }, fail('config'));
+    } catch (err) {
+      setSource('error', `Board database could not be read (${(err && err.code) || err.message || 'error'})`);
+    }
+  }
+
+  render();
+  connect();
+})();
+</script>

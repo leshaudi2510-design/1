@@ -1,0 +1,47 @@
+{
+  "_about": "GitHub labels for the factory (SPEC 10.2, MASTER-PLAN D-20). tools/labels.mjs --seed creates or updates them; --labeler writes .github/labeler.yml from the rules below plus one site:<slug> per sites/<slug>/ and one pack:<type> per types/<type>/. Owner: partition F.",
+  "schemaVersion": 1,
+  "labels": [
+    { "name": "stage:intake", "color": "c5def5", "description": "Order received; questions pending" },
+    { "name": "stage:proposal", "color": "c5def5", "description": "Concept directions sent to the client" },
+    { "name": "stage:approved", "color": "bfd4f2", "description": "Concept approved; ready to scaffold" },
+    { "name": "stage:scaffold", "color": "bfd4f2", "description": "Site folder created from the type template" },
+    { "name": "stage:building", "color": "1d76db", "description": "Lanes are building the site" },
+    { "name": "stage:review", "color": "5319e7", "description": "Judges and gates are reviewing" },
+    { "name": "stage:fix", "color": "d93f0b", "description": "Review found blocking items" },
+    { "name": "stage:ready-for-launch", "color": "0e8a16", "description": "All gates green; waiting for launch approval" },
+    { "name": "stage:ready", "color": "0e8a16", "description": "Launch approved; ship pending" },
+    { "name": "stage:live", "color": "006b75", "description": "Deployed and verified" },
+    { "name": "stage:maintenance", "color": "006b75", "description": "Live site under change" },
+    { "name": "type:order", "color": "fbca04", "description": "A new site order" },
+    { "name": "type:fix", "color": "fbca04", "description": "A change to an existing site" },
+    { "name": "type:engine", "color": "b60205", "description": "Touches engine/**; engine-regression applies" },
+    { "name": "type:judges", "color": "b60205", "description": "Touches a judge path; needs /review --calibrate" },
+    { "name": "type:tooling", "color": "fef2c0", "description": "CI, tools, schemas, .claude, artifacts or docs" },
+    { "name": "type:ppc", "color": "fef2c0", "description": "Paid-search kit, queries or PPC hooks" },
+    { "name": "qa:browser", "color": "0052cc", "description": "Run the Playwright + axe + Lighthouse job in sites-ci" },
+    { "name": "preview", "color": "0052cc", "description": "Deploy a preview of the site (Phase 3)" },
+    { "name": "blocked", "color": "000000", "description": "Waiting on the owner, the client or a third party" },
+    { "name": "client-review", "color": "f9d0c4", "description": "Waiting on the client's answer" },
+    { "name": "placeholders-ok", "color": "e4e669", "description": "Strict build may keep placeholder operator details (pre-launch only)" },
+    { "name": "incident", "color": "b60205", "description": "Live-site incident" },
+    { "name": "uniqueness", "color": "d4c5f9", "description": "Uniqueness gate finding" }
+  ],
+  "generated": {
+    "site": { "prefix": "site:", "from": "sites/<slug>/ (not _-prefixed)", "color": "ededed", "description": "Changes sites/{slug}/" },
+    "pack": { "prefix": "pack:", "from": "types/<type>/", "color": "d4c5f9", "description": "Changes the {type} type pack" }
+  },
+  "labeler": {
+    "type:engine": ["engine/**"],
+    "type:judges": [
+      ".claude/agents/uniqueness-skeptic.md",
+      ".claude/agents/compliance-judge.md",
+      ".claude/agents/rubrics.json",
+      "tools/uniqueness.mjs",
+      "tools/judge-pack.mjs",
+      "sites/_fixtures/**"
+    ],
+    "type:tooling": [".github/**", "tools/**", "schemas/**", ".claude/**", "artifacts/**", "docs/**", "package.json", "package-lock.json"],
+    "type:ppc": ["ppc/**", "tools/ppc/**", "types/*/ppc/**", ".mcp.json"]
+  }
+}

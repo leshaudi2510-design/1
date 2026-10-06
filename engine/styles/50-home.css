@@ -1,0 +1,163 @@
+/* ---------- 9. Hero (home) ---------- */
+.hero{position:relative;overflow:clip;isolation:isolate;background:var(--hero-bg);color:var(--hero-text);
+  border-bottom:var(--bw) solid var(--line);padding:clamp(24px, 3.4vw, 52px) 0 clamp(36px, 4vw, 60px)}
+.hero::before{ /* sunburst rays centred behind the stage */
+  content:"";position:absolute;inset:0;z-index:-2;
+  background:repeating-conic-gradient(from 2deg at var(--rx,71%) var(--ry,50%), var(--hero-ray) 0 5deg, transparent 5deg 14deg);
+  -webkit-mask-image:radial-gradient(circle at var(--rx,71%) var(--ry,50%), #000 18%, transparent 72%);
+          mask-image:radial-gradient(circle at var(--rx,71%) var(--ry,50%), #000 18%, transparent 72%)}
+.hero::after{ /* Ben-Day field, kept clear of the copy column */
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background-image:radial-gradient(circle, var(--hero-dot) 30%, transparent 32%), radial-gradient(circle, var(--hero-dot-2) 28%, transparent 30%);
+  background-size:14px 14px;background-position:0 0, 7px 7px;
+  -webkit-mask-image:linear-gradient(100deg, transparent 50%, #000 96%);
+          mask-image:linear-gradient(100deg, transparent 50%, #000 96%)}
+.hero__grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);grid-template-areas:"head stage" "body stage";column-gap:clamp(28px, 4.4vw, 72px);align-items:center}
+.hero__head{grid-area:head;align-self:end}
+.hero__body{grid-area:body;align-self:start}
+.hero__stage{grid-area:stage;position:relative;padding:22px 20px 18px 6px}
+.kicker{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-bottom:22px;font:700 15px/1.3 var(--f-ui)}
+.hero h1{font-size:clamp(38px, 2.6vw + 18px, 60px);margin-bottom:24px;text-wrap:balance}
+.hero h1 .hl{display:inline-block;margin-top:.14em;padding:.1em .24em .08em;background:var(--hl-bg);color:var(--hl-text);border:var(--bw) solid var(--k);
+  transform:rotate(-2deg);text-shadow:none;box-shadow:5px 5px 0 var(--k)}
+.lede{font-size:clamp(17px, .35vw + 15px, 20px);line-height:1.55;max-width:32em;margin-bottom:20px;font-weight:500}
+.ticks{display:flex;flex-wrap:wrap;gap:8px 20px;margin-bottom:26px;font:700 15.5px/1.3 var(--f-ui)}
+.ticks li{display:flex;align-items:center;gap:8px}
+.ticks svg{width:24px;height:24px;flex:none}
+.hero__ctas{display:flex;flex-wrap:wrap;gap:14px 16px}
+.hero .btn--primary:not(.btn--play){background:var(--cta-bg);color:var(--cta-text);border-color:var(--cta-line);--btn-pop:var(--cta-pop);--gloss:inset 0 3px 0 rgb(255 255 255 / .18)}
+.hero__ctas .btn--secondary{background:var(--surface);color:var(--text);border-color:var(--k);--btn-pop:var(--k)} /* the CTA row only: the stage's buttons keep their own look */
+.hero__burst{position:absolute;z-index:0;inset:-7% -3% -1% -7%;margin:auto;--bf:var(--burst)}
+.hero__burst svg{transform:rotate(8deg)}
+/* Demos switched off: our own slot panel stands on the burst instead of the stage */
+.hero--house .hero__stage > .game{position:relative;z-index:1}
+.hero--house .hero__stage canvas{max-width:100%;height:auto}
+
+
+/* ---------- 12. Section furniture ---------- */
+section{position:relative}
+.sechead{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 32px;margin-bottom:26px}
+h2.display,.h2{font-size:clamp(32px, 2.4vw + 16px, 52px)}
+.sechead p{max-width:34em;color:var(--text-2)}
+.sechead code{font:700 .9em/1 ui-monospace, Menlo, monospace;background:var(--surface);border:2px solid var(--ctl-line);border-radius:6px;padding:2px 5px;color:var(--text)}
+
+/* Tape: static caption strip between hero and lobby */
+.tape{background:var(--tape-bg);color:var(--tape-text);border-bottom:var(--bw) solid var(--line)}
+.tape ul{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px 22px;padding:13px 0;font:900 15px/1.2 var(--f-ui);font-stretch:118%;text-transform:uppercase;letter-spacing:.06em}
+.tape li{display:flex;align-items:center;gap:22px}
+.tape li + li::before{content:"";width:14px;height:14px;flex:none;background:var(--sp, var(--m));
+  clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%)}
+.tape li:nth-child(3){--sp:var(--c)} .tape li:nth-child(4){--sp:var(--y)} .tape li:nth-child(5){--sp:var(--r)}
+
+
+/* ---------- 14. Bands ---------- */
+.band{padding:var(--section) 0;border-bottom:var(--bw) solid var(--line);isolation:isolate}
+.band::before{content:"";position:absolute;inset:0;z-index:-1;background-size:12px 12px}
+.band--how{background:var(--band-how);color:var(--band-how-text);--plate:var(--band-how-plate);--focus:#18122B;--link:#18122B;border-top:var(--bw) solid var(--line)}
+.band--how::before{background-image:radial-gradient(circle, var(--band-how-dot) 30%, transparent 32%);
+  -webkit-mask-image:linear-gradient(180deg, #000, transparent 65%);mask-image:linear-gradient(180deg, #000, transparent 65%)}
+.band--how .sechead p{color:inherit}
+.steps{display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:26px;margin-top:44px}
+.step{position:relative;background:var(--surface);color:var(--text);border:var(--bw) solid var(--line);border-radius:var(--r-box);padding:60px 24px 24px;box-shadow:7px 7px 0 var(--k)}
+.step:nth-child(1){--sc:var(--step-1)} .step:nth-child(2){--sc:var(--step-2)} .step:nth-child(3){--sc:var(--step-3)}
+.step__num{position:absolute;top:-34px;left:16px;width:80px;height:80px;--bf:var(--sc)}
+.step__num b{position:absolute;inset:0;display:grid;place-items:center;font:900 32px/1 var(--f-ui);font-stretch:112%;color:var(--k)}
+.step h3{font:900 22px/1.15 var(--f-ui);font-stretch:110%;margin-bottom:10px}
+.step p{color:var(--text-2)}
+.step::after{content:"";position:absolute;right:14px;top:14px;width:54px;height:54px;border-radius:50%;
+  background-image:radial-gradient(circle, var(--sc) 34%, transparent 36%);background-size:9px 9px}
+.how__note{display:flex;align-items:center;gap:16px;margin-top:34px;padding:16px 20px;background:var(--surface);color:var(--text);border:var(--bw) solid var(--line);border-radius:var(--r-box);box-shadow:6px 6px 0 var(--k);max-width:52em}
+.how__note p{font:700 18px/1.4 var(--f-ui)}
+.how__note .sticker{--sticker-bg:#FFE11A;--sticker-text:#18122B;flex:none}
+
+.band--safe{background:var(--band-safe);color:var(--band-safe-text);--plate:var(--band-safe-plate);--focus:#18122B}
+.band--safe::before{background-image:radial-gradient(circle, var(--band-safe-dot) 30%, transparent 32%);
+  -webkit-mask-image:linear-gradient(90deg, transparent 35%, #000);mask-image:linear-gradient(90deg, transparent 35%, #000)}
+.safe{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(28px,4vw,56px);align-items:start}
+.safe h2{margin-bottom:16px}
+.safe__lede{font-size:18px;max-width:34em;margin-bottom:24px;font-weight:500}
+.tools{display:grid;grid-template-columns:repeat(2, minmax(0,1fr));gap:14px}
+.tools > li{display:flex}
+.tools > li > .tool{flex:1}
+/* icon tile colours (no inline styles: CSP) */
+.tool--y{--tc:#FFE11A} .tool--m{--tc:#FF4FB0} .tool--c{--tc:#3DD6FF} .tool--r{--tc:#FF6A4D}
+.tool{display:flex;align-items:center;gap:12px;min-height:72px;padding:12px 14px;background:var(--surface);color:var(--text);text-decoration:none;
+  border:var(--bw) solid var(--line);border-radius:var(--r-ctl);box-shadow:4px 4px 0 var(--k);font:800 16.5px/1.2 var(--f-ui);transition:transform .12s, box-shadow .12s}
+.tool small{display:block;font:400 14.5px/1.35 var(--f-body);color:var(--text-2);margin-top:3px}
+.tool:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--k)}
+.tool:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--k)}
+.tool .ti{width:40px;height:40px;border-radius:10px;border:var(--bw-ctl) solid var(--k);display:grid;place-items:center;flex:none;color:var(--k);background:var(--tc)}
+.tool .ti svg{width:22px;height:22px}
+.tool .go{margin-left:auto;width:20px;height:20px;flex:none;color:var(--text-2)}
+.helpline{background:var(--surface);color:var(--text);border:var(--bw-heavy) solid var(--line);border-radius:var(--r-box);padding:24px;box-shadow:8px 8px 0 var(--k)}
+.helpline h3{font:900 28px/1.05 var(--f-display);font-stretch:112%;margin-bottom:8px}
+.helpline .tel{display:inline-flex;align-items:center;gap:10px;margin:8px 0 14px;padding:4px 0;font:900 clamp(26px, 2.4vw, 34px)/1 var(--f-ui);font-stretch:106%;color:var(--text);
+  text-decoration:underline;text-decoration-color:var(--m);text-decoration-thickness:.14em;text-underline-offset:.16em}
+.helpline .tel svg{width:28px;height:28px}
+.helpline p{color:var(--text-2);font-size:16px}
+.helpline p + p{margin-top:10px}
+.helpline a:not(.tel){color:var(--link);font-weight:700;display:inline-block;padding:2px 0}
+.helpline :focus-visible{outline-color:var(--focus-card, #1F5BFF)}
+.clocknote{display:flex;gap:12px;align-items:center;margin-top:18px;padding-top:16px;border-top:2.5px dashed var(--text-2);font-size:15.5px;color:var(--text-2)}
+
+/* ---------- 15. FAQ (details) ---------- */
+.faq{padding:var(--section) 0}
+.faq__grid{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(24px,4vw,64px);align-items:start}
+.faq h2{margin-bottom:14px}
+.faq__intro{color:var(--text-2)}
+.qa{border:var(--bw) solid var(--line);border-radius:var(--r-ctl);background:var(--surface);box-shadow:5px 5px 0 var(--pop);margin-bottom:16px}
+.qa summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;min-height:60px;padding:12px 18px;font:800 18px/1.3 var(--f-ui);font-stretch:102%;border-radius:calc(var(--r-ctl) - 3px)}
+.qa summary::-webkit-details-marker{display:none}
+.qa summary:hover{background:var(--surface-2)}
+.qa summary .q{flex:none;width:36px;height:36px;border-radius:50%;background:var(--y);color:var(--k);border:var(--bw-ctl) solid var(--k);display:grid;place-items:center;font:900 19px/1 var(--f-ui)}
+.qa summary .chev{margin-left:auto;width:24px;height:24px;flex:none;transition:transform .15s}
+.qa[open] summary .chev{transform:rotate(180deg)}
+.qa .a{padding:0 20px 18px 68px;color:var(--text-2)}
+.qa .a p + p{margin-top:8px}
+
+
+/* ---------- responsive ---------- */
+@media (max-width: 999px){
+  .hero__grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "stage" "body"}
+  .hero__stage{max-width:720px;width:100%;padding:12px 16px 12px 4px}
+  .hero__body{margin-top:26px}
+  .hero{--rx:50%;--ry:58%}
+  .hero::after{-webkit-mask-image:radial-gradient(90% 520px at 100% 0, #000, transparent);mask-image:radial-gradient(90% 520px at 100% 0, #000, transparent)}
+  .hero__burst{inset:-4% -2% -6% -4%}
+  .safe,.faq__grid{grid-template-columns:1fr}
+}
+@media (max-width: 860px){
+  .steps{grid-template-columns:1fr;gap:52px}
+}
+@media (max-width: 720px){
+  .hero{padding-top:16px}
+  .kicker{margin-bottom:14px;font-size:14px;gap:8px 12px}
+  .kicker .sticker{font-size:13px}
+  .hero h1{font-size:clamp(32px, 9.4vw, 40px);font-stretch:100%;margin-bottom:14px}
+  .hero h1 .hl{white-space:nowrap}
+  .hero__stage{padding:6px 10px 8px 0}
+  /* Demos switched off: our slot panel is taller than the demo stage, so it
+     sheds what is said again just below, and Spin stays above the dock
+     (spec 13). The fact strip under the panel repeats the RTP, the stake
+     control shows the stakes, and the lede says what the games are. */
+  .hero--house .kicker__text{display:none}
+  .hero--house .game[data-variant=hero] .game__facts{display:none}
+  .hero--house .game[data-variant=hero] .game__head{padding-block:8px}
+  .hero--house .game[data-variant=hero] .game__crest{width:40px;height:40px}
+  .hero--house .game[data-variant=hero] .slot__layout{padding:10px;gap:10px}
+  .hero--house .game[data-variant=hero] .slot__stage{padding:6px}
+  .hero__body{margin-top:22px}
+  .lede{font-size:17px}
+  .ticks{font-size:14.5px;gap:8px 16px}
+  .hero__ctas .btn{flex:1 1 auto}
+  .tape ul{font-size:13px;gap:6px 14px;padding:11px 0}
+  .tape li{gap:14px}
+  .tape li + li::before{width:11px;height:11px}
+  .steps{margin-top:40px}
+  .step{padding:56px 20px 20px}
+  .how__note{flex-direction:column;align-items:flex-start;gap:12px}
+  .how__note p{font-size:16.5px}
+  .tools{grid-template-columns:1fr}
+  .qa summary{font-size:17px;padding:10px 14px;gap:12px}
+  .qa .a{padding:0 16px 16px}
+}

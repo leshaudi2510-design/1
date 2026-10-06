@@ -1,85 +1,84 @@
-# Pixel Crown Club
+# Site factory
 
-Сайт для **pixelcrownclub.com**: бесплатное социальное казино в стиле премиального пиксель-арта.
-Три игры на виртуальные «Crowns». Реальных денег, покупок и призов нет, доступ 18+.
+This repository is a studio's site factory: one shared static engine, one pack per order type, and one folder per client site, built in bulk with Claude Code (cloud sessions, workflows, routines and a Board artifact). Operators start with the Russian operating guide, [`docs/SOP-operator.md`](docs/SOP-operator.md); everyone else starts with [`docs/factory/MASTER-PLAN.md`](docs/factory/MASTER-PLAN.md), the authoritative plan.
 
-## Что внутри
+Status: **Phase 1** (factory skeleton) is in progress; see [`docs/PLAN.md`](docs/PLAN.md). Nothing is deployed by the factory yet.
 
-| Файл | Назначение |
-|---|---|
-| `index.html` | Главная: hero с анимированной пиксельной короной, столы, бонус, «Play well», FAQ |
-| `terms.html`, `privacy.html` | Условия игры и политика конфиденциальности |
-| `assets/css/site.css` | Весь дизайн: бархатная ночь, золото, пиксельные рамки |
-| `assets/js/config.js` | **Настройки интеграций**: GA4, Яндекс Метрика, Telegram / Instagram / X |
-| `assets/js/core.js` | Кошелёк (localStorage), честный ГСЧ на `crypto.getRandomValues`, спрайты, шина событий, фишки |
-| `assets/js/fx.js` | Чиптюн-звуки (Web Audio), вибрация, пиксельное конфетти, анимация счётчиков, подсветка за курсором, 3D-наклон, «магнитные» кнопки |
-| `assets/js/app.js` | Вкладки с View Transitions, баланс, бонус каждые 8 ч, окно 18+, напоминание о перерыве |
-| `assets/js/club.js` | Членство: 5 уровней (Copper → Crown), голографическая карта, статистика, 8 трофеев, окно Big Win с PNG-открыткой «Поделиться» |
-| `assets/js/integrations.js` | PWA (установка, офлайн), аналитика только после согласия на cookies, соцсети |
-| `assets/js/crown.js` | Анимация короны в hero |
-| `assets/js/reels.js` | **Crown Reels**: слот на 3 барабана, выплаты 128×/64×/32×/16×/8×/4×, RTP ≈ 94.5% |
-| `assets/js/wheel.js` | **Royal Wheel**: европейская рулетка с полным игровым полем |
-| `assets/js/blackjack.js` | **Club 21**: блэкджек, 6 колод, дилер стоит на 17, блэкджек платит 3:2 |
-| `sw.js`, `manifest.webmanifest`, `assets/icons/` | Приложение (PWA): иконки, офлайн-кэш |
-| `assets/fonts/` | Шрифты хостятся на сайте (быстрее и без запросов к Google) |
-| `assets/og-image.png` | Превью ссылки в соцсетях и мессенджерах (1200×630) |
-| `CNAME`, `robots.txt`, `sitemap.xml`, `favicon.svg` | Домен и SEO |
+## Order types
 
-## Интеграции: как включить
+| Type | What the site is | Pack | State |
+|---|---|---|---|
+| `social-casino` | UK free-to-play social casino: house games on a virtual currency, no real money, no prizes, 18+ only | `types/social-casino/` | site #1 is Opal Quest Lounge; full pack in Phase 2 |
+| `online-games` | browser-game portal, single-game page or kids' games site | `types/online-games/` | stub (builds with a `type-stub` warning); full pack in Phase 4 |
+| `hotel-casino` | marketing site for a hotel or resort that has a casino; Mode A (casino-free domain) by default | `types/hotel-casino/` | stub; full pack in Phase 4 |
 
-Откройте `assets/js/config.js` и впишите ID:
+Out of scope by rule: real-money gambling, sweepstakes, an advertised demo lobby, hotel Mode B without written confirmations, scraped game portals (SITE-TYPES 1.4).
 
-```js
-ga4: 'G-XXXXXXXXXX',        // Google Analytics 4
-metrika: '12345678',        // Яндекс Метрика
-telegram: 'https://t.me/…', // ссылка появится в подвале
+## Layout
+
+```
+engine/      shared builder, client code, styles, game plugins, check suite (engine/tools), docs (engine/docs)
+types/       one pack per order type: pages, content schemas, lint rules, checks, policy data, template site
+sites/       one folder per site (sites/<slug>/); sites/registry.json is a generated snapshot
+orders/      one folder per order: brief, order.json, questions, proposal, reviews, evidence
+tools/       factory tools: order validation, scaffolding, uniqueness, status, Board rows, partition scope
+schemas/     order, stages, direction, registry, review, evidence and Board schemas
+artifacts/   the Board and the client-facing proposal and Evidence page templates
+CLAUDE.md    the agents' constitution (<= 200 lines)
+.claude/     Claude Code project layer: settings and hooks, skills, agents, workflows, rules, craft documents
+docs/        plans, SOPs, ADRs, contract changes, routines, policy watch, lessons
+reports/     gitignored build, check, Lighthouse and session reports per site
 ```
 
-Если ID пустые, баннер cookies не показывается и сторонние скрипты не грузятся.
-Когда ID указан, счётчик загружается только после нажатия «Allow analytics».
-Игровые события (`game_result`) уходят в аналитику автоматически.
+The full tree with owners and phases is MASTER-PLAN section 2.
 
-## Членство и уровни
+## Commands (Claude Code)
 
-| Уровень | Поставлено Crowns | Что даёт |
+| Command | Purpose | Phase |
 |---|---|---|
-| Copper | 0 | фишки 16–256 |
-| Silver | 4 096 | серебряная карта |
-| Gold | 32 768 | фишка 512 |
-| Platinum | 131 072 | фишка 1K |
-| Crown | 524 288 | фишка 2K и чёрная голографическая карта |
+| `/order` | a new order from a brief: `order.json`, questions for the client, proposal, approval | 1 |
+| `/build` | build one site from its approved order | 1 (thin), 2 (full) |
+| `/qa` | every gate for one site: strict builds, browser checks, Lighthouse, uniqueness | 1 |
+| `/status` | portfolio or site status; Board sync; launch-gate checklist | 1 |
+| `/batch`, `/review`, `/fix`, `/handoff`, `/pragmatic-verify`, `/ship` | waves of cloud sessions, review panel, fixes, hand-over, demo check, the only door to production | 3 |
+| `/monitor`, `/policy-recheck` | routines; policy quote recheck | 4 |
+| `/ppc-kit`, `/ppc-audit` | Google Ads kit per order; read-only account audit | 5 |
 
-## Современный фронтенд
-
-View Transitions между столами, scroll-driven анимации (`animation-timeline: view()`),
-container queries, анимируемые `@property` (вращающаяся рамка, блик на кнопках),
-подсветка за курсором, зерно плёнки, LED-бегущая строка, нижний док-бар на телефоне,
-`prefers-reduced-motion` отключает всю анимацию.
-
-Всё в «степенях двойки»: стартовый баланс 4 096, фишки 16–256, бонус 1 024 каждые 8 часов.
-
-## Запуск локально
+Direct tool commands (Phase 1):
 
 ```bash
-python3 -m http.server 8000
-# открыть http://localhost:8000
+node engine/build.mjs sites/<slug> [--strict] [--json]
+CHECK_TIMEOUT_MIN=15 node engine/tools/check.mjs --site sites/<slug> --report reports/<slug>/check.json
+node engine/tools/lighthouse.mjs sites/<slug>/dist --out reports/<slug>/lighthouse
+node tools/validate-order.mjs orders/<id> --level draft|build|launch
+node tools/new-site.mjs <slug> --type <type>
+node tools/uniqueness.mjs --post sites/<slug> --against all --fail
+node tools/status.mjs --table --offline-ok
 ```
 
-Сборка не нужна: чистые HTML, CSS и JS.
+## Documents
 
-## Публикация на pixelcrownclub.com через GitHub Pages
+| Read this | For |
+|---|---|
+| [`docs/factory/MASTER-PLAN.md`](docs/factory/MASTER-PLAN.md) | the authoritative plan (decisions, tree, contracts, roster, phases, owner questions, risks) |
+| [`docs/factory/`](docs/factory/) | the detail references: SPEC, SITE-TYPES, ECC-ADOPTION, TOOLKIT-SCOUT |
+| [`docs/SOP-operator.md`](docs/SOP-operator.md), [`docs/SOP-new-order.md`](docs/SOP-new-order.md) | operating the factory (Russian) |
+| [`docs/OWNER-QUESTIONS.ru.md`](docs/OWNER-QUESTIONS.ru.md) | the owner's 15 open questions and the defaults in use (Russian) |
+| [`engine/docs/invariants.md`](engine/docs/invariants.md) | every non-negotiable property of a built site, with ids |
+| [`docs/CONTRACT-CHANGES.md`](docs/CONTRACT-CHANGES.md), [`docs/adr/`](docs/adr/) | how and why shared contracts change |
+| [`docs/board.md`](docs/board.md), [`docs/routines.md`](docs/routines.md) | the Board and the scheduled routines |
+| [`docs/policy-watch.md`](docs/policy-watch.md) | how policy quotes get verified (all unverified today) |
+| [`docs/evals.md`](docs/evals.md), [`docs/lessons/`](docs/lessons/) | what is measured; what the factory learned |
 
-1. В репозитории: **Settings → Pages → Source: Deploy from a branch**, выбрать ветку и папку `/ (root)`.
-2. Файл `CNAME` уже содержит `pixelcrownclub.com`.
-3. У регистратора домена добавить DNS-записи:
-   - `A` для `@` на `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
-   - `CNAME` для `www` на `<ваш-логин>.github.io`
-4. После проверки DNS включить **Enforce HTTPS**.
+## Policy quotes are unverified
 
-Подойдёт и любой статический хостинг: Netlify, Cloudflare Pages, Vercel.
+No official policy page (Google Ads, ASA/CAP, ICO, Gambling Commission, legislation.gov.uk) has been opened from the factory's environment. Every quote is marked unverified; rules built on one run as warnings until a named person verifies it, and no site launches while a quote its type's strict rules depend on is unverified. The studio's own rules (verbatim disclaimer, age ribbon, own domain, nothing third-party before consent) are hard gates from day one.
 
-## Что дописать перед запуском
+## Legacy sites
 
-- Реквизиты владельца или компании и контактный email в `terms.html`.
-- ID аналитики и ссылки на соцсети в `assets/js/config.js` (по желанию).
-- При каждом обновлении файлов меняйте `VERSION` в `sw.js`, чтобы установленное приложение подтянуло новую версию.
+- **Opal Quest Lounge** (`sites/opalquestlounge/`, until partition A's Phase 1 move: `opalquestlounge/`): site #1, built by the engine; its own README and COMPLIANCE are in its `docs/`.
+- **Pixel Crown Club** (`sites/pixelcrownclub/`, until the move: the repository root): the original hand-built site, `engine: none`; CI skips it.
+
+## Licences
+
+The factory vendors and adapts material from Everything Claude Code and claude-swarm by Affaan Mustafa (MIT). Licence texts and the per-file provenance table: [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).

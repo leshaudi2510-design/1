@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://factory.invalid/engine/games/roulette/skin.schema.json",
+  "title": "roulette skin (DRAFT, Phase 1)",
+  "description": "DRAFT for the Phase 3 plugin engine/games/roulette/ (single-zero European roulette, SPEC 3.3), generalised from engine/games/_legacy/lapidary-wheel.math.js. The maths keeps the neutral pocket keys red | black | zero and the standard wheel order and bets; the skin names the pockets, picks theme tokens and sets chips and the table limit. RTP is 36/37 for every bet whatever the skin. Not yet read by any code.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["pockets", "chips", "tableLimit"],
+  "properties": {
+    "pockets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["red", "black", "zero"],
+      "properties": {
+        "red": { "$ref": "#/$defs/pocket" },
+        "black": { "$ref": "#/$defs/pocket" },
+        "zero": { "$ref": "#/$defs/pocket" }
+      }
+    },
+    "chips": { "type": "array", "minItems": 3, "maxItems": 6, "items": { "type": "integer", "minimum": 1 } },
+    "tableLimit": { "type": "integer", "minimum": 50 },
+    "tableName": { "type": "string", "maxLength": 40, "description": "What the layout is called on the page (\"The setting circle\")." },
+    "fonts": { "type": "object", "properties": { "num": { "type": "string" } }, "additionalProperties": false }
+  },
+  "$defs": {
+    "pocket": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "token"],
+      "properties": {
+        "label": { "type": "string", "minLength": 2, "maxLength": 24, "description": "The colour's name in this world (\"Garnet\")." },
+        "token": { "type": "string", "pattern": "^--[a-z0-9-]+$", "description": "Theme token that paints it (default --pocket-red / --pocket-black / --pocket-zero)." }
+      }
+    }
+  }
+}

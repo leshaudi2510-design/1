@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://factory.invalid/engine/games/blackjack/skin.schema.json",
+  "title": "blackjack skin (DRAFT, Phase 1)",
+  "description": "DRAFT for the Phase 3 plugin engine/games/blackjack/ (SPEC 3.3), generalised from engine/games/_legacy/brilliant-21.math.js (6 decks, dealer stands on soft 17, 3:2 natural, double any two, split once). The skin names the natural and picks the rules the maths supports; the RTP printed on the page comes from engine/tools/simulate-21.mjs --spec <skin> stored in content/games/<slug>.json rtp. Not yet read by any code.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["naturalName", "stakes"],
+  "properties": {
+    "naturalName": { "type": "string", "minLength": 2, "maxLength": 24, "description": "What a two-card 21 is called (\"Brilliant\")." },
+    "decks": { "enum": [1, 2, 4, 6, 8], "default": 6 },
+    "dealer": { "enum": ["S17", "H17"], "default": "S17", "description": "Dealer stands (S17) or hits (H17) on soft 17." },
+    "naturalPays": { "enum": ["3:2"], "default": "3:2", "description": "6:5 is refused: it is the worse game sold as the same one." },
+    "cutAt": { "type": "number", "minimum": 0.15, "maximum": 0.5, "default": 0.25, "description": "Reshuffle when this share of the shoe is left." },
+    "hint": { "type": "boolean", "default": true, "description": "The basic-strategy hint button." },
+    "stakes": { "type": "array", "minItems": 3, "maxItems": 6, "items": { "type": "integer", "minimum": 1 } },
+    "fonts": { "type": "object", "properties": { "num": { "type": "string" } }, "additionalProperties": false }
+  }
+}

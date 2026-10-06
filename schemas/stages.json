@@ -1,0 +1,54 @@
+{
+  "$id": "https://studio.local/factory/schemas/stages.json",
+  "$comment": "The one state machine (SPEC 4.6, MASTER-PLAN 4.4). The Board's `stage` is canonical; order.json `status`, the registry `status`, the PR label and the Kanban column are derived from it by `derive`. tools/status.mjs --check enforces agreement; schemas/board.schema.json `stages` must equal `stages` below. `$defs` lets other schemas reference the derived vocabularies (order.schema.json uses stages.json#/$defs/orderStatus).",
+  "version": "1.0",
+  "stages": ["intake", "questions-sent", "proposal", "approved", "building", "review", "fix", "ready-for-launch", "ready", "live-pending", "live", "maintenance", "blocked", "paused", "retired"],
+  "derive": {
+    "orderStatus": { "intake": "draft", "questions-sent": "questions-sent", "proposal": "proposal", "approved": "approved", "building": "building", "review": "review", "fix": "review", "ready-for-launch": "ready-for-launch", "ready": "launch-ready", "live-pending": "live-pending", "live": "live", "maintenance": "live", "blocked": "blocked", "paused": "paused", "retired": "retired" },
+    "registryStatus": { "intake": null, "questions-sent": null, "proposal": null, "approved": "approved", "building": "approved", "review": "review", "fix": "review", "ready-for-launch": "review", "ready": "review", "live-pending": "review", "live": "live", "maintenance": "live", "blocked": "approved", "paused": "approved", "retired": "released" },
+    "prLabel": { "intake": "stage:intake", "questions-sent": "stage:intake", "proposal": "stage:proposal", "approved": "stage:approved", "building": "stage:building", "review": "stage:review", "fix": "stage:fix", "ready-for-launch": "stage:ready-for-launch", "ready": "stage:ready", "live-pending": "stage:ready", "live": "stage:live", "maintenance": "stage:maintenance", "blocked": "blocked", "paused": "blocked", "retired": null },
+    "kanbanColumn": { "intake": "intake", "questions-sent": "questions-sent", "proposal": "proposal", "approved": "approved", "building": "building", "review": "review", "fix": "fix", "ready-for-launch": "ready-for-launch", "ready": "ready", "live-pending": "live-pending", "live": "live", "maintenance": "maintenance", "blocked": "stopped", "paused": "stopped", "retired": "stopped" }
+  },
+  "kanbanColumns": ["intake", "questions-sent", "proposal", "approved", "building", "review", "fix", "ready-for-launch", "ready", "live-pending", "live", "maintenance", "stopped"],
+  "orderStatusLag": {
+    "$comment": "order.json status lags the Board for post-launch stages (SPEC 4.6, D12): when the Board stage is a key here, any listed order status is accepted by status.mjs --check.",
+    "live-pending": ["launch-ready", "live-pending"],
+    "live": ["launch-ready", "live-pending", "live"],
+    "maintenance": ["launch-ready", "live-pending", "live"],
+    "retired": ["live", "paused", "blocked", "retired"]
+  },
+  "transitions": [
+    { "from": null, "to": "intake", "by": "/order", "gate": "brand.name present" },
+    { "from": "intake", "to": "questions-sent", "by": "/order", "gate": "validate-order --level draft; brand name present" },
+    { "from": "questions-sent", "to": "proposal", "by": "/order --propose", "gate": "before-build questions answered; concept-panel produced >= 2 directions; same-family directions acknowledged" },
+    { "from": "proposal", "to": "approved", "by": "orders-inbox -> /order --approve", "gate": "pack approvalItems approved (concept, palette, typography, structure + type items); validate-order --level build; registry.mjs reserve succeeded; hosting project created" },
+    { "from": "approved", "to": "building", "by": "/batch (registry.mjs stage building)", "gate": "reservation approved; coordinator at acceptEdits+" },
+    { "from": "building", "to": "review", "by": "build-site.js Deliver", "gate": "spoke gates green; PR ready; qa:browser; fingerprint.json committed" },
+    { "from": "building", "to": "fix", "by": "build-site.js Deliver (verifyFailed)", "gate": "second Verify failure: PR stays draft, stage:fix + uniqueness, Board amber" },
+    { "from": "review", "to": "fix", "by": "review-panel.js verdict fix", "gate": "bounded to 3 rounds" },
+    { "from": "fix", "to": "review", "by": "/fix --from-review", "gate": "fix lanes done; gates green" },
+    { "from": "review", "to": "ready-for-launch", "by": "review-panel.js verdict ready", "gate": "sites-ok on head sha; skeptics <= 1; compliance pass; in-flight siblings compared" },
+    { "from": "ready-for-launch", "to": "ready", "by": "/ship after `ship <slug>`", "gate": "ship-gate.mjs all green; launch approval by a named viewer" },
+    { "from": "ready", "to": "live-pending", "by": "/ship step 3", "gate": "auto-merge enabled in the merge queue; registry live-pending" },
+    { "from": "live-pending", "to": "live", "by": "pr-shepherd", "gate": "merge + verify-then-promote deploy + green post-deploy re-probe; <meta name=build> equals the merged build" },
+    { "from": "live", "to": "maintenance", "by": "/fix on main", "gate": "same gates, lighter review (changed page types only)" },
+    { "from": "maintenance", "to": "live", "by": "/ship", "gate": "same gates, lighter review" },
+    { "from": "*", "to": "blocked", "by": "operator, review round 4, or two failed respawns", "gate": "none" },
+    { "from": "*", "to": "paused", "by": "operator", "gate": "none" },
+    { "from": "*", "to": "retired", "by": "operator", "gate": "registry release" },
+    { "from": "blocked", "to": "*", "by": "operator", "gate": "the stage it left" },
+    { "from": "paused", "to": "*", "by": "operator", "gate": "the stage it left" }
+  ],
+  "writers": {
+    "stage": ["Board via hub skills and routines"],
+    "orderStatus": ["build-site.js Deliver", "/ship", "weekly reconcile"],
+    "registryStatus": ["tools/registry.mjs (hub)"],
+    "prLabel": ["release-manager", "review-panel.js", "/ship", "pr-shepherd"]
+  },
+  "$defs": {
+    "stage": { "type": "string", "enum": ["intake", "questions-sent", "proposal", "approved", "building", "review", "fix", "ready-for-launch", "ready", "live-pending", "live", "maintenance", "blocked", "paused", "retired"] },
+    "orderStatus": { "type": "string", "enum": ["draft", "questions-sent", "proposal", "approved", "building", "review", "ready-for-launch", "launch-ready", "live-pending", "live", "blocked", "paused", "retired"] },
+    "registryStatus": { "type": "string", "enum": ["reserved", "approved", "review", "live", "released"] },
+    "prLabel": { "type": "string", "enum": ["stage:intake", "stage:proposal", "stage:approved", "stage:building", "stage:review", "stage:fix", "stage:ready-for-launch", "stage:ready", "stage:live", "stage:maintenance", "blocked"] }
+  }
+}

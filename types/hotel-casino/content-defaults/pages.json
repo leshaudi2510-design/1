@@ -1,0 +1,146 @@
+{
+  "_default": true,
+  "_about": "Default pages of the hotel-casino stub (engine/pages/article.mjs specs). A site overrides them all with its own content/pages.json. {brand}, {company}, {email} and {updated} are filled from site.config.json. Mode A (the default) is a domain with no gaming content at all, so these pages never mention it. Placeholder copy: the copy lane replaces every page before launch.",
+  "pages": [
+    {
+      "id": "home",
+      "path": "/",
+      "title": "{brand}: Rooms, Dining and Offers",
+      "description": "{brand}: rooms, dining and offers. This is the starting template: every page here is placeholder copy until the site is written.",
+      "heading": "{brand}",
+      "eyebrow": "Hotel",
+      "lede": "This is the hotel starting template. Rooms, offers, the gallery, the map and booking arrive with the full type pack.",
+      "sections": [
+        {
+          "id": "stay",
+          "title": "Stay with us",
+          "paragraphs": [
+            "Rooms and suites, dining, the spa and the meeting spaces, each with its own page, real photographs and the total price of a stay.",
+            "Placeholder copy. The copy lane replaces it with the hotel’s own facts before launch."
+          ]
+        },
+        {
+          "id": "status",
+          "title": "Template status",
+          "paragraphs": [
+            "Built from the hotel stub pack: generic pages, the engine’s basic chrome and no type rules yet. A launch build (--strict) refuses it until the pack is complete."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "about",
+      "path": "/about/",
+      "title": "About {brand}",
+      "description": "The hotel, the people who run it and how to reach them.",
+      "heading": "About {brand}",
+      "lede": "{brand} is operated by {company}.",
+      "sections": [
+        {
+          "id": "who",
+          "title": "Who we are",
+          "paragraphs": [
+            "{company} operates the hotel and this site. Its registered details are in the footer of every page.",
+            "Placeholder copy: the copy lane writes this page from the client’s facts."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "path": "/contact/",
+      "title": "Contact {brand}",
+      "description": "How to reach {brand}: email, and what to include so the team can help.",
+      "heading": "Contact us",
+      "lede": "Email <a href=\"mailto:{email}\">{email}</a>. The team replies within two working days.",
+      "sections": [
+        {
+          "id": "include",
+          "title": "What to include",
+          "paragraphs": [
+            "Your dates, the number of guests and anything we should know before you arrive."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "terms",
+      "path": "/terms/",
+      "legal": "terms",
+      "title": "Terms of Use · {brand}",
+      "description": "The terms that apply when you use the {brand} website. Placeholder text until the legal review.",
+      "heading": "Terms of use",
+      "lede": "Updated {updated}.",
+      "sections": [
+        {
+          "id": "terms-placeholder",
+          "title": "Placeholder",
+          "paragraphs": [
+            "These terms are placeholder text. The legal pages of this type are written and reviewed with the full pack, before any launch."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "privacy",
+      "path": "/privacy/",
+      "legal": "privacy",
+      "title": "Privacy Notice · {brand}",
+      "description": "What the {brand} website keeps about you and why. Placeholder text until the legal review.",
+      "heading": "Privacy notice",
+      "lede": "Updated {updated}.",
+      "sections": [
+        {
+          "id": "privacy-placeholder",
+          "title": "Placeholder",
+          "paragraphs": [
+            "This notice is placeholder text. {company} is the controller of any personal data this site handles; the full notice comes with the legal review."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cookies",
+      "path": "/cookies/",
+      "legal": "cookies",
+      "title": "Cookies and Storage · {brand}",
+      "description": "What the {brand} website stores on your device and why. Placeholder text until the legal review.",
+      "heading": "Cookies and storage",
+      "lede": "Updated {updated}.",
+      "sections": [
+        {
+          "id": "storage",
+          "title": "What we store",
+          "paragraphs": [
+            "Your theme choice and your cookie choice, on your device only. Anything else is off until you switch it on."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "not-found",
+      "path": "/404.html",
+      "file": "404.html",
+      "canonical": false,
+      "noindex": true,
+      "sitemap": false,
+      "title": "Page Not Found · {brand}",
+      "description": "This page isn’t here. Try the home page of {brand}.",
+      "heading": "This page isn’t here",
+      "eyebrow": "Error 404",
+      "lede": "It may have moved, or the address may have a typo. <a href=\"/\">Back to the home page</a>."
+    },
+    {
+      "id": "offline",
+      "path": "/offline/",
+      "canonical": false,
+      "noindex": true,
+      "sitemap": false,
+      "title": "You’re Offline · {brand}",
+      "description": "You’re offline. Pages you’ve visited on {brand} still work.",
+      "heading": "You’re offline",
+      "eyebrow": "No connection",
+      "lede": "This page hasn’t been saved on your device yet. Pages you’ve already opened still work."
+    }
+  ]
+}

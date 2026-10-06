@@ -1,0 +1,494 @@
+{
+  "$comment": "One manifest for vendored files (MASTER-PLAN 7.1, D-21; ECC-ADOPTION 8.3). files[] = copies present in this repo (row shape { dest, src, commit, mode, note? } + source/licence for non-ECC rows); pending[] = planned copies not yet made, with the phase that owns them; references[] = originals that only cite an upstream design. tools/vendor-sync.mjs reads this file.",
+  "ecc": {
+    "repo": "affaan-m/everything-claude-code",
+    "commit": "ef648e01899ba3e8dc6371642deaaf64b4477775",
+    "version": "2.2.3",
+    "licence": "MIT",
+    "copyright": "Copyright (c) 2026 Affaan Mustafa"
+  },
+  "swarm": {
+    "repo": "affaan-m/claude-swarm",
+    "commit": "9b1c5561157a",
+    "ideasOnly": true,
+    "licence": "MIT"
+  },
+  "sources": {
+    "anthropics/skills": {
+      "repo": "anthropics/skills",
+      "commit": "683bc88e56f3e09ba94f7055977f3d3aa499f202",
+      "licence": "Apache-2.0",
+      "fetched": "2026-10-06"
+    },
+    "coreyhaines31/marketingskills": {
+      "repo": "coreyhaines31/marketingskills",
+      "version": "v2.11.17",
+      "licence": "MIT",
+      "status": "pending"
+    },
+    "google-marketing-solutions/ads-policy-monitor": {
+      "repo": "google-marketing-solutions/ads-policy-monitor",
+      "licence": "Apache-2.0",
+      "status": "pending"
+    }
+  },
+  "tools": {
+    "ecc-agentshield": {
+      "version": "1.6.0",
+      "use": "tools/vet-skill.sh --scanners agentshield",
+      "vendored": false
+    }
+  },
+  "files": [
+    {
+      "dest": ".claude/agents/silent-failure-hunter.md",
+      "src": "agents/silent-failure-hunter.md",
+      "commit": "ef648e01",
+      "mode": "verbatim",
+      "note": "provenance as a YAML comment in frontmatter (agent keys are limited); factory note appended"
+    },
+    {
+      "dest": ".claude/agents/code-simplifier.md",
+      "src": "agents/code-simplifier.md",
+      "commit": "ef648e01",
+      "mode": "verbatim",
+      "note": "provenance as a YAML comment in frontmatter (agent keys are limited); factory note appended"
+    },
+    {
+      "dest": ".claude/skills/loop-design-check/SKILL.md",
+      "src": "skills/loop-design-check/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "verbatim",
+      "note": "metadata.origin only"
+    },
+    {
+      "dest": ".claude/skills/architecture-decision-records/SKILL.md",
+      "src": "skills/architecture-decision-records/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "verbatim",
+      "note": "metadata.origin only"
+    },
+    {
+      "dest": ".claude/skills/growth-log/SKILL.md",
+      "src": "skills/growth-log/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "verbatim",
+      "note": "metadata.origin only"
+    },
+    {
+      "dest": ".claude/skills/security-scan/SKILL.md",
+      "src": "skills/security-scan/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "verbatim",
+      "note": "metadata.origin; factory note appended (tools/vet-skill.sh, pinned ecc-agentshield@1.6.0)"
+    },
+    {
+      "dest": ".claude/craft/parallel-execution.md",
+      "src": "skills/parallel-execution-optimizer/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "verbatim",
+      "note": "metadata.origin only"
+    },
+    {
+      "dest": ".claude/craft/agent-harness.md",
+      "src": "skills/agent-harness-construction/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "verbatim",
+      "note": "metadata.origin only"
+    },
+    {
+      "dest": ".claude/craft/agentic-engineering.md",
+      "src": "skills/agentic-engineering/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "verbatim",
+      "note": "metadata.origin only"
+    },
+    {
+      "dest": ".claude/craft/interfaces.md",
+      "src": "skills/make-interfaces-feel-better/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "verbatim",
+      "note": "community contribution by linus707 (ECC PR #1659), origin: community kept"
+    },
+    {
+      "dest": ".claude/craft/design-direction.md",
+      "src": "skills/frontend-design-direction/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-30: ECC note dropped; factory adaptation section"
+    },
+    {
+      "dest": ".claude/craft/design-system.md",
+      "src": "skills/design-system/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-31: examples dropped; tokens.css/token contract"
+    },
+    {
+      "dest": ".claude/craft/accessibility.md",
+      "src": "skills/accessibility/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-32: iOS/Android dropped; skills/frontend-a11y folded in as vanilla HTML/JS translations (no TSX copied)"
+    },
+    {
+      "dest": ".claude/craft/motion.md",
+      "src": "skills/motion-foundations/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-37: motion/react rules, SSR and TSX dropped; CSS factory rules"
+    },
+    {
+      "dest": ".claude/craft/copy.md",
+      "src": "skills/article-writing/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-36: newsletters/essays dropped; factory page set and fact sources"
+    },
+    {
+      "dest": ".claude/craft/seo.md",
+      "src": "skills/seo/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-39: brief thresholds, schema set, doorway audit"
+    },
+    {
+      "dest": ".claude/craft/interaction-audit.md",
+      "src": "skills/click-path-audit/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-44: React/Zustand language replaced; engine client modules"
+    },
+    {
+      "dest": ".claude/craft/council.md",
+      "src": "skills/council/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-64: example and ECC persistence targets replaced by ADR/growth-log"
+    },
+    {
+      "dest": ".claude/craft/voice-profile.md",
+      "src": "skills/brand-voice/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-35: merged with skills/brand-voice/references/voice-profile-schema.md; ECC defaults and X-post collection dropped"
+    },
+    {
+      "dest": ".claude/craft/concept-synthesis.md",
+      "src": "skills/brand-discovery/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-34: merged with references/90_SYNTHESIS, 40_personality-archetype, 50_voice-tone (Raw interview sections dropped); interview, state and multi-founder protocols dropped"
+    },
+    {
+      "dest": ".claude/hooks/lib/hook-input.cjs",
+      "src": "scripts/hooks/hook-input.js",
+      "commit": "ef648e01",
+      "mode": "verbatim",
+      "note": "ECC_HOOK_INPUT_MAX_BYTES diagnostic renamed FACTORY_HOOK_INPUT_MAX_BYTES; shebang dropped"
+    },
+    {
+      "dest": ".claude/hooks/lib/visible-output.cjs",
+      "src": "scripts/hooks/pretooluse-visible-output.js",
+      "commit": "ef648e01",
+      "mode": "verbatim",
+      "note": "shebang dropped"
+    },
+    {
+      "dest": ".claude/hooks/lib/transcript-context.cjs",
+      "src": "scripts/lib/transcript-context.js",
+      "commit": "ef648e01",
+      "mode": "verbatim",
+      "note": "ECC_CONTEXT_WINDOW_TOKENS renamed FACTORY_CONTEXT_WINDOW_TOKENS"
+    },
+    {
+      "dest": ".claude/hooks/lib/suggest-compact.cjs",
+      "src": "scripts/hooks/suggest-compact.js",
+      "commit": "ef648e01",
+      "mode": "verbatim",
+      "note": "only hookEventName becomes UserPromptSubmit; require paths; exported for context-line.mjs, runs standalone only when executed directly"
+    },
+    {
+      "dest": ".claude/hooks/lib/utils.cjs",
+      "src": "scripts/lib/utils.js",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "subset: getTempDir, ensureDir, writeFile, readStdinJson, log, output"
+    },
+    {
+      "dest": ".claude/hooks/lib/config-protection.cjs",
+      "src": "scripts/hooks/config-protection.js",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-84: linter list replaced by the factory protected list; library run() for guard-scope.mjs"
+    },
+    {
+      "dest": ".claude/hooks/lib/design-signals.cjs",
+      "src": "scripts/hooks/design-quality-check.js",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-83: signal table from guard-rules.json; additionalContext instead of stderr"
+    },
+    {
+      "dest": ".claude/hooks/lib/edit-accumulator.cjs",
+      "src": "scripts/hooks/post-edit-accumulator.js",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-82: session id from stdin, all paths recorded, read/clear helpers"
+    },
+    {
+      "dest": ".claude/hooks/lib/doc-guard.cjs",
+      "src": "scripts/hooks/doc-file-warning.js",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-85: allowlist per deliverable tree, exit 2"
+    },
+    {
+      "dest": ".claude/hooks/tests/check-hooks-schema-keys.cjs",
+      "src": "scripts/ci/check-hooks-schema-keys.js",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "file argument; settings.json hooks subtree; event names from schemas/hooks.schema.json + StopFailure; matcher required per the schema; Codex set dropped"
+    },
+    {
+      "dest": ".claude/agents/uniqueness-skeptic.md",
+      "src": "agents/gan-evaluator.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-03: Playwright MCP, numeric score and file contract dropped; citation rule (D-34)"
+    },
+    {
+      "dest": ".claude/agents/compliance-judge.md",
+      "src": "agents/healthcare-reviewer.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-17: shape only; domain replaced (Google Ads, CAP 16, ICO); evaluator stance from gan-evaluator"
+    },
+    {
+      "dest": ".claude/agents/qa-runner.md",
+      "src": "agents/e2e-runner.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-11: agent-browser, POM and editing dropped; run.mjs gates; no background: true (D-34)"
+    },
+    {
+      "dest": ".claude/agents/intake-analyst.md",
+      "src": "skills/intent-driven-development/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-14 + A-15 (skills/product-capability/SKILL.md restatement block)"
+    },
+    {
+      "dest": ".claude/agents/site-sentinel.md",
+      "src": "agents/loop-operator.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-16 escalation triggers + A-48 skills/canary-watch/SKILL.md"
+    },
+    {
+      "dest": ".claude/skills/qa/SKILL.md",
+      "src": "skills/verification-loop/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "note": "A-40: phases section; npm/tsc/coverage dropped"
+    },
+    {
+      "dest": ".claude/craft/frontend-design.md",
+      "src": "skills/frontend-design/SKILL.md",
+      "source": "anthropics/skills",
+      "commit": "683bc88e56f3e09ba94f7055977f3d3aa499f202",
+      "mode": "verbatim",
+      "licence": "Apache-2.0",
+      "note": "metadata.origin added to frontmatter (a change under Apache-2.0 section 4b); licence text at .claude/craft/frontend-design.LICENSE.txt"
+    },
+    {
+      "dest": ".claude/craft/frontend-design.LICENSE.txt",
+      "src": "skills/frontend-design/LICENSE.txt",
+      "source": "anthropics/skills",
+      "commit": "683bc88e56f3e09ba94f7055977f3d3aa499f202",
+      "mode": "verbatim",
+      "licence": "Apache-2.0"
+    }
+  ],
+  "pending": [
+    {
+      "dest": ".claude/agents/concept-designer.md",
+      "src": "agents/gan-planner.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "phase": 3,
+      "status": "pending",
+      "reason": "roster: concept-designer is a Phase 3 agent (MASTER-PLAN 5.7, D-44); concept-panel.js reads the craft docs until it lands"
+    },
+    {
+      "dest": ".claude/agents/engine-reviewer.md",
+      "src": "agents/code-reviewer.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "phase": 2,
+      "status": "pending",
+      "reason": "roster: engine-reviewer is a Phase 2 agent; engine-regression.js Review tolerates its absence"
+    },
+    {
+      "dest": ".claude/agents/copywriter.md",
+      "src": "agents/marketing-agent.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "phase": 2,
+      "status": "pending",
+      "reason": "roster: Phase 2 lane agent"
+    },
+    {
+      "dest": ".claude/agents/lessons-miner.md",
+      "src": "agents/conversation-analyzer.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "phase": 4,
+      "status": "pending",
+      "reason": "roster: Phase 4 agent"
+    },
+    {
+      "dest": ".claude/agents/compliance-auditor.md",
+      "src": "agents/a11y-architect.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "phase": 3,
+      "status": "pending",
+      "reason": "roster: Phase 3 agent (merged with seo-specialist, performance-optimizer, doc-updater)"
+    },
+    {
+      "dest": ".claude/agents/release-manager.md",
+      "src": "agents/opensource-sanitizer.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "phase": 3,
+      "status": "pending",
+      "reason": "roster: Phase 3 agent (pre-check section only)"
+    },
+    {
+      "dest": ".claude/skills/review/SKILL.md",
+      "src": "skills/santa-method/SKILL.md",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "phase": 3,
+      "status": "pending",
+      "reason": "roster: /review is a Phase 3 skill (independence rules section)"
+    },
+    {
+      "dest": ".claude/workflows/review-panel.js",
+      "src": "workflows/orch-review.workflow.js",
+      "commit": "ef648e01",
+      "mode": "adapted",
+      "phase": 3,
+      "status": "pending",
+      "reason": "roster: review-panel.js is a Phase 3 workflow (Verdict stage only)"
+    },
+    {
+      "dest": ".claude/skills/ppc-kit/references/",
+      "src": "skills/*/references (seven ads references) + evals.json",
+      "source": "coreyhaines31/marketingskills",
+      "commit": "v2.11.17",
+      "mode": "verbatim",
+      "phase": 5,
+      "status": "pending",
+      "reason": "partition P, Phase 5"
+    },
+    {
+      "dest": "ppc/queries/",
+      "src": "cloud_functions/ads_policy_monitor/gaql/{ad_policy_data,ad_group_asset,campaign_asset,customer_asset}.sql",
+      "source": "google-marketing-solutions/ads-policy-monitor",
+      "commit": "",
+      "mode": "verbatim",
+      "licence": "Apache-2.0",
+      "phase": 5,
+      "status": "pending",
+      "reason": "partition P, Phase 5"
+    }
+  ],
+  "references": [
+    {
+      "dest": ".claude/hooks/lib/out.cjs",
+      "src": "scripts/hooks/run-with-flags.js + scripts/lib/hook-flags.js",
+      "commit": "ef648e01",
+      "mode": "reference",
+      "ids": "A-77"
+    },
+    {
+      "dest": ".claude/hooks/lib/state-load.mjs",
+      "src": "scripts/hooks/session-start.js",
+      "commit": "ef648e01",
+      "mode": "reference",
+      "ids": "A-79"
+    },
+    {
+      "dest": ".claude/hooks/session-start.sh",
+      "src": "scripts/hooks/session-start.js",
+      "commit": "ef648e01",
+      "mode": "reference",
+      "ids": "A-101"
+    },
+    {
+      "dest": ".claude/hooks/flush-events.mjs",
+      "src": "scripts/hooks/{session-end,pre-compact,stop-format-typecheck,cost-tracker,skill-run-tracker,session-activity-tracker,governance-capture}.js",
+      "commit": "ef648e01",
+      "mode": "reference",
+      "ids": "A-80..A-82, A-54, A-70, A-88, A-89"
+    },
+    {
+      "dest": ".claude/hooks/guard-ship.mjs",
+      "src": "scripts/hooks/{gateguard-heredoc,gateguard-fact-force,pre-bash-commit-quality}.js",
+      "commit": "ef648e01",
+      "mode": "reference",
+      "ids": "A-86, A-87"
+    },
+    {
+      "dest": ".claude/hooks/guard-scope.mjs",
+      "src": "scripts/hooks/{config-protection,doc-file-warning}.js",
+      "commit": "ef648e01",
+      "mode": "reference",
+      "ids": "A-84, A-85"
+    },
+    {
+      "dest": ".claude/hooks/guard-rules.json",
+      "src": "skills/hookify-rules/SKILL.md (rule shape)",
+      "commit": "ef648e01",
+      "mode": "reference",
+      "ids": "A-65"
+    },
+    {
+      "dest": ".claude/workflows/engine-regression.js",
+      "src": "skills/dynamic-workflow-mode/SKILL.md (header); claude-swarm src/claude_swarm/quality_gate.py @ 9b1c5561157a (fail-closed idea)",
+      "commit": "ef648e01",
+      "mode": "reference",
+      "ids": "A-73, A-100"
+    },
+    {
+      "dest": ".claude/workflows/concept-panel.js",
+      "src": "skills/dev-team/SKILL.md (judging lenses, untrusted wrapper); agents/agent-evaluator.md (scores)",
+      "commit": "ef648e01",
+      "mode": "reference",
+      "ids": "A-25, A-33, A-73"
+    },
+    {
+      "dest": "CLAUDE.md",
+      "src": "CLAUDE.md (Prompt Defense Baseline bullets 1,2,4-6 verbatim); rules/common/agents.md (Delegation Completion Contract verbatim)",
+      "commit": "ef648e01",
+      "mode": "reference",
+      "ids": "4.1, 4.3, I-13"
+    },
+    {
+      "dest": ".claude/rules/sites.md",
+      "src": "rules/web/design-quality.md, rules/web/performance.md, rules/common/code-review.md",
+      "commit": "ef648e01",
+      "mode": "reference",
+      "ids": "A-92, A-94, A-95"
+    },
+    {
+      "dest": ".claude/rules/engine.md",
+      "src": "skills/ai-regression-testing, skills/search-first, rules/web/{performance,testing,security,coding-style}.md",
+      "commit": "ef648e01",
+      "mode": "reference",
+      "ids": "A-43, A-63, A-95, A-96"
+    }
+  ]
+}

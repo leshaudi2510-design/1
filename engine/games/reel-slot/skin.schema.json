@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://factory.invalid/engine/games/reel-slot/skin.schema.json",
+  "title": "reel-slot skin (DRAFT, Phase 1)",
+  "description": "DRAFT for the Phase 3 plugin engine/games/reel-slot/ (SPEC 3.3), generalised from engine/games/_legacy/seven-systems.math.js. A skin is site.config.json typeOptions.games[].skin for an entry with engine 'reel-slot' (hand edits allowed there only, D-11). The maths keeps neutral keys: symbol codes are single upper-case letters; names, notes, colours, strips and paytable come from the skin. exactStats() recomputes the RTP from strips + paytable at build time (lint sc.skin-schema validates the skin; the build prints the RTP). Not yet read by any code.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["symbols", "strips", "paytable", "stakes"],
+  "properties": {
+    "reels": { "const": 3, "description": "Three reels today (the legacy maths); 5 is an engine-library work order." },
+    "rows": { "const": 3 },
+    "symbols": {
+      "type": "object",
+      "description": "By code: what the symbol is called and shown as. Objects and places only (CAP art rule).",
+      "minProperties": 6,
+      "maxProperties": 10,
+      "propertyNames": { "pattern": "^[A-Z]$" },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "minLength": 2, "maxLength": 24 },
+          "note": { "type": "string", "maxLength": 120 },
+          "wild": { "type": "boolean" },
+          "set": { "type": ["string", "null"], "description": "Id of a mixed-symbol set in 'sets', or null." },
+          "art": { "type": "string", "description": "Sprite symbol id in the site's art/index.mjs." }
+        }
+      }
+    },
+    "sets": {
+      "type": "object",
+      "description": "Mixed-symbol pays: any three members in any order pay 'pays' x the line stake.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "members", "pays"],
+        "properties": {
+          "name": { "type": "string" },
+          "members": { "type": "array", "minItems": 2, "items": { "type": "string", "pattern": "^[A-Z]$" } },
+          "pays": { "type": "number", "exclusiveMinimum": 0 },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "strips": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "description": "One string of symbol codes per reel; every reel the same length.",
+      "items": { "type": "string", "pattern": "^[A-Z]{12,64}$" }
+    },
+    "paytable": {
+      "type": "object",
+      "description": "Three of a kind, as multiples of the line stake, by symbol code.",
+      "propertyNames": { "pattern": "^[A-Z]$" },
+      "additionalProperties": { "type": "number", "exclusiveMinimum": 0 }
+    },
+    "lines": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "description": "Paylines as row indexes per reel (0 top, 1 middle, 2 bottom); default the legacy five.",
+      "items": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "enum": [0, 1, 2] } }
+    },
+    "stakes": { "type": "array", "minItems": 3, "maxItems": 6, "items": { "type": "integer", "minimum": 1 } },
+    "targetRtp": { "type": "number", "minimum": 0.9, "maximum": 0.99, "description": "What the skin designer aimed for; the build prints the exact figure." },
+    "colours": { "type": "object", "additionalProperties": { "type": "string", "pattern": "^--[a-z0-9-]+$" }, "description": "Roles to theme token names (no colour literals)." },
+    "fonts": { "type": "object", "properties": { "num": { "type": "string" } }, "additionalProperties": false }
+  }
+}

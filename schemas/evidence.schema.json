@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://studio.local/factory/schemas/evidence.schema.json",
+  "title": "Evidence Bundle summary",
+  "description": "reports/<slug>/evidence/summary.json written by tools/evidence.mjs (SPEC 14) and mirrored to orders/<slug>/evidence/summary.json at /ship. Rendered by evidence-clerk into artifacts/evidence.template.html (client-facing; WebP data URIs under 10 MB). Per-type checklist items: social-casino certification dossier status; hotel-casino Mode and geo list verified; online-games provider paid-search clause (MASTER-PLAN 5.6).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["slug", "brand", "domain", "type", "engineVersion", "buildVersion", "checklist", "uniqueness", "reviews", "check", "lighthouse", "generatedAt"],
+  "properties": {
+    "slug": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,39}$" },
+    "brand": { "type": "string" },
+    "domain": { "type": "string" },
+    "type": { "type": "string", "enum": ["social-casino", "online-games", "hotel-casino"] },
+    "variant": { "type": "string" },
+    "casinoMode": { "type": "string", "enum": ["A", "A+", "B"] },
+    "engineVersion": { "type": "string" },
+    "buildVersion": { "type": "string" },
+    "generatedAt": { "type": "string" },
+    "headSha": { "type": "string" },
+    "deployed": {
+      "type": ["object", "null"],
+      "properties": { "version": { "type": "string" }, "at": { "type": "string" }, "sha": { "type": "string" } }
+    },
+    "checklist": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["item", "done"],
+        "properties": {
+          "item": { "type": "string" },
+          "done": { "type": "boolean" },
+          "by": { "type": "string" },
+          "on": { "type": "string" },
+          "evidence": { "type": "string" },
+          "command": { "type": "string" }
+        }
+      }
+    },
+    "uniqueness": {
+      "type": "object",
+      "required": ["nearest", "inFlightCompared", "passed"],
+      "properties": {
+        "nearest": { "type": "array", "maxItems": 2, "items": { "type": "string" } },
+        "inFlightCompared": { "type": "array", "items": { "type": "string" } },
+        "scores": { "type": "object" },
+        "passed": { "type": "boolean" }
+      }
+    },
+    "reviews": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["round", "verdict", "items"],
+        "properties": {
+          "round": { "type": "integer", "minimum": 1 },
+          "verdict": { "type": "string", "enum": ["ready", "fix", "blocked"] },
+          "rubricVersions": { "type": "object" },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["judge", "page", "rule"],
+              "properties": {
+                "judge": { "type": "string" }, "page": { "type": "string" }, "quote": { "type": "string" }, "selector": { "type": "string" },
+                "rule": { "type": "string" }, "fix": { "type": "string" }, "severity": { "type": "string", "enum": ["blocking", "advisory"] },
+                "fixedBy": { "type": "object", "properties": { "commit": { "type": "string" }, "url": { "type": "string" } } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "check": {
+      "type": "object",
+      "required": ["totals", "sections", "axe"],
+      "properties": {
+        "totals": { "type": "object", "required": ["passed", "failed"], "properties": { "passed": { "type": "integer" }, "failed": { "type": "integer" } } },
+        "partial": { "type": "boolean" },
+        "sections": { "type": "array", "items": { "type": "object", "required": ["id", "passed", "failed"], "properties": { "id": { "type": "string" }, "title": { "type": "string" }, "passed": { "type": "integer" }, "failed": { "type": "integer" } } } },
+        "axe": { "type": "object", "required": ["violations"], "properties": { "violations": { "type": "integer", "minimum": 0 }, "pages": { "type": "integer" } } }
+      }
+    },
+    "lighthouse": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["url", "preset", "perf", "a11y", "bp", "seo"],
+        "properties": {
+          "url": { "type": "string" }, "preset": { "type": "string", "enum": ["mobile", "desktop"] },
+          "perf": { "type": "number" }, "a11y": { "type": "number" }, "bp": { "type": "number" }, "seo": { "type": "number" },
+          "lcp": { "type": "number" }, "cls": { "type": "number" }, "reportUrl": { "type": "string" }
+        }
+      }
+    },
+    "policies": {
+      "type": "object",
+      "properties": { "verified": { "type": "integer" }, "unverified": { "type": "integer" }, "demoted": { "type": "array", "items": { "type": "string" } } }
+    },
+    "liveHeaders": {
+      "type": ["object", "null"],
+      "properties": {
+        "csp": { "type": "string" }, "hsts": { "type": "string" }, "frameAncestors": { "type": "string" },
+        "cacheControl": { "type": "object" }, "pagesDevNoindex": { "type": "boolean" }
+      }
+    },
+    "screenshots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["page", "theme", "width", "dataUri"],
+        "properties": {
+          "page": { "type": "string" }, "theme": { "type": "string", "enum": ["light", "dark"] }, "width": { "type": "integer" },
+          "dataUri": { "type": "string", "pattern": "^data:image/(webp|png);base64," }
+        }
+      }
+    },
+    "complianceMd": { "type": "string" }
+  }
+}

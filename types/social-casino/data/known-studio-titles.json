@@ -1,0 +1,92 @@
+{
+  "_about": "Game titles of other studios that a house game's name must not equal or closely imitate (lint sc.game-name-collision, Phase 3; the game-skinner and the uniqueness skeptic read it). A seed list of widely known titles, compiled from memory on 2026-10-06 without network access: it is not exhaustive, and an entry's studio attribution is informational only. Comparison is case-insensitive on letters and digits; 'avoidWords' are single words too closely tied to one title to use in a house game's name. Owned by partition B (engine-games) from Phase 3.",
+  "schemaVersion": 1,
+  "compiled": "2026-10-06",
+  "studios": [
+    {
+      "studio": "Pragmatic Play",
+      "titles": ["Gates of Olympus", "Gates of Olympus 1000", "Zeus vs Hades - Gods of War", "Fruit Party", "Big Bass Bonanza", "Big Bass Splash", "Wolf Gold", "Great Rhino Megaways", "Buffalo King Megaways", "Madame Destiny Megaways", "Wild West Gold", "Sweet Bonanza", "Sugar Rush", "The Dog House", "Starlight Princess", "John Hunter and the Tomb of the Scarab Queen", "Gems Bonanza", "Release the Kraken", "Floating Dragon", "Joker's Jewels", "Mustang Gold", "Chilli Heat", "5 Lions Megaways", "Curse of the Werewolf Megaways"]
+    },
+    {
+      "studio": "NetEnt",
+      "titles": ["Starburst", "Gonzo's Quest", "Dead or Alive", "Dead or Alive 2", "Twin Spin", "Mega Fortune", "Divine Fortune", "Blood Suckers", "Jack and the Beanstalk", "Hall of Gods", "Mega Joker", "Aloha! Cluster Pays", "Finn and the Swirly Spin", "Narcos", "Vikings"]
+    },
+    {
+      "studio": "Red Tiger",
+      "titles": ["Gonzo's Quest Megaways", "Dragon's Luck", "Pirates' Plenty", "Mystery Reels", "Piggy Riches Megaways"]
+    },
+    {
+      "studio": "Play'n GO",
+      "titles": ["Book of Dead", "Reactoonz", "Rise of Olympus", "Fire Joker", "Moon Princess", "Legacy of Dead", "Rich Wilde and the Tome of Madness", "Gemix", "Viking Runecraft", "Golden Ticket"]
+    },
+    {
+      "studio": "Games Global (Microgaming)",
+      "titles": ["Mega Moolah", "Immortal Romance", "Thunderstruck", "Thunderstruck II", "Break da Bank Again", "Avalon", "9 Masks of Fire", "Agent Jane Blonde"]
+    },
+    {
+      "studio": "Big Time Gaming",
+      "titles": ["Bonanza", "Extra Chilli", "White Rabbit", "Danger High Voltage", "Who Wants to Be a Millionaire", "Kingmaker"]
+    },
+    {
+      "studio": "Blueprint Gaming",
+      "titles": ["Fishin' Frenzy", "Eye of Horus", "Diamond Mine", "Ted", "King Kong Cash", "Wish Upon a Jackpot"]
+    },
+    {
+      "studio": "Novomatic",
+      "titles": ["Book of Ra", "Book of Ra Deluxe", "Sizzling Hot", "Lucky Lady's Charm", "Dolphin's Pearl", "Lord of the Ocean", "Columbus"]
+    },
+    {
+      "studio": "IGT",
+      "titles": ["Cleopatra", "Da Vinci Diamonds", "Wolf Run", "Wheel of Fortune", "Double Diamond", "Siberian Storm", "Kitty Glitter"]
+    },
+    {
+      "studio": "Aristocrat",
+      "titles": ["Buffalo", "Queen of the Nile", "5 Dragons", "Lightning Link", "Where's the Gold", "Big Red", "Dragon Link"]
+    },
+    {
+      "studio": "Light & Wonder (Barcrest, WMS)",
+      "titles": ["Rainbow Riches", "88 Fortunes", "Zeus", "Raging Rhino", "Bier Haus", "Monopoly Big Event"]
+    },
+    {
+      "studio": "Playtech",
+      "titles": ["Age of the Gods", "Gladiator", "Buffalo Blitz", "Great Blue", "Halloween Fortune", "Beach Life"]
+    },
+    {
+      "studio": "Nolimit City",
+      "titles": ["Mental", "San Quentin", "Tombstone", "Deadwood", "Fire in the Hole", "Punk Rocker"]
+    },
+    {
+      "studio": "Hacksaw Gaming",
+      "titles": ["Wanted Dead or a Wild", "Chaos Crew", "Hand of Anubis", "Stack 'Em", "RIP City"]
+    },
+    {
+      "studio": "Push Gaming",
+      "titles": ["Jammin' Jars", "Razor Shark", "Fat Rabbit", "Big Bamboo", "Retro Tapes"]
+    },
+    {
+      "studio": "Relax Gaming",
+      "titles": ["Money Train", "Money Train 2", "Temple Tumble", "Snake Arena"]
+    },
+    {
+      "studio": "ELK Studios",
+      "titles": ["Wild Toro", "Cygnus", "Nitropolis", "Ecuador Gold"]
+    },
+    {
+      "studio": "Yggdrasil",
+      "titles": ["Vikings Go Berzerk", "Valley of the Gods", "Holmes and the Stolen Stones", "Joker Millions"]
+    },
+    {
+      "studio": "Quickspin",
+      "titles": ["Big Bad Wolf", "Sakura Fortune", "Sticky Bandits", "Ticket to the Stars"]
+    },
+    {
+      "studio": "Thunderkick",
+      "titles": ["Esqueleto Explosivo", "Pink Elephants", "Beat the Beast"]
+    },
+    {
+      "studio": "Evolution (live and game shows)",
+      "titles": ["Crazy Time", "Lightning Roulette", "Monopoly Live", "Dream Catcher", "Lightning Dice", "Mega Ball", "Funky Time"]
+    }
+  ],
+  "avoidWords": ["Megaways", "Bonanza", "Olympus", "Moolah", "Starburst", "Thunderstruck", "Reactoonz", "Jackpot"]
+}

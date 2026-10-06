@@ -1,0 +1,102 @@
+{
+  "fixture": "bad-copy",
+  "purpose": "Calibration (SPEC 15.6, MASTER-PLAN 9.3): a site whose copy breaks the wording rules. The strict build's wording lint must report forbidden wording (deposit, cash out, real money wins, win big, jackpot, hurry, don't miss out); compliance-judge must return pass: false with quotes for the implied-winning phrasing a regex cannot catch (\"your luckiest table awaits\", \"members win more\"), the mascot cover subject (a smiling moon) and the dark theme that is a plain inversion.",
+  "handWritten": [
+    "site.config.json",
+    "data/pragmatic-games.json (summary, bonus, howItPlays, features)",
+    "fixture.json conceptForJudges (becomes concept.json once engine/schema/concept.schema.json exists, Phase 2)"
+  ],
+  "copiedFrom": "the reference site's public assets, fonts data and tokens (hues rotated 150 degrees), so the build itself succeeds and only the copy is wrong",
+  "expect": {
+    "strictBuild": "problems include forbidden wording",
+    "complianceJudge": "pass: false, blocking items quote the implied-winning lines",
+    "uniquenessPost": "pass once site copy lives in sites/<slug>/content (Phase 2); in Phase 1 the engine pages still carry the reference copy"
+  },
+  "conceptForJudges": {
+    "title": "Moonlit Lanterns",
+    "family": "theatre-stage",
+    "era": "contemporary",
+    "place": "night market",
+    "craft": "paper lanterns",
+    "world": "A night market under a smiling moon mascot who winks at every player and promises that tonight is the lucky night. Lanterns glow brighter the longer you stay.",
+    "boldMove": "The moon mascot follows the cursor and cheers every spin.",
+    "vocabulary": [
+      {
+        "term": "Lantern",
+        "meaning": "The virtual unit",
+        "usedFor": [
+          "currency"
+        ]
+      },
+      {
+        "term": "Lucky night",
+        "meaning": "A session",
+        "usedFor": [
+          "copy"
+        ]
+      },
+      {
+        "term": "Moon bonus",
+        "meaning": "Free spins",
+        "usedFor": [
+          "copy"
+        ]
+      },
+      {
+        "term": "Stall",
+        "meaning": "A game",
+        "usedFor": [
+          "nav"
+        ]
+      },
+      {
+        "term": "Glow",
+        "meaning": "A win",
+        "usedFor": [
+          "ui-state"
+        ]
+      },
+      {
+        "term": "Wish",
+        "meaning": "A spin",
+        "usedFor": [
+          "copy"
+        ]
+      }
+    ],
+    "artwork": {
+      "rule": "objects-and-places-only",
+      "subjects": [
+        "a smiling moon mascot",
+        "paper lanterns",
+        "market stalls",
+        "a cartoon cat holding coins"
+      ],
+      "avoid": []
+    },
+    "palette": {
+      "colours": [],
+      "themes": {
+        "light": {
+          "background": "#FFFFFF",
+          "text": "#000000"
+        },
+        "dark": {
+          "background": "#000000",
+          "text": "#FFFFFF",
+          "note": "plain inversion of the light theme"
+        }
+      }
+    },
+    "fonts": {
+      "display": "Archivo",
+      "body": "Radio Canada"
+    },
+    "voice": {
+      "register": "warm",
+      "notes": "Excited, urgent, lots of exclamation marks."
+    },
+    "antiReferences": [],
+    "siblings": []
+  }
+}

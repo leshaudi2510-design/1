@@ -1,0 +1,128 @@
+/* ---------- 10. Demo stage (component; same on home and game pages) ----------
+   Markup: src/lib/ui/stage.mjs. States (data-state on the root, set by
+   assets/js/games/pragmatic.js): idle · loading · ready · failed · blocked,
+   plus [data-expanded] (the fullscreen fallback) and :fullscreen. */
+.stage{position:relative;z-index:1;background:var(--stage-frame);border:var(--bw-heavy) solid var(--line);border-radius:var(--r-stage);box-shadow:10px 10px 0 var(--pop);overflow:hidden;color:var(--text)}
+/* The bar keeps the same rows in every state: it is always tall enough for the
+   46px fullscreen button (46 + 2 × 7 + 4 = 64), and Close demo, shown from
+   Play on, keeps its place while idle (hidden, so it can't be focused), so
+   pressing Play never makes the bar or the stage jump. */
+.stage__bar{display:flex;align-items:center;gap:10px 14px;padding:7px 14px;border-bottom:var(--bw-heavy) solid var(--line);flex-wrap:wrap;min-height:64px;container-type:inline-size}
+.stage__label{font:900 14px/1 var(--f-ui);font-stretch:118%;text-transform:uppercase;letter-spacing:.07em;background:var(--m);color:var(--k);border:var(--bw-ctl) solid var(--k);border-radius:6px;padding:7px 10px 6px;transform:rotate(-2deg);flex:none}
+.stage__name{flex:1 1 6em;min-width:0;font:800 18px/1.15 var(--f-ui);font-stretch:104%} /* takes the spare room */
+.stage__prov{display:inline-flex;align-items:center;gap:7px;font:600 15px/1.2 var(--f-body);color:var(--text-2)}
+.stage__bar .stage__prov{margin-left:auto}
+.stage__tools{margin-left:auto;display:flex;align-items:center;gap:8px}
+.stage__tools .when-ready{display:inline-flex!important;visibility:hidden}
+.stage:is([data-state="loading"],[data-state="ready"]) .stage__tools .when-ready{visibility:visible}
+/* Home: the tools replace the provider once Play is pressed. The name takes
+   the squeeze, and on a narrow bar the decorative label makes way for them
+   (the label isn't part of the stage's name). On the narrowest phones the
+   name steps out of sight too (still the stage's name for screen readers);
+   the loading message and the game itself name it. */
+.stage--featured .stage__name{flex-basis:0;overflow-wrap:break-word}
+@container (max-width: 520px){
+  .stage--featured:is([data-state="loading"],[data-state="ready"]) .stage__label{display:none}
+}
+@container (max-width: 290px){
+  .stage--featured:is([data-state="loading"],[data-state="ready"]) .stage__name{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+}
+
+/* the screen: a 16:10 cover with our art, the lettering and the Play button */
+.stage__screen{position:relative;aspect-ratio:16/10;container-type:inline-size;--focus:#FFFFFF;
+  --c1:#5B2BD6;--c2:#E0288F} /* fallback colours; each game's [data-cover] rule replaces them */
+.stage__screen[data-cover="gates-of-olympus"]{--c1:#4A22C9} /* the stage art is drawn on a deeper violet */
+.stage__art{position:absolute;inset:0;width:100%;height:100%}
+/* a lobby cover motif (4:3) across the 16:10 screen: full width, trimmed top and bottom,
+   nudged down so the lettering sits over the sky and the Play button over the ground */
+.stage__art--cover{inset:6% 0 auto;height:auto;aspect-ratio:16/10;max-width:none}
+.stage__over{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:3cqi;padding:5cqi 4cqi 5cqi}
+.stage__title.ct,.stage__screen .stage__title.ct{position:static;font-size:8.8cqi;max-width:100%}
+.stage__screen .stage__title--l.ct{font-size:7.6cqi}
+.stage__screen .stage__title--xl.ct{font-size:6.6cqi}
+.stage__title small{font-size:.46em}
+.stage__title .rib{font-size:.34em}
+
+/* the caption, required in every state */
+.stage__foot{display:flex;align-items:flex-start;gap:10px;padding:11px 14px 12px;border-top:var(--bw-heavy) solid var(--line);font-size:15px;line-height:1.45}
+.stage__foot svg{width:22px;height:22px;flex:none;margin-top:1px}
+.stage__foot p span{color:var(--text-2)}
+
+/* fact strip under the home stage; fact tags also sit in the game hero meta row */
+.stage__facts{position:relative;z-index:1;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:22px}
+.fact{display:inline-flex;align-items:center;gap:5px;min-height:32px;font:700 14px/1 var(--f-ui);font-stretch:104%;padding:6px 11px;border:var(--bw-ctl) solid var(--ctl-line);border-radius:var(--r-pill);background:var(--surface);color:var(--text);white-space:nowrap}
+.fact--link{gap:6px;background:var(--k);color:var(--y);border-color:var(--k);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px;box-shadow:3px 3px 0 var(--m)}
+.fact--link:hover{text-decoration-thickness:3px}
+.fact--link svg{width:17px;height:17px}
+
+/* small buttons (global: the stage tools, Settings, the consent banner) */
+.btn--sm{min-height:44px;padding:6px 14px;font-size:15px;--sh:3px;gap:6px}
+.btn--sm svg{width:18px;height:18px}
+
+/* tools that belong to a running demo: Close demo shows from the moment Play
+   is pressed (focus moves to it, and it can cancel a slow load); on game
+   pages it keeps its place, hidden, before that (see .stage__tools above) */
+.when-ready{display:none!important}
+.stage:is([data-state="loading"],[data-state="ready"]) .when-ready{display:inline-flex!important}
+.stage:is([data-state="loading"],[data-state="ready"]) .when-idle{display:none}
+
+/* the iframe fills the screen once loaded */
+.stage__frame{position:absolute;inset:0;z-index:4;display:none;background:#000}
+.stage[data-state="ready"] .stage__frame{display:block}
+.stage[data-state="ready"] .stage__over{display:none}
+.stage__frame iframe{display:block;width:100%;height:100%;border:0;background:#000}
+
+/* loading, failed and blocked: an ink scrim over the cover with one message */
+.stage__msg{position:absolute;inset:0;z-index:5;display:none;place-items:center;padding:5cqi 6cqi;text-align:center;background:rgb(24 18 43 / .86);color:#FFF5E1;--focus:#FFE11A}
+.stage__msg > div{max-width:30em;display:grid;justify-items:center;gap:clamp(8px, 2cqi, 14px)}
+.stage__msg p{font-size:clamp(14px, 2.2cqi, 18px);line-height:1.45}
+.stage__msg strong{font:900 clamp(18px, 3.2cqi, 26px)/1.15 var(--f-ui);font-stretch:108%}
+.stage__msg .ico{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:var(--y);color:var(--k);border:var(--bw) solid var(--k)}
+.stage__msg .ico svg{width:28px;height:28px}
+.stage__msg .btn--secondary{background:#FFFFFF;color:var(--k);border-color:var(--k);--btn-pop:var(--k)}
+.stage__msg .btn--secondary svg{width:18px;height:18px}
+.stage__msg a:not(.btn){display:inline-block;padding:3px 0;color:#FFE11A;font-weight:600}
+.stage__msg-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 12px;margin-top:2px}
+.stage[data-state="loading"] .stage__msg--loading,
+.stage[data-state="failed"] .stage__msg--failed,
+.stage[data-state="blocked"] .stage__msg--blocked{display:grid}
+/* a shown message sits in the flow, so on a narrow screen it can make the screen taller than 16:10 rather than be cut off */
+.stage:is([data-state="loading"],[data-state="failed"],[data-state="blocked"]) .stage__screen{aspect-ratio:auto}
+.stage:is([data-state="loading"],[data-state="failed"],[data-state="blocked"]) .stage__msg{position:relative;inset:auto;min-height:62.5cqi}
+.stage:is([data-state="loading"],[data-state="failed"],[data-state="blocked"]) .btn--play{visibility:hidden}
+.bar{display:block;width:min(260px, 60cqi);height:12px;border-radius:999px;border:2px solid #FFF5E1;background:linear-gradient(90deg, #FFE11A 0 40%, transparent 40%)}
+
+/* fullscreen, and the expanded fallback where an element can't go fullscreen (iPhone) */
+.stage[data-expanded]{position:fixed;inset:0;z-index:90}
+.stage[data-expanded],.stage:fullscreen{border-radius:0;border-width:0;box-shadow:none;display:flex;flex-direction:column;width:100%;height:100%;height:100dvh}
+.stage:is([data-expanded],:fullscreen) .stage__screen{flex:1;aspect-ratio:auto;min-height:0}
+.stage:is([data-expanded],:fullscreen) .stage__foot{display:none}
+.stage:is([data-expanded],:fullscreen) .stage__bar{padding-top:max(10px, env(safe-area-inset-top));padding-inline:max(14px, env(safe-area-inset-left)) max(14px, env(safe-area-inset-right))}
+.stage:is([data-expanded],:fullscreen) .stage__label{transform:none}
+/* the heroes are stacking contexts: lift the one holding an expanded stage over the sticky header and the dock */
+:is(.hero,.game-hero,.hero__stage):has(.stage[data-expanded]){z-index:95}
+html:has(.stage[data-expanded]){overflow:hidden}
+
+/* ---------- responsive ---------- */
+@media (max-width: 1239px){
+  .stage__bar .stage__prov{display:none}
+}
+@media (max-width: 720px){
+  .stage{border-width:3px;box-shadow:6px 6px 0 var(--pop);border-radius:18px}
+  .stage__bar{padding:8px 10px;min-height:65px;gap:8px;border-bottom-width:3px} /* 46 + 2 × 8 + 3 */
+  .stage__label{font-size:11.5px;padding:6px 7px 5px;letter-spacing:.05em;font-stretch:112%}
+  .stage__name{font-size:16px;font-stretch:100%}
+  .stage__bar .stage__prov{display:none}
+  .stage__foot{font-size:14px;padding:9px 12px 10px;border-top-width:3px}
+  .stage__facts{margin-top:18px;gap:6px}
+  .fact{font-size:13px;min-height:30px;padding:5px 9px}
+  .btn--play{min-height:50px;padding:6px 16px 6px 6px;gap:9px;border-width:3px;font-size:15.5px;--sh:4px}
+  .btn--play .play-ico{width:34px;height:34px}
+  .stage__msg{padding:12px 16px}
+  .stage__msg .ico{width:40px;height:40px;border-width:2.5px}
+  .stage__msg .ico svg{width:22px;height:22px}
+  .stage__msg .btn--sm{min-height:40px;padding:5px 12px;font-size:14.5px}
+}
+@media (max-width: 400px){
+  .btn--play{font-size:15px;font-stretch:96%}
+}
