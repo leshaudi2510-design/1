@@ -1,0 +1,768 @@
+{
+  "schemaVersion": "1.2",
+  "orderId": "meridian-signal-rooms",
+  "type": "social-casino",
+  "variant": "own-games",
+  "status": "approved",
+  "client": {
+    "name": "Studio client 03 (fictional example)",
+    "contact": {
+      "telegram": "@client03"
+    },
+    "language": "ru",
+    "notes": "Third site for the same operator as Opal Quest Lounge. Wants the same hosting and CI pattern."
+  },
+  "brief": {
+    "path": "orders/meridian-signal-rooms/brief.md",
+    "receivedAt": "2026-10-06",
+    "language": "ru",
+    "summary": "Client wants a third UK social-casino site called Meridian Signal Rooms on meridiansignalrooms.com, themed on a Victorian observatory and time-signal station. No purchases. GA4 ID to follow. Launch by 20 November 2026. Hosting like the other sites (Cloudflare Pages)."
+  },
+  "brand": {
+    "name": "Meridian Signal Rooms",
+    "shortName": "Meridian",
+    "wordmarkTag": true,
+    "trademarkSearch": {
+      "done": true,
+      "by": "operator",
+      "on": "2026-10-07",
+      "notes": "No UK or EU mark found for the phrase; no casino brand uses 'Meridian' alone in gambling class 41 (operator to confirm with counsel)."
+    },
+    "rationale": "Greenwich meridian + the 1 pm time ball and telegraph signal rooms. Nothing in the name promises winning."
+  },
+  "domain": "meridiansignalrooms.com",
+  "dns": {
+    "registrar": "Namecheap",
+    "managedBy": "cloudflare",
+    "accessConfirmed": true,
+    "notes": "Nameservers already moved to Cloudflare on 2026-10-07."
+  },
+  "markets": [
+    "GB"
+  ],
+  "locales": [
+    {
+      "code": "en-GB",
+      "path": "/",
+      "default": true,
+      "dir": "ltr",
+      "fonts": [
+        "fraunces",
+        "public-sans",
+        "azeret-mono"
+      ],
+      "dictionary": "en-GB"
+    }
+  ],
+  "geo": {
+    "market": "GB",
+    "adsExclude": [],
+    "minAge": 18,
+    "rg": "full",
+    "priceRules": "uk-dmcc",
+    "accessibilityStatement": true
+  },
+  "concept": {
+    "title": "The Signal Rooms",
+    "family": "science-instrument",
+    "era": "1880s",
+    "place": "Greenwich observatory",
+    "craft": "chronometry",
+    "world": "An 1880s observatory time-signal station: brass chronometers, transit circles, star charts on cream paper, verdigris domes and the red time ball that drops at one o'clock. Every result is a reading taken from an instrument, logged in a ledger.",
+    "boldMove": "The whole site is a ledger page: a hairline grid of ruled lines, with the live slot drawn as a transit-circle readout in the first screen.",
+    "vocabulary": [
+      {
+        "term": "Tick",
+        "meaning": "One beat of the chronometer; the virtual unit",
+        "usedFor": [
+          "currency",
+          "copy"
+        ]
+      },
+      {
+        "term": "Transit",
+        "meaning": "A star crossing the meridian wire; a spin",
+        "usedFor": [
+          "game-name",
+          "ui-state"
+        ]
+      },
+      {
+        "term": "Reading",
+        "meaning": "A result taken from an instrument",
+        "usedFor": [
+          "copy",
+          "ui-state"
+        ]
+      },
+      {
+        "term": "Ledger",
+        "meaning": "The observer's log; the lobby and history",
+        "usedFor": [
+          "nav",
+          "copy"
+        ]
+      },
+      {
+        "term": "Time ball",
+        "meaning": "The red ball dropped at 1 pm; the reality-check reminder",
+        "usedFor": [
+          "copy",
+          "ui-state",
+          "sound"
+        ]
+      },
+      {
+        "term": "Verdigris",
+        "meaning": "Green patina on brass domes",
+        "usedFor": [
+          "palette-name"
+        ]
+      },
+      {
+        "term": "Chart paper",
+        "meaning": "Cream star-chart stock",
+        "usedFor": [
+          "palette-name"
+        ]
+      }
+    ],
+    "artwork": {
+      "rule": "objects-and-places-only",
+      "subjects": [
+        "transit circle",
+        "marine chronometer",
+        "sextant",
+        "star chart",
+        "observatory dome",
+        "time ball on its mast",
+        "telegraph key"
+      ],
+      "avoid": [
+        "astronomer figures",
+        "constellation creatures",
+        "zodiac characters",
+        "cartoon planets with faces"
+      ]
+    },
+    "mood": [
+      "precise",
+      "quiet",
+      "brass and paper",
+      "measured"
+    ],
+    "antiReferences": [
+      "Opal Quest Lounge (pop-art, CMYK, halftone)",
+      "Pixel Crown Club (pixel art, velvet night, gold)",
+      "purple-neon casino gradients",
+      "gold-on-black coins"
+    ]
+  },
+  "palette": {
+    "model": "oklch",
+    "colours": [
+      {
+        "role": "ink",
+        "name": "Night ink",
+        "oklch": {
+          "l": 0.22,
+          "c": 0.045,
+          "h": 265
+        },
+        "hex": "#101A2F"
+      },
+      {
+        "role": "paper",
+        "name": "Chart paper",
+        "oklch": {
+          "l": 0.965,
+          "c": 0.02,
+          "h": 85
+        },
+        "hex": "#FAF3E5"
+      },
+      {
+        "role": "primary",
+        "name": "Brass",
+        "oklch": {
+          "l": 0.76,
+          "c": 0.13,
+          "h": 80
+        },
+        "hex": "#DCA744"
+      },
+      {
+        "role": "secondary",
+        "name": "Verdigris",
+        "oklch": {
+          "l": 0.7,
+          "c": 0.1,
+          "h": 175
+        },
+        "hex": "#50B39B"
+      },
+      {
+        "role": "accent",
+        "name": "Time-ball red",
+        "oklch": {
+          "l": 0.6,
+          "c": 0.2,
+          "h": 25
+        },
+        "hex": "#DE3B3D"
+      },
+      {
+        "role": "signal",
+        "name": "Chalk",
+        "oklch": {
+          "l": 0.93,
+          "c": 0.025,
+          "h": 230
+        },
+        "hex": "#D8EBF6"
+      }
+    ],
+    "themes": {
+      "light": {
+        "background": "#FEFAF1",
+        "surface": "#FAF3E5",
+        "text": "#101A2F",
+        "themeColor": "#FAF3E5"
+      },
+      "dark": {
+        "background": "#080F1F",
+        "surface": "#101A2F",
+        "text": "#D8EBF6",
+        "themeColor": "#080F1F"
+      }
+    },
+    "contrastChecked": true
+  },
+  "typography": {
+    "display": {
+      "family": "Fraunces",
+      "licence": "OFL",
+      "axes": [
+        "wght",
+        "opsz",
+        "SOFT",
+        "WONK"
+      ],
+      "weightRange": [
+        500,
+        900
+      ],
+      "selfHosted": true
+    },
+    "body": {
+      "family": "Public Sans",
+      "licence": "OFL",
+      "axes": [
+        "wght"
+      ],
+      "weightRange": [
+        400,
+        700
+      ],
+      "selfHosted": true
+    },
+    "numeric": {
+      "family": "Azeret Mono",
+      "licence": "OFL",
+      "axes": [
+        "wght"
+      ],
+      "weightRange": [
+        400,
+        600
+      ],
+      "selfHosted": true
+    },
+    "rationale": "A soft Victorian serif for headings against a plain civic sans for reading; a mono face for readings and balances, like a logbook."
+  },
+  "operator": {
+    "name": "Meridian Rooms Ltd",
+    "registrationNumber": "15823417",
+    "registry": "Companies House",
+    "registeredIn": "England and Wales",
+    "address": "4 Flamsteed Way, Greenwich, London SE10 9NF, United Kingdom",
+    "country": "GB",
+    "email": "hello@meridiansignalrooms.com",
+    "registryCheck": {
+      "checked": true,
+      "by": "intake agent",
+      "on": "2026-10-07",
+      "url": "https://find-and-update.company-information.service.gov.uk/company/15823417"
+    }
+  },
+  "analytics": {
+    "ga4": "",
+    "adsConversionId": "",
+    "mode": "gtag",
+    "consentMode": "basic",
+    "personalisation": false
+  },
+  "contactEndpoint": "",
+  "dates": {
+    "received": "2026-10-06",
+    "launchTarget": "2026-11-20",
+    "contentFreeze": "2026-11-13",
+    "lastUpdated": "2026-10-06",
+    "legalUpdated": {
+      "terms": "2026-10-06",
+      "privacy": "2026-10-06",
+      "cookies": "2026-10-06"
+    }
+  },
+  "hosting": {
+    "provider": "cloudflare-pages",
+    "repo": {
+      "owner": "studio-org",
+      "name": "meridiansignalrooms",
+      "branch": "main",
+      "path": ""
+    },
+    "cloudflare": {
+      "projectName": "meridiansignalrooms"
+    },
+    "searchConsole": {
+      "verification": "dns-txt"
+    }
+  },
+  "structure": {
+    "heroGame": "transit-reels",
+    "heroStyle": "first-spin",
+    "homeSections": [
+      "hero",
+      "world",
+      "lobby",
+      "how",
+      "safer",
+      "faq"
+    ],
+    "lobbyLayout": "ledger",
+    "gamePageLayout": "rules-first",
+    "faq": [
+      "faq-what-are-ticks",
+      "faq-can-i-buy",
+      "faq-how-results-decided",
+      "faq-why-adults-only",
+      "faq-rtp-meaning",
+      "faq-time-limits",
+      "faq-offline"
+    ],
+    "navLabels": {
+      "games": "Reels",
+      "tables": "Tables",
+      "safer": "Safer play",
+      "about": "The rooms"
+    },
+    "extraPages": [
+      "glossary"
+    ]
+  },
+  "copy": {
+    "spelling": "en-GB",
+    "voice": {
+      "register": "precise",
+      "notes": "Short declarative sentences, like a logbook entry. Second person. No exclamation marks. Numbers set in the mono face."
+    },
+    "heroH1": "Take a reading from the transit circle.",
+    "heroHighlight": "Played for Ticks.",
+    "tagline": "Free-to-play reels and tables from an 1880s signal station.",
+    "howItWorksMetaphor": "The chronometer winds your Ticks; a day of Ticks to start, wound again when you run low. Nothing is bought and nothing is paid out.",
+    "buttons": {
+      "spin": "Spin for 24 Ticks",
+      "deal": "Deal for 30 Ticks",
+      "claim": "Wind on 720 Ticks"
+    },
+    "sample": "Transit Reels has three reels and three lines. A reading is fixed by your browser's cryptographic random number generator before the reels move, and the paytable below lists every combination with its probability."
+  },
+  "typeOptions": {
+    "currency": {
+      "singular": "Tick",
+      "plural": "Ticks",
+      "abbr": "tk",
+      "startingBalance": 1440,
+      "topUpAmount": 720,
+      "topUpBelow": 60,
+      "origin": "1,440 minutes in a day; the chronometer gives you a day of Ticks to start."
+    },
+    "games": {
+      "mode": "house",
+      "house": [
+        {
+          "slug": "transit-reels",
+          "name": "Transit Reels",
+          "engine": "reel-slot",
+          "spec": {
+            "reels": 3,
+            "lines": 3,
+            "symbols": [
+              {
+                "code": "M",
+                "name": "Meridian wire",
+                "wild": true
+              },
+              {
+                "code": "C",
+                "name": "Chronometer"
+              },
+              {
+                "code": "S",
+                "name": "Sextant"
+              },
+              {
+                "code": "T",
+                "name": "Transit circle"
+              },
+              {
+                "code": "D",
+                "name": "Dome"
+              },
+              {
+                "code": "K",
+                "name": "Telegraph key"
+              },
+              {
+                "code": "P",
+                "name": "Star chart"
+              }
+            ],
+            "stakes": [
+              12,
+              24,
+              60,
+              120
+            ],
+            "targetRtp": 0.955
+          },
+          "coverMotif": "A brass transit circle on a stone pier under a half-open dome, drawn in hairline ink on chart paper.",
+          "tileFacts": [
+            "3 reels",
+            "3 lines"
+          ],
+          "tags": [],
+          "rtpNote": "Exact: every reel-stop combination enumerated by the build (as Seven Systems does).",
+          "status": "approved"
+        },
+        {
+          "slug": "equatorial-wheel",
+          "name": "Equatorial Wheel",
+          "engine": "european-roulette",
+          "spec": {
+            "chips": [
+              2,
+              10,
+              50,
+              200
+            ],
+            "tableLimit": 1000,
+            "pocketNames": {
+              "red": "Sunrise",
+              "black": "Midnight",
+              "zero": "Meridian"
+            }
+          },
+          "coverMotif": "A single-zero wheel drawn as a brass setting circle with engraved degree marks.",
+          "tileFacts": [
+            "Roulette",
+            "Single zero"
+          ],
+          "tags": [
+            "table"
+          ],
+          "rtpNote": "Exact: 36 ÷ 37 for every bet on the table.",
+          "status": "approved"
+        },
+        {
+          "slug": "chronometer-twenty-one",
+          "name": "Chronometer Twenty-One",
+          "engine": "blackjack",
+          "spec": {
+            "decks": 8,
+            "dealer": "S17",
+            "naturalName": "Chronometer",
+            "naturalPays": "3:2",
+            "hint": true,
+            "stakes": [
+              12,
+              30,
+              60,
+              120
+            ]
+          },
+          "coverMotif": "An open marine chronometer in its gimballed box beside two face-down cards.",
+          "tileFacts": [
+            "Blackjack",
+            "8 decks"
+          ],
+          "tags": [
+            "table"
+          ],
+          "rtpNote": "Measured: 20 million simulated hands of basic strategy for 8 decks, S17 (tools/simulate-21.mjs with the order's spec).",
+          "status": "approved"
+        }
+      ],
+      "pragmatic": {
+        "enabled": false,
+        "writtenConsent": null
+      }
+    },
+    "purchases": {
+      "enabled": false
+    },
+    "ageVerification": {
+      "method": "self-declaration",
+      "decidedBy": "operator",
+      "decidedOn": "2026-10-07"
+    }
+  },
+  "legal": {
+    "reviewer": "pending (operator's solicitor)",
+    "scope": [
+      "terms",
+      "privacy",
+      "cookies",
+      "age-verification"
+    ],
+    "notes": "Same configuration as Opal Quest Lounge in fallback mode: no demos, no purchases, no analytics at launch. Review scheduled for the week of 2026-11-02."
+  },
+  "uniqueness": {
+    "comparedAgainst": [
+      "opalquestlounge",
+      "pixelcrownclub"
+    ],
+    "checkedOn": "2026-10-08",
+    "results": {
+      "copyJaccardMax": 0.06,
+      "paletteMinDistance": 0.21,
+      "fontPairUnique": true,
+      "nameCollisions": 0,
+      "structureTupleUnique": true,
+      "conceptFamilyUnique": true,
+      "familyRule": "unique",
+      "inFlightCompared": []
+    },
+    "passed": true,
+    "report": "reports/meridian-signal-rooms/uniqueness.json"
+  },
+  "ppc": {
+    "primaryConversion": "",
+    "certification": "social-casino",
+    "advertiserOfRecord": "Meridian Rooms Ltd",
+    "paymentProfileOwner": "client"
+  },
+  "provenance": {
+    "brand.name": {
+      "source": "brief",
+      "quote": "Название Meridian Signal Rooms",
+      "confidence": 1
+    },
+    "domain": {
+      "source": "brief",
+      "quote": "домен meridiansignalrooms.com",
+      "confidence": 1
+    },
+    "concept": {
+      "source": "proposed",
+      "quote": "что-то про старую обсерваторию в Гринвиче",
+      "confidence": 0.8,
+      "by": "intake agent"
+    },
+    "palette": {
+      "source": "proposed",
+      "confidence": 0.7,
+      "by": "design agent"
+    },
+    "typography": {
+      "source": "proposed",
+      "confidence": 0.7,
+      "by": "design agent"
+    },
+    "typeOptions.currency": {
+      "source": "proposed",
+      "confidence": 0.8,
+      "by": "intake agent"
+    },
+    "typeOptions.games.house": {
+      "source": "proposed",
+      "confidence": 0.75,
+      "by": "intake agent"
+    },
+    "operator": {
+      "source": "asked",
+      "askedOn": "2026-10-06",
+      "answeredOn": "2026-10-07",
+      "by": "operator"
+    },
+    "typeOptions.purchases.enabled": {
+      "source": "brief",
+      "quote": "Без покупок",
+      "confidence": 1
+    },
+    "analytics.ga4": {
+      "source": "asked",
+      "askedOn": "2026-10-06",
+      "by": "operator"
+    },
+    "contactEndpoint": {
+      "source": "asked",
+      "askedOn": "2026-10-06",
+      "answeredOn": "2026-10-07"
+    },
+    "dates.launchTarget": {
+      "source": "brief",
+      "quote": "Запуск к 20 ноября",
+      "confidence": 0.95
+    },
+    "hosting.provider": {
+      "source": "brief",
+      "quote": "Хостинг как у остальных",
+      "confidence": 0.9
+    },
+    "typeOptions.ageVerification": {
+      "source": "asked",
+      "askedOn": "2026-10-06",
+      "answeredOn": "2026-10-07"
+    },
+    "structure": {
+      "source": "computed",
+      "by": "uniqueness gate: first unused (hero, lobby, order) tuple"
+    },
+    "copy": {
+      "source": "proposed",
+      "confidence": 0.7,
+      "by": "copy agent"
+    },
+    "type": {
+      "source": "brief",
+      "quote": "Третий сайт социального казино для UK",
+      "confidence": 1
+    },
+    "variant": {
+      "source": "computed",
+      "by": "intake agent: no demos requested, so own-games"
+    },
+    "ppc.primaryConversion": {
+      "source": "default",
+      "by": "intake agent: owner placeholder until Q11 is answered"
+    }
+  },
+  "approvals": [
+    {
+      "item": "concept",
+      "status": "approved",
+      "by": "operator",
+      "on": "2026-10-07",
+      "note": "Chose direction B of three."
+    },
+    {
+      "item": "palette",
+      "status": "approved",
+      "by": "operator",
+      "on": "2026-10-07"
+    },
+    {
+      "item": "typography",
+      "status": "approved",
+      "by": "operator",
+      "on": "2026-10-07"
+    },
+    {
+      "item": "currency",
+      "status": "approved",
+      "by": "operator",
+      "on": "2026-10-07"
+    },
+    {
+      "item": "games",
+      "status": "approved",
+      "by": "operator",
+      "on": "2026-10-08",
+      "note": "Asked for 8 decks instead of 6 so it differs from Brilliant Twenty-One."
+    },
+    {
+      "item": "structure",
+      "status": "approved",
+      "by": "operator",
+      "on": "2026-10-08"
+    },
+    {
+      "item": "copy",
+      "status": "pending"
+    },
+    {
+      "item": "operator",
+      "status": "approved",
+      "by": "operator",
+      "on": "2026-10-07"
+    },
+    {
+      "item": "legal",
+      "status": "pending"
+    },
+    {
+      "item": "launch",
+      "status": "pending"
+    }
+  ],
+  "launch": {
+    "checklist": {
+      "orderValidated": {
+        "done": true,
+        "by": "intake agent",
+        "on": "2026-10-08",
+        "evidence": "node tools/validate-order.mjs orders/meridian-signal-rooms --level build: ok"
+      },
+      "operatorDetails": {
+        "done": true,
+        "by": "intake agent",
+        "on": "2026-10-07",
+        "evidence": "Companies House 15823417 matches name and registered office"
+      },
+      "uniquenessGate": {
+        "done": true,
+        "by": "uniqueness gate",
+        "on": "2026-10-08",
+        "evidence": "node tools/uniqueness.mjs --pre orders/meridian-signal-rooms/order.json: copy 0.06, palette 0.21, fonts unique, names 0, structure unique"
+      },
+      "mailboxWorks": {
+        "done": false
+      },
+      "legalReview": {
+        "done": false
+      },
+      "strictBuild": {
+        "done": false
+      },
+      "e2eChecks": {
+        "done": false
+      },
+      "lighthouse": {
+        "done": false
+      },
+      "dns": {
+        "done": false
+      },
+      "searchConsole": {
+        "done": false
+      },
+      "adsCertification": {
+        "done": false
+      },
+      "policyUrlsVerified": {
+        "done": false
+      },
+      "audienceAssessmentSigned": {
+        "done": false
+      },
+      "trademark": {
+        "done": true,
+        "by": "operator",
+        "on": "2026-10-07",
+        "evidence": "brand.trademarkSearch"
+      }
+    }
+  }
+}

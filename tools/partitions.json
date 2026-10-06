@@ -1,0 +1,155 @@
+{
+  "$comment": "Machine copy of MASTER-PLAN 9.2 (plus D-17, D-18, D-35, D-45; SPEC 19; ECC 9). Read by tools/partition-scope.mjs and the CI partition-scope job. A path belongs to the partition whose `owns` globs match it and whose `except` globs do not; partitions not yet active in `phase` fold into `foldedInto` (B and T into A, P into E in Phase 1). `shared` lists the only paths two partitions may both edit; `exceptions` the sanctioned cross-partition writes. `ignored` paths are never owned (gitignored or generated). `expects` are the Phase 1 deliverables checked by --exists. Globs: ** any depth, * within a segment, {a,b} alternatives. Frozen Phase 1 contract (MASTER-PLAN 9.2): change it through docs/CONTRACT-CHANGES.md.",
+  "version": 1,
+  "phase": 1,
+  "partitions": {
+    "A": {
+      "name": "engine-core (+ B folded in Phase 1)",
+      "activeFrom": 1,
+      "owns": [
+        "engine/**",
+        "types/**",
+        "sites/opalquestlounge/**",
+        "opalquestlounge/**",
+        "prompts/**",
+        "index.html", "privacy.html", "terms.html", "sw.js", "manifest.webmanifest", "favicon.svg", "robots.txt", "sitemap.xml", "CNAME", "assets/**",
+        ".github/workflows/opalquestlounge-*.yml"
+      ],
+      "except": [
+        "engine/tools/**",
+        "engine/docs/**",
+        "engine/games/**",
+        "types/social-casino/checks/**",
+        "types/social-casino/data/known-studio-titles.json",
+        "types/online-games/**",
+        "types/hotel-casino/**",
+        "types/*/ppc/**",
+        "sites/opalquestlounge/docs/**",
+        "sites/opalquestlounge/checks.json"
+      ],
+      "note": "Also performs every SPEC 3.1 move/delete (legacy opalquestlounge/, root site files, prompts/, old workflows) in one commit.",
+      "expects": [
+        "engine/build.mjs", "engine/package.json", "engine/dist-hashes.json", "engine/schema/site.config.schema.json",
+        "engine/styles/tokens.contract.json", "engine/fonts/approved-pairings.json",
+        "types/social-casino/pack.mjs", "types/social-casino/lint.mjs", "types/social-casino/template-site/site.config.json",
+        "types/social-casino/schema/order-options.schema.json", "types/social-casino/policy-urls.json", "types/social-casino/helplines.json",
+        "types/online-games/pack.mjs", "types/online-games/template-site/site.config.json", "types/online-games/schema/order-options.schema.json",
+        "types/hotel-casino/pack.mjs", "types/hotel-casino/template-site/site.config.json", "types/hotel-casino/schema/order-options.schema.json",
+        "sites/opalquestlounge/site.config.json", "sites/opalquestlounge/theme/tokens.css"
+      ]
+    },
+    "B": {
+      "name": "engine-games",
+      "activeFrom": 3,
+      "foldedInto": "A",
+      "owns": ["engine/games/**", "engine/tools/simulate-21.mjs", "types/social-casino/data/known-studio-titles.json"],
+      "except": [],
+      "expects": []
+    },
+    "C": {
+      "name": "qa-tools",
+      "activeFrom": 1,
+      "owns": ["engine/tools/**", "types/social-casino/checks/**", "sites/opalquestlounge/checks.json"],
+      "except": ["engine/tools/simulate-21.mjs"],
+      "expects": [
+        "engine/tools/check.mjs", "engine/tools/lighthouse.mjs", "engine/tools/serve.mjs", "engine/tools/make-images.mjs",
+        "engine/tools/checks.schema.json", "engine/tools/README.md", "engine/tools/oracle/opalquestlounge.json",
+        "sites/opalquestlounge/checks.json"
+      ]
+    },
+    "D": {
+      "name": "factory-tools",
+      "activeFrom": 1,
+      "owns": ["tools/**", "schemas/**", "orders/_templates/**", "sites/_fixtures/**", "portfolio/**"],
+      "except": ["tools/labels.*", "tools/ppc/**", "tools/ci-lint.mjs", "schemas/board.schema.json"],
+      "expects": [
+        "schemas/order.schema.json", "schemas/stages.json", "schemas/direction.schema.json", "schemas/registry.schema.json",
+        "schemas/review.schema.json", "schemas/evidence.schema.json",
+        "orders/_templates/order.example.json", "orders/_templates/order.example.online-games.json", "orders/_templates/order.example.hotel-casino.json",
+        "orders/_templates/direction.example.json", "orders/_templates/proposal.en.md", "orders/_templates/proposal.ru.md",
+        "orders/_templates/questions.social-casino.en.md", "orders/_templates/questions.social-casino.ru.md",
+        "orders/_templates/questions.online-games.en.md", "orders/_templates/questions.online-games.ru.md",
+        "orders/_templates/questions.hotel-casino.en.md", "orders/_templates/questions.hotel-casino.ru.md",
+        "tools/validate-order.mjs", "tools/order-to-config.mjs", "tools/new-site.mjs", "tools/uniqueness.mjs", "tools/status.mjs",
+        "tools/board.mjs", "tools/engine-hashes.mjs", "tools/partition-scope.mjs", "tools/partitions.json", "tools/engine-lint.mjs",
+        "tools/vet-skill.sh", "tools/fixtures/make-reskin.mjs",
+        "sites/_fixtures/reskin-of-oql/site.config.json", "sites/_fixtures/bad-copy/site.config.json"
+      ]
+    },
+    "E": {
+      "name": "claude-layer",
+      "activeFrom": 1,
+      "owns": ["CLAUDE.md", ".claude/**"],
+      "except": [".claude/worktrees/**", ".claude/settings.local.json", ".claude/.slug", ".claude/hooks/guard-ppc.mjs", ".claude/skills/ppc-kit/**", ".claude/skills/ppc-audit/**", ".claude/agents/ppc-auditor.md", ".claude/agents/catalogue-curator.md"],
+      "expects": [
+        "CLAUDE.md", ".claude/settings.json", ".claude/factory.json", ".claude/VENDORED.json",
+        ".claude/rules/sites.md", ".claude/rules/engine.md", ".claude/rules/types.md",
+        ".claude/skills/order/SKILL.md", ".claude/skills/build/SKILL.md", ".claude/skills/qa/SKILL.md", ".claude/skills/status/SKILL.md",
+        ".claude/agents/intake-analyst.md", ".claude/agents/qa-runner.md", ".claude/agents/uniqueness-skeptic.md", ".claude/agents/compliance-judge.md",
+        ".claude/agents/site-sentinel.md", ".claude/agents/silent-failure-hunter.md", ".claude/agents/code-simplifier.md", ".claude/agents/rubrics.json",
+        ".claude/workflows/engine-regression.js", ".claude/workflows/concept-panel.js",
+        ".claude/hooks/session-start.sh", ".claude/hooks/context-line.mjs", ".claude/hooks/guard-scope.mjs", ".claude/hooks/guard-ship.mjs",
+        ".claude/hooks/lint-touched-site.mjs", ".claude/hooks/flush-events.mjs", ".claude/hooks/log-event.mjs", ".claude/hooks/guard-ppc.mjs",
+        ".claude/hooks/guard-rules.json"
+      ]
+    },
+    "F": {
+      "name": "ci-gitops",
+      "activeFrom": 1,
+      "owns": [".github/**", "package.json", "package-lock.json", ".gitignore", "README.md", "tools/labels.*", "tools/ci-lint.mjs", "sites/registry.json", "sites/pixelcrownclub/**", ".skillspector-baseline.yaml"],
+      "except": [".github/workflows/opalquestlounge-*.yml"],
+      "expects": [
+        ".github/workflows/sites-ci.yml", ".github/workflows/engine-ci.yml", ".github/CODEOWNERS", ".github/PULL_REQUEST_TEMPLATE.md",
+        ".github/labeler.yml", ".github/dependabot.yml", "package.json", ".gitignore", "tools/labels.mjs", "tools/labels.json",
+        "tools/ci-lint.mjs", "sites/registry.json"
+      ]
+    },
+    "G": {
+      "name": "board-artifacts",
+      "activeFrom": 1,
+      "owns": ["artifacts/**", "schemas/board.schema.json"],
+      "except": ["artifacts/ppc-dashboard/**"],
+      "expects": ["schemas/board.schema.json", "artifacts/board/index.html"]
+    },
+    "H": {
+      "name": "docs",
+      "activeFrom": 1,
+      "owns": ["docs/**", "engine/docs/**", "sites/opalquestlounge/docs/**", "briefs/**", "THIRD_PARTY_NOTICES.md", "README.md"],
+      "except": [],
+      "expects": [
+        "THIRD_PARTY_NOTICES.md", "docs/PLAN.md", "docs/CONTRACT-CHANGES.md", "docs/SOP-operator.md", "docs/SOP-new-order.md",
+        "docs/board.md", "docs/routines.md", "docs/policy-watch.md", "docs/evals.md",
+        "docs/adr/0001-adopt-ecc-by-vendoring.md", "docs/adr/0002-type-packs.md", "docs/adr/0003-policy-verified-mechanism.md",
+        "docs/lessons/README.md", "engine/docs/invariants.md", "engine/docs/game-facts.md",
+        "engine/docs/templates/README.ru.md", "engine/docs/templates/README.en.md",
+        "engine/docs/templates/COMPLIANCE.ru.md", "engine/docs/templates/COMPLIANCE.en.md",
+        "briefs/social-casino-uk.md"
+      ]
+    },
+    "T": {
+      "name": "type-packs",
+      "activeFrom": 4,
+      "foldedInto": "A",
+      "owns": ["types/online-games/**", "types/hotel-casino/**", ".claude/agents/catalogue-curator.md"],
+      "except": ["types/*/ppc/**"],
+      "expects": []
+    },
+    "P": {
+      "name": "ppc",
+      "activeFrom": 5,
+      "foldedInto": "E",
+      "owns": ["ppc/**", "tools/ppc/**", ".mcp.json", "types/*/ppc/**", ".claude/skills/ppc-kit/**", ".claude/skills/ppc-audit/**", ".claude/agents/ppc-auditor.md", ".claude/hooks/guard-ppc.mjs", "artifacts/ppc-dashboard/**"],
+      "except": [],
+      "note": "In Phase 1 only .claude/hooks/guard-ppc.mjs exists; E commits it on P's behalf (W23).",
+      "expects": []
+    }
+  },
+  "shared": [
+    { "path": "README.md", "partitions": ["A", "F", "H"], "why": "A moves the old root README to sites/pixelcrownclub (SPEC 3.1), F writes the new stub, H the body (MASTER-PLAN 2)." }
+  ],
+  "exceptions": [
+    { "partition": "G", "path": ".claude/factory.json", "keys": ["boardUrl", "boardId"], "why": "G records the published Board URL and id (SPEC 19)." },
+    { "partition": "E", "path": ".claude/hooks/guard-ppc.mjs", "why": "E commits the inert hook on P's behalf in Phase 1 (W23)." }
+  ],
+  "ignored": ["reports/**", "node_modules/**", "**/node_modules/**", ".claude/worktrees/**", ".claude/settings.local.json", ".claude/.slug", "sites/*/dist/**", "sites/*/dist-*/**", "sites/*/check-shots/**"]
+}

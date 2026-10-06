@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://studio.local/factory/schemas/registry.schema.json",
+  "title": "Portfolio registry",
+  "description": "portfolio/registry.json on branch `registry` (SPEC 4.4): the single operational and uniqueness record, written only by tools/registry.mjs from the hub. Entries carry type/variant/locales/market/casinoMode (MASTER-PLAN 4.5); uniqueness compares within type. `$defs/snapshot` is the shape of the informational sites/registry.json on main.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "entries"],
+  "properties": {
+    "schemaVersion": { "const": 2 },
+    "updatedAt": { "type": "string" },
+    "entries": { "type": "array", "items": { "$ref": "#/$defs/entry" } }
+  },
+  "$defs": {
+    "slug": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,39}$" },
+    "oklch": {
+      "type": "object", "required": ["l", "c", "h"],
+      "properties": { "l": { "type": "number", "minimum": 0, "maximum": 1 }, "c": { "type": "number", "minimum": 0, "maximum": 0.5 }, "h": { "type": "number", "minimum": 0, "maximum": 360 } }
+    },
+    "minhash": { "type": "array", "minItems": 128, "maxItems": 128, "items": { "type": "integer", "minimum": 0 } },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slug", "type", "stage", "status", "engine"],
+      "properties": {
+        "slug": { "$ref": "#/$defs/slug" },
+        "orderId": { "$ref": "#/$defs/slug" },
+        "type": { "type": "string", "enum": ["social-casino", "online-games", "hotel-casino"] },
+        "variant": { "type": "string" },
+        "locales": { "type": "array", "items": { "type": "string" } },
+        "market": { "type": "string", "pattern": "^[A-Z]{2}$" },
+        "casinoMode": { "type": "string", "enum": ["A", "A+", "B"] },
+        "stage": { "$ref": "stages.json#/$defs/stage" },
+        "status": { "$ref": "stages.json#/$defs/registryStatus" },
+        "engine": { "type": "string", "enum": ["factory", "none"] },
+        "hosting": { "type": "string", "enum": ["studio-cf", "client-repo", "bundle"] },
+        "cfProject": { "type": "string" },
+        "pr": { "type": ["integer", "null"] },
+        "deliveredTag": { "type": "string" },
+        "engineVersion": { "type": "string" },
+        "requiresSignoff": { "type": "boolean" },
+        "sameFamilyAs": { "type": "array", "items": { "$ref": "#/$defs/slug" } },
+        "reservedAt": { "type": "string" },
+        "reservedBy": { "type": "string" },
+        "expiresAt": { "type": "string" },
+        "family": { "$ref": "order.schema.json#/$defs/family" },
+        "era": { "type": "string" },
+        "place": { "type": "string" },
+        "craft": { "type": "string" },
+        "keywords": { "type": "array", "items": { "type": "string" } },
+        "vocabulary": { "type": "array", "items": { "type": "string" } },
+        "palette": { "type": "array", "items": { "type": "object", "required": ["role", "oklch"], "properties": { "role": { "type": "string" }, "name": { "type": "string" }, "oklch": { "$ref": "#/$defs/oklch" } } } },
+        "fonts": { "type": "object", "properties": { "display": { "type": "string" }, "body": { "type": "string" }, "numeric": { "type": "string" } } },
+        "currency": { "type": "object", "properties": { "singular": { "type": "string" }, "plural": { "type": "string" } } },
+        "games": { "type": "array", "items": { "type": "object", "required": ["name", "slug"], "properties": { "name": { "type": "string" }, "slug": { "type": "string" }, "engine": { "type": "string" }, "specHash": { "type": "string" } } } },
+        "engines": { "type": "array", "items": { "type": "string" } },
+        "pragmatic": { "type": "array", "items": { "type": "string" } },
+        "structureTuple": {
+          "type": "object",
+          "properties": {
+            "heroStyle": { "type": "string" }, "lobbyLayout": { "type": "string" }, "gamePageLayout": { "type": "string" },
+            "homeSections": { "type": "array", "items": { "type": "string" } }, "extraPages": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "navLabels": { "type": "array", "items": { "type": "string" } },
+        "faqIds": { "type": "array", "items": { "type": "string" } },
+        "coverKeywords": { "type": "array", "items": { "type": "string" } },
+        "copyMinHash": { "type": "object", "additionalProperties": { "$ref": "#/$defs/minhash" } },
+        "headingShingles": { "type": "array", "items": { "type": "integer" } },
+        "routeSetHash": { "type": "string" },
+        "fingerprintSha": { "type": "string" },
+        "fingerprintAt": { "type": "string" },
+        "operator": { "type": "string" },
+        "domain": { "type": "string" },
+        "launchedOn": { "type": "string" }
+      },
+      "allOf": [
+        { "if": { "properties": { "type": { "const": "hotel-casino" } } }, "then": { "required": ["casinoMode"] } }
+      ]
+    },
+    "snapshot": {
+      "type": "object",
+      "required": ["generatedAt", "sites"],
+      "properties": {
+        "generatedAt": { "type": "string" },
+        "fromCommit": { "type": "string" },
+        "sites": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["slug"],
+            "properties": {
+              "slug": { "type": "string" }, "brand": { "type": "string" }, "domain": { "type": "string" }, "type": { "type": "string" },
+              "variant": { "type": "string" }, "stage": { "type": "string" }, "status": { "type": ["string", "null"] },
+              "engine": { "type": "string", "enum": ["factory", "none"] }, "hosting": { "type": "string" }, "cfProject": { "type": "string" },
+              "pr": { "type": ["integer", "null"] }, "deliveredTag": { "type": "string" }, "engineVersion": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,3195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://studio.local/factory/schemas/order.schema.json",
+  "title": "Site factory order (all types)",
+  "description": "One order = one brand, one domain, one concept, one type. schemaVersion 1.2 = the intake audit schema (1.0) + the SPEC 4.1 amendments (1.1) + the MASTER-PLAN 4.1 type fields (1.2): type, variant, locales, geo, audience, casinoMode, markets, generic operator, typeOptions (validated per type by types/<type>/schema/order-options.schema.json when the pack ships one), launch ticks policyUrlsVerified/audienceAssessmentSigned/affiliatePaidSearchChecked/providerPaidSearchChecked, ppc.primaryConversion. Invariants (disclaimer, RG tools, helplines, consent, SEO rules, budgets, WCAG, banned words, page set) are fixed by the engine and the type pack and are not configurable here. Cross-field rules JSON Schema cannot express (heroGame is a house slug, palette roles unique, topUpBelow < startingBalance, demos exist in the catalogue, registry number in the registry URL, dates not in the future, MX at launch, the ST 1.4 rejections) are checked by tools/validate-order.mjs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "orderId",
+    "type",
+    "variant",
+    "status",
+    "client",
+    "brief",
+    "brand",
+    "domain",
+    "dns",
+    "markets",
+    "locales",
+    "geo",
+    "concept",
+    "palette",
+    "typography",
+    "operator",
+    "analytics",
+    "contactEndpoint",
+    "dates",
+    "hosting",
+    "structure",
+    "copy",
+    "typeOptions",
+    "legal",
+    "uniqueness",
+    "ppc",
+    "provenance",
+    "approvals",
+    "launch"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.2"
+    },
+    "orderId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{2,39}$",
+      "description": "Folder name under orders/. Stable for the life of the site."
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "social-casino",
+        "online-games",
+        "hotel-casino"
+      ]
+    },
+    "variant": {
+      "type": "string"
+    },
+    "status": {
+      "$ref": "stages.json#/$defs/orderStatus"
+    },
+    "client": {
+      "$ref": "#/$defs/client"
+    },
+    "brief": {
+      "$ref": "#/$defs/brief"
+    },
+    "brand": {
+      "$ref": "#/$defs/brand"
+    },
+    "domain": {
+      "$ref": "#/$defs/domain"
+    },
+    "dns": {
+      "$ref": "#/$defs/dns"
+    },
+    "markets": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z]{2}$"
+      }
+    },
+    "locales": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/locale"
+      }
+    },
+    "geo": {
+      "$ref": "#/$defs/geo"
+    },
+    "audience": {
+      "type": "string",
+      "enum": [
+        "general-adult",
+        "mixed",
+        "child-likely"
+      ],
+      "description": "Set only from the signed audience assessment (D-23)."
+    },
+    "audienceAssessment": {
+      "$ref": "#/$defs/audienceAssessment"
+    },
+    "casinoMode": {
+      "type": "string",
+      "enum": [
+        "A",
+        "A+",
+        "B"
+      ]
+    },
+    "concept": {
+      "$ref": "#/$defs/concept"
+    },
+    "palette": {
+      "$ref": "#/$defs/palette"
+    },
+    "typography": {
+      "$ref": "#/$defs/typography"
+    },
+    "operator": {
+      "$ref": "#/$defs/operator"
+    },
+    "analytics": {
+      "$ref": "#/$defs/analytics"
+    },
+    "contactEndpoint": {
+      "anyOf": [
+        {
+          "const": ""
+        },
+        {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        }
+      ],
+      "description": "Empty: the contact form opens the mail client (mailto)."
+    },
+    "dates": {
+      "$ref": "#/$defs/dates"
+    },
+    "hosting": {
+      "$ref": "#/$defs/hosting"
+    },
+    "structure": {
+      "$ref": "#/$defs/structure"
+    },
+    "copy": {
+      "$ref": "#/$defs/copy"
+    },
+    "typeOptions": {
+      "type": "object"
+    },
+    "legal": {
+      "$ref": "#/$defs/legal"
+    },
+    "uniqueness": {
+      "$ref": "#/$defs/uniqueness"
+    },
+    "ppc": {
+      "$ref": "#/$defs/ppc"
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    },
+    "approvals": {
+      "$ref": "#/$defs/approvals"
+    },
+    "launch": {
+      "$ref": "#/$defs/launch"
+    },
+    "build": {
+      "$ref": "#/$defs/buildStages"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "social-casino"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "variant": {
+            "enum": [
+              "own-games",
+              "demo-lobby"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "online-games"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "variant": {
+            "enum": [
+              "portal",
+              "single-game",
+              "kids"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "hotel-casino"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "variant": {
+            "enum": [
+              "single-hotel",
+              "integrated-resort",
+              "resort-group"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "$comment": "social-casino: typeOptions, structure/copy shapes, one en-GB locale, RG full, 18+, no personalisation (MASTER-PLAN 4.2).",
+      "if": {
+        "properties": {
+          "type": {
+            "const": "social-casino"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "typeOptions": {
+            "$ref": "#/$defs/socialCasinoOptions"
+          },
+          "structure": {
+            "$ref": "#/$defs/structureSocialCasino"
+          },
+          "copy": {
+            "$ref": "#/$defs/copySocialCasino"
+          },
+          "locales": {
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "properties": {
+                "code": {
+                  "const": "en-GB"
+                }
+              }
+            }
+          },
+          "geo": {
+            "properties": {
+              "rg": {
+                "const": "full"
+              },
+              "minAge": {
+                "const": 18
+              }
+            }
+          },
+          "analytics": {
+            "properties": {
+              "personalisation": {
+                "const": false
+              }
+            }
+          },
+          "casinoMode": false
+        }
+      }
+    },
+    {
+      "$comment": "social-casino with demos (pragmatic mode or demo-lobby): no Google Ads conversion id (ST 1.1, 1.4).",
+      "if": {
+        "properties": {
+          "type": {
+            "const": "social-casino"
+          },
+          "typeOptions": {
+            "properties": {
+              "games": {
+                "properties": {
+                  "mode": {
+                    "const": "pragmatic"
+                  }
+                },
+                "required": [
+                  "mode"
+                ]
+              }
+            },
+            "required": [
+              "games"
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "typeOptions"
+        ]
+      },
+      "then": {
+        "properties": {
+          "analytics": {
+            "properties": {
+              "adsConversionId": {
+                "const": ""
+              }
+            }
+          },
+          "variant": {
+            "const": "demo-lobby"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "social-casino"
+          },
+          "variant": {
+            "const": "demo-lobby"
+          }
+        },
+        "required": [
+          "type",
+          "variant"
+        ]
+      },
+      "then": {
+        "properties": {
+          "analytics": {
+            "properties": {
+              "adsConversionId": {
+                "const": ""
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "online-games"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "typeOptions": {
+            "$ref": "#/$defs/onlineGamesOptions"
+          },
+          "casinoMode": false,
+          "geo": {
+            "properties": {
+              "rg": {
+                "const": "off"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$comment": "online-games child-likely: no personalisation, childDirected tag (MASTER-PLAN 4.2).",
+      "if": {
+        "properties": {
+          "type": {
+            "const": "online-games"
+          },
+          "audience": {
+            "const": "child-likely"
+          }
+        },
+        "required": [
+          "type",
+          "audience"
+        ]
+      },
+      "then": {
+        "properties": {
+          "analytics": {
+            "properties": {
+              "personalisation": {
+                "const": false
+              }
+            }
+          },
+          "typeOptions": {
+            "required": [
+              "childDirected"
+            ],
+            "properties": {
+              "childDirected": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "hotel-casino"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "required": [
+          "casinoMode"
+        ],
+        "properties": {
+          "typeOptions": {
+            "$ref": "#/$defs/hotelCasinoOptions"
+          }
+        }
+      }
+    },
+    {
+      "$comment": "hotel-casino Mode A: a casino-free domain (ST 1.3).",
+      "if": {
+        "properties": {
+          "type": {
+            "const": "hotel-casino"
+          },
+          "casinoMode": {
+            "const": "A"
+          }
+        },
+        "required": [
+          "type",
+          "casinoMode"
+        ]
+      },
+      "then": {
+        "properties": {
+          "typeOptions": {
+            "not": {
+              "$comment": "a casino block",
+              "required": [
+                "casino"
+              ]
+            }
+          },
+          "geo": {
+            "properties": {
+              "rg": {
+                "const": "off"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "hotel-casino"
+          },
+          "casinoMode": {
+            "enum": [
+              "A+",
+              "B"
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "casinoMode"
+        ]
+      },
+      "then": {
+        "properties": {
+          "geo": {
+            "properties": {
+              "rg": {
+                "const": "info"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "hotel-casino"
+          },
+          "casinoMode": {
+            "const": "B"
+          }
+        },
+        "required": [
+          "type",
+          "casinoMode"
+        ]
+      },
+      "then": {
+        "properties": {
+          "analytics": {
+            "properties": {
+              "personalisation": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$comment": "launch-ready | live-pending | live forbid placeholders and require the launch evidence (SPEC 4.1).",
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "launch-ready",
+              "live-pending",
+              "live"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "operator": {
+            "properties": {
+              "name": {
+                "pattern": "^[^\\[\\]]+$"
+              },
+              "registrationNumber": {
+                "pattern": "^[^\\[\\]]+$"
+              },
+              "address": {
+                "pattern": "^[^\\[\\]]+$"
+              }
+            },
+            "required": [
+              "registryCheck"
+            ]
+          },
+          "legal": {
+            "required": [
+              "reviewer",
+              "reviewedOn",
+              "scope"
+            ]
+          },
+          "uniqueness": {
+            "required": [
+              "comparedAgainst",
+              "checkedOn",
+              "results",
+              "passed"
+            ],
+            "properties": {
+              "passed": {
+                "const": true
+              }
+            }
+          },
+          "approvals": {
+            "contains": {
+              "required": [
+                "item",
+                "status",
+                "by",
+                "on"
+              ],
+              "properties": {
+                "item": {
+                  "const": "launch"
+                },
+                "status": {
+                  "const": "approved"
+                }
+              }
+            }
+          },
+          "ppc": {
+            "properties": {
+              "primaryConversion": {
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "ISO date; shown on the site as '25 September 2026'."
+    },
+    "hex": {
+      "type": "string",
+      "pattern": "^#[0-9A-F]{6}$"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "maxLength": 40
+    },
+    "theme": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "background",
+        "surface",
+        "text",
+        "themeColor"
+      ],
+      "properties": {
+        "background": {
+          "$ref": "#/$defs/hex"
+        },
+        "surface": {
+          "$ref": "#/$defs/hex"
+        },
+        "text": {
+          "$ref": "#/$defs/hex"
+        },
+        "themeColor": {
+          "$ref": "#/$defs/hex",
+          "description": "site.config.json themeColor for this theme."
+        }
+      }
+    },
+    "font": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "family",
+        "licence",
+        "axes",
+        "weightRange",
+        "selfHosted"
+      ],
+      "properties": {
+        "family": {
+          "type": "string",
+          "minLength": 2,
+          "not": {
+            "enum": [
+              "Inter",
+              "Poppins",
+              "Montserrat",
+              "Space Grotesk",
+              "Archivo",
+              "Radio Canada"
+            ]
+          },
+          "description": "Banned by the brief: Inter, Poppins, Montserrat, Space Grotesk. Archivo and Radio Canada are taken by Opal Quest Lounge; the validator extends this list from the portfolio registry."
+        },
+        "licence": {
+          "type": "string",
+          "enum": [
+            "OFL",
+            "Apache-2.0",
+            "UFL"
+          ]
+        },
+        "axes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "wght",
+              "wdth",
+              "opsz",
+              "slnt",
+              "ital",
+              "SOFT",
+              "WONK",
+              "GRAD",
+              "CASL",
+              "MONO"
+            ]
+          }
+        },
+        "weightRange": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 1000
+          }
+        },
+        "selfHosted": {
+          "const": true,
+          "description": "Subset woff2 in assets/fonts, font-display: swap, metric-matched fallbacks; never a Google Fonts request."
+        }
+      }
+    },
+    "tick": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "done"
+      ],
+      "properties": {
+        "done": {
+          "type": "boolean"
+        },
+        "by": {
+          "type": "string"
+        },
+        "on": {
+          "$ref": "#/$defs/date"
+        },
+        "evidence": {
+          "type": "string",
+          "description": "A command output, a URL, a screenshot path or a ticket id."
+        }
+      }
+    },
+    "houseGame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slug",
+        "name",
+        "engine",
+        "spec",
+        "coverMotif",
+        "tileFacts",
+        "status"
+      ],
+      "properties": {
+        "slug": {
+          "$ref": "#/$defs/slug"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 32,
+          "description": "Unique across the whole portfolio; never a real slot or studio name."
+        },
+        "engine": {
+          "type": "string",
+          "enum": [
+            "reel-slot",
+            "european-roulette",
+            "blackjack",
+            "hi-lo",
+            "dice",
+            "video-poker",
+            "baccarat",
+            "wheel-of-fortune",
+            "keno",
+            "scratch-card",
+            "plinko",
+            "custom"
+          ],
+          "description": "reel-slot, european-roulette and blackjack exist today (seven-systems, lapidary-wheel, brilliant-21 maths); the others are engine-library work orders."
+        },
+        "spec": {
+          "type": "object",
+          "description": "Engine parameters; shape depends on engine (see the conditional rules)."
+        },
+        "coverMotif": {
+          "type": "string",
+          "minLength": 10,
+          "description": "Objects and places only."
+        },
+        "tileFacts": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "string",
+            "maxLength": 16
+          }
+        },
+        "tags": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "table",
+              "freespins",
+              "tumble",
+              "megaways"
+            ]
+          },
+          "description": "Only features the game really has (build.mjs checks)."
+        },
+        "rtpNote": {
+          "type": "string",
+          "description": "How the RTP is established: exact enumeration, 36/37, or Monte Carlo with hand count."
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "proposed",
+            "approved",
+            "implemented",
+            "verified"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "engine": {
+                "const": "reel-slot"
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "spec": {
+                "additionalProperties": false,
+                "required": [
+                  "reels",
+                  "lines",
+                  "symbols",
+                  "stakes"
+                ],
+                "properties": {
+                  "reels": {
+                    "type": "integer",
+                    "enum": [
+                      3,
+                      5
+                    ]
+                  },
+                  "lines": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 25
+                  },
+                  "symbols": {
+                    "type": "array",
+                    "minItems": 6,
+                    "maxItems": 10,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "code",
+                        "name"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "wild": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  },
+                  "stakes": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 6,
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "targetRtp": {
+                    "type": "number",
+                    "minimum": 0.9,
+                    "maximum": 0.99
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "engine": {
+                "const": "european-roulette"
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "spec": {
+                "additionalProperties": false,
+                "required": [
+                  "chips",
+                  "tableLimit",
+                  "pocketNames"
+                ],
+                "properties": {
+                  "chips": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 6,
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "tableLimit": {
+                    "type": "integer",
+                    "minimum": 50
+                  },
+                  "pocketNames": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "red",
+                      "black",
+                      "zero"
+                    ],
+                    "properties": {
+                      "red": {
+                        "type": "string"
+                      },
+                      "black": {
+                        "type": "string"
+                      },
+                      "zero": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "engine": {
+                "const": "blackjack"
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "spec": {
+                "additionalProperties": false,
+                "required": [
+                  "decks",
+                  "dealer",
+                  "naturalName",
+                  "naturalPays",
+                  "hint",
+                  "stakes"
+                ],
+                "properties": {
+                  "decks": {
+                    "type": "integer",
+                    "enum": [
+                      4,
+                      6,
+                      8
+                    ]
+                  },
+                  "dealer": {
+                    "type": "string",
+                    "enum": [
+                      "S17",
+                      "H17"
+                    ]
+                  },
+                  "naturalName": {
+                    "type": "string"
+                  },
+                  "naturalPays": {
+                    "const": "3:2"
+                  },
+                  "hint": {
+                    "type": "boolean"
+                  },
+                  "stakes": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 6,
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        }
+      ]
+    },
+    "family": {
+      "type": "string",
+      "enum": [
+        "craft-workshop",
+        "architecture-place",
+        "era-style",
+        "natural-phenomenon",
+        "science-instrument",
+        "transport-travel",
+        "print-typography",
+        "landscape-coast",
+        "collection-museum",
+        "sport-pastime",
+        "textile-pattern",
+        "music-sound",
+        "cartography",
+        "horology",
+        "botany-garden",
+        "maritime",
+        "astronomy",
+        "apothecary",
+        "railway",
+        "aviation",
+        "mining-geology",
+        "mineralogy-gems",
+        "clockwork-automata",
+        "ceramics-pottery",
+        "glassmaking",
+        "bookbinding-library",
+        "postal-telegraph",
+        "radio-broadcast",
+        "film-cinema",
+        "theatre-stage",
+        "tea-spice-trade",
+        "polar-expedition",
+        "desert-oasis",
+        "mountaineering",
+        "art-deco",
+        "modernist-design",
+        "industrial-mill",
+        "weather-meteorology",
+        "heraldry-calligraphy",
+        "photography-darkroom",
+        "other"
+      ],
+      "description": "Concept family (~40 values; soft uniqueness rule, SPEC 15.4). Seeded from the brief concept families plus the registry usage."
+    },
+    "placeholder": {
+      "$comment": "A bracketed placeholder such as \"[Companies House number]\".",
+      "type": "string",
+      "pattern": "^\\[.*\\]$"
+    },
+    "concept": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "family",
+        "era",
+        "place",
+        "craft",
+        "world",
+        "boldMove",
+        "vocabulary",
+        "artwork"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 60
+        },
+        "family": {
+          "$ref": "#/$defs/family"
+        },
+        "world": {
+          "type": "string",
+          "minLength": 60,
+          "maxLength": 400,
+          "description": "The one idea from which palette, fonts, game names, currency, sound and motion are derived."
+        },
+        "boldMove": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 240,
+          "description": "The single bold decision for the whole site; everything else stays restrained."
+        },
+        "vocabulary": {
+          "type": "array",
+          "minItems": 6,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "term",
+              "meaning",
+              "usedFor"
+            ],
+            "properties": {
+              "term": {
+                "type": "string"
+              },
+              "meaning": {
+                "type": "string"
+              },
+              "usedFor": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "currency",
+                    "game-name",
+                    "nav",
+                    "copy",
+                    "ui-state",
+                    "palette-name",
+                    "sound",
+                    "room-name",
+                    "category",
+                    "section-name"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "artwork": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "rule",
+            "subjects"
+          ],
+          "properties": {
+            "rule": {
+              "const": "objects-and-places-only",
+              "description": "CAP 16.3.12: no characters, mascots, animals, faces, sweets, youth slang, memes or emoji."
+            },
+            "subjects": {
+              "type": "array",
+              "minItems": 4,
+              "items": {
+                "type": "string"
+              }
+            },
+            "avoid": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "mood": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "antiReferences": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "What it must not look like (e.g. the brief's banned 2025 clichés, and the sibling sites)."
+        },
+        "era": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 40,
+          "description": "Short keyword, e.g. \"1880s\"."
+        },
+        "place": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 60,
+          "description": "Short keyword, e.g. \"Greenwich observatory\"."
+        },
+        "craft": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 40,
+          "description": "Short keyword, e.g. \"chronometry\"."
+        },
+        "siblings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Filled by order-to-config from the registry (same type only); stripped at export."
+        }
+      }
+    },
+    "palette": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model",
+        "colours",
+        "themes"
+      ],
+      "properties": {
+        "model": {
+          "const": "oklch"
+        },
+        "colours": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "role",
+              "name",
+              "oklch",
+              "hex"
+            ],
+            "properties": {
+              "role": {
+                "type": "string",
+                "enum": [
+                  "ink",
+                  "paper",
+                  "primary",
+                  "secondary",
+                  "accent",
+                  "signal"
+                ]
+              },
+              "name": {
+                "type": "string",
+                "description": "A name from the concept's world, not 'blue'."
+              },
+              "oklch": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "l",
+                  "c",
+                  "h"
+                ],
+                "properties": {
+                  "l": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "c": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.4
+                  },
+                  "h": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 360
+                  }
+                }
+              },
+              "hex": {
+                "$ref": "#/$defs/hex"
+              }
+            }
+          }
+        },
+        "themes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "light",
+            "dark"
+          ],
+          "properties": {
+            "light": {
+              "$ref": "#/$defs/theme"
+            },
+            "dark": {
+              "$ref": "#/$defs/theme"
+            }
+          },
+          "description": "Two themes designed separately (light-dark()), never one inverted."
+        },
+        "contrastChecked": {
+          "type": "boolean",
+          "description": "Text/background pairs meet WCAG 2.2 AA in both themes."
+        }
+      }
+    },
+    "typography": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "display",
+        "body"
+      ],
+      "properties": {
+        "display": {
+          "$ref": "#/$defs/font"
+        },
+        "body": {
+          "$ref": "#/$defs/font"
+        },
+        "numeric": {
+          "$ref": "#/$defs/font",
+          "description": "Utility face for balances and tables; may be omitted when display covers it."
+        },
+        "rationale": {
+          "type": "string"
+        }
+      }
+    },
+    "client": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "language"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 2
+        },
+        "contact": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "email": {
+              "type": "string",
+              "format": "email"
+            },
+            "telegram": {
+              "type": "string"
+            },
+            "other": {
+              "type": "string"
+            }
+          }
+        },
+        "language": {
+          "type": "string",
+          "enum": [
+            "ru",
+            "en"
+          ],
+          "description": "Language for questions, proposals and hand-over docs."
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "brief": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "receivedAt",
+        "language"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^orders/[a-z][a-z0-9-]+/brief\\.md$",
+          "description": "The client's free text, stored verbatim."
+        },
+        "receivedAt": {
+          "$ref": "#/$defs/date"
+        },
+        "language": {
+          "type": "string",
+          "enum": [
+            "ru",
+            "en",
+            "mixed"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "maxLength": 600,
+          "description": "AI summary in English of what the client asked for."
+        }
+      }
+    },
+    "brand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "shortName"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 40,
+          "pattern": "^[\\p{Lu}0-9][\\p{L}0-9’'&.\\- ]*[\\p{L}0-9]$",
+          "description": "Must not contain any real casino, bookmaker or game-studio brand."
+        },
+        "shortName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 12,
+          "description": "Web manifest short_name and the mobile dock."
+        },
+        "wordmarkTag": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the last word of the name as a tag in the wordmark (as 'Lounge' in Opal Quest Lounge)."
+        },
+        "trademarkSearch": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "done"
+          ],
+          "properties": {
+            "done": {
+              "type": "boolean"
+            },
+            "by": {
+              "type": "string"
+            },
+            "on": {
+              "$ref": "#/$defs/date"
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        },
+        "rationale": {
+          "type": "string"
+        }
+      }
+    },
+    "dns": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "managedBy",
+        "accessConfirmed"
+      ],
+      "properties": {
+        "registrar": {
+          "type": "string"
+        },
+        "managedBy": {
+          "type": "string",
+          "enum": [
+            "cloudflare",
+            "registrar",
+            "unknown"
+          ]
+        },
+        "accessConfirmed": {
+          "type": "boolean",
+          "description": "Someone on the order can change the records."
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "domain": {
+      "type": "string",
+      "pattern": "^([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,24}$",
+      "description": "Apex domain. www always redirects to it (by host only, never by geo or user agent)."
+    },
+    "dates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "received",
+        "launchTarget",
+        "lastUpdated",
+        "legalUpdated"
+      ],
+      "properties": {
+        "received": {
+          "$ref": "#/$defs/date"
+        },
+        "launchTarget": {
+          "$ref": "#/$defs/date"
+        },
+        "contentFreeze": {
+          "$ref": "#/$defs/date"
+        },
+        "lastUpdated": {
+          "$ref": "#/$defs/date",
+          "description": "site.config.json lastUpdated; never in the future."
+        },
+        "legalUpdated": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "terms",
+            "privacy",
+            "cookies"
+          ],
+          "properties": {
+            "terms": {
+              "$ref": "#/$defs/date"
+            },
+            "privacy": {
+              "$ref": "#/$defs/date"
+            },
+            "cookies": {
+              "$ref": "#/$defs/date"
+            }
+          }
+        },
+        "launchedOn": {
+          "$ref": "#/$defs/date"
+        }
+      }
+    },
+    "hosting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "repo"
+      ],
+      "properties": {
+        "provider": {
+          "type": "string",
+          "enum": [
+            "cloudflare-pages",
+            "github-pages"
+          ]
+        },
+        "repo": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "owner",
+            "name",
+            "branch"
+          ],
+          "properties": {
+            "owner": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "branch": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string",
+              "description": "Folder inside the repo when several sites share one; empty when the site has its own repo."
+            }
+          }
+        },
+        "cloudflare": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "projectName": {
+              "type": "string"
+            },
+            "accountLabel": {
+              "type": "string"
+            }
+          }
+        },
+        "searchConsole": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "verification"
+          ],
+          "properties": {
+            "verification": {
+              "type": "string",
+              "enum": [
+                "dns-txt",
+                "html-meta",
+                "none-yet"
+              ]
+            },
+            "token": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-zA-Z0-9_.\\[\\]]+$",
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "brief",
+              "asked",
+              "proposed",
+              "default",
+              "computed"
+            ]
+          },
+          "quote": {
+            "type": "string",
+            "description": "The brief's own words (any language) that the value came from."
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "askedOn": {
+            "$ref": "#/$defs/date"
+          },
+          "answeredOn": {
+            "$ref": "#/$defs/date"
+          },
+          "by": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Where each value came from: extracted from the brief, asked of the operator, proposed by the AI, a factory default, or computed."
+    },
+    "legal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope"
+      ],
+      "properties": {
+        "reviewer": {
+          "type": "string"
+        },
+        "reviewedOn": {
+          "$ref": "#/$defs/date"
+        },
+        "scope": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "terms",
+              "privacy",
+              "cookies",
+              "age-verification",
+              "pecr-demo-frame",
+              "trademarks",
+              "purchases",
+              "accessibility",
+              "booking-terms",
+              "offers",
+              "children-code",
+              "dpia"
+            ]
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "operator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "registrationNumber",
+        "registry",
+        "address",
+        "country",
+        "email"
+      ],
+      "description": "Generic legal operator (D-11). Must match footer, Terms, Organization JSON-LD and the Google Ads advertiser verification. Never filled from guesses: unknown values are \"[bracketed]\" placeholders and become questions.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 3
+        },
+        "registrationNumber": {
+          "type": "string",
+          "minLength": 1
+        },
+        "registry": {
+          "type": "string",
+          "minLength": 2,
+          "description": "e.g. \"Companies House\", \"Registrar of Companies (Cyprus)\"."
+        },
+        "registeredIn": {
+          "type": "string",
+          "description": "Jurisdiction of registration, e.g. \"England and Wales\"."
+        },
+        "address": {
+          "type": "string",
+          "minLength": 10
+        },
+        "country": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "registryCheck": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "checked"
+          ],
+          "properties": {
+            "checked": {
+              "type": "boolean"
+            },
+            "by": {
+              "type": "string"
+            },
+            "on": {
+              "$ref": "#/$defs/date"
+            },
+            "url": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "registry": {
+                "const": "Companies House"
+              }
+            },
+            "required": [
+              "registry"
+            ]
+          },
+          "then": {
+            "properties": {
+              "registrationNumber": {
+                "pattern": "^(\\d{8}|[A-Z]{2}\\d{6}|\\[.*\\])$"
+              },
+              "country": {
+                "const": "GB"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "analytics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ga4",
+        "adsConversionId"
+      ],
+      "properties": {
+        "ga4": {
+          "type": "string",
+          "pattern": "^(G-[A-Z0-9]{6,12})?$"
+        },
+        "adsConversionId": {
+          "type": "string",
+          "pattern": "^(AW-[0-9]{6,12})?$"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "gtag",
+            "gtm"
+          ]
+        },
+        "consentMode": {
+          "type": "string",
+          "enum": [
+            "basic",
+            "advanced"
+          ]
+        },
+        "personalisation": {
+          "type": "boolean"
+        },
+        "conversions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "crossDomain": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "locale": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "path",
+        "default"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[a-z]{2,3}(-[A-Z]{2})?$"
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^/([a-z]{2,3}(-[a-z]{2})?/)?$"
+        },
+        "default": {
+          "type": "boolean"
+        },
+        "dir": {
+          "type": "string",
+          "enum": [
+            "ltr",
+            "rtl"
+          ]
+        },
+        "fonts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dictionary": {
+          "type": "string"
+        }
+      }
+    },
+    "geo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "market",
+        "minAge",
+        "rg"
+      ],
+      "properties": {
+        "market": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$"
+        },
+        "adsExclude": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}(-[A-Z0-9]{1,3})?$"
+          }
+        },
+        "minAge": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 25
+        },
+        "rg": {
+          "type": "string",
+          "enum": [
+            "full",
+            "info",
+            "off"
+          ]
+        },
+        "priceRules": {
+          "type": "string"
+        },
+        "accessibilityStatement": {
+          "type": "boolean"
+        }
+      }
+    },
+    "structure": {
+      "type": "object",
+      "required": [
+        "homeSections",
+        "navLabels"
+      ],
+      "properties": {
+        "homeSections": {
+          "type": "array",
+          "minItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          }
+        },
+        "navLabels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "maxLength": 18
+          }
+        },
+        "faq": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^faq-[a-z0-9-]+$"
+          }
+        },
+        "extraPages": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          }
+        },
+        "heroStyle": {
+          "type": "string"
+        }
+      }
+    },
+    "structureSocialCasino": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "heroGame",
+        "heroStyle",
+        "homeSections",
+        "lobbyLayout",
+        "gamePageLayout",
+        "faq",
+        "navLabels"
+      ],
+      "properties": {
+        "heroGame": {
+          "$ref": "#/$defs/slug",
+          "description": "A house game that plays live in the first screen."
+        },
+        "heroStyle": {
+          "type": "string",
+          "enum": [
+            "first-spin",
+            "first-deal",
+            "first-throw",
+            "first-draw",
+            "first-flip"
+          ]
+        },
+        "homeSections": {
+          "type": "array",
+          "minItems": 5,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "hero",
+              "lobby",
+              "how",
+              "safer",
+              "faq",
+              "world",
+              "glossary",
+              "maths",
+              "history"
+            ]
+          },
+          "description": "Order of the home page. hero, lobby, how, safer and faq are mandatory; the rest are optional."
+        },
+        "lobbyLayout": {
+          "type": "string",
+          "enum": [
+            "strip",
+            "ledger",
+            "editorial",
+            "featured-first",
+            "broken-grid"
+          ]
+        },
+        "gamePageLayout": {
+          "type": "string",
+          "enum": [
+            "play-first",
+            "rules-first",
+            "split"
+          ]
+        },
+        "faq": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^faq-[a-z0-9-]+$"
+          },
+          "description": "Ids from the FAQ bank; each answer is rewritten in the site's voice."
+        },
+        "navLabels": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "games",
+            "tables",
+            "safer",
+            "about"
+          ],
+          "properties": {
+            "games": {
+              "type": "string",
+              "maxLength": 14
+            },
+            "tables": {
+              "type": "string",
+              "maxLength": 14
+            },
+            "safer": {
+              "type": "string",
+              "maxLength": 14
+            },
+            "about": {
+              "type": "string",
+              "maxLength": 14
+            }
+          }
+        },
+        "extraPages": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "glossary",
+              "world",
+              "maths",
+              "history"
+            ]
+          }
+        }
+      }
+    },
+    "copy": {
+      "type": "object",
+      "required": [
+        "spelling",
+        "voice",
+        "heroH1"
+      ],
+      "properties": {
+        "spelling": {
+          "type": "string",
+          "pattern": "^[a-z]{2,3}(-[A-Z]{2})?$"
+        },
+        "voice": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "register"
+          ],
+          "properties": {
+            "register": {
+              "type": "string",
+              "enum": [
+                "plain",
+                "warm",
+                "precise",
+                "dry-wit",
+                "editorial"
+              ]
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        },
+        "heroH1": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 90
+        },
+        "heroHighlight": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "tagline": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "howItWorksMetaphor": {
+          "type": "string"
+        },
+        "buttons": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "sample": {
+          "type": "string",
+          "maxLength": 800
+        }
+      }
+    },
+    "copySocialCasino": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "spelling",
+        "voice",
+        "heroH1",
+        "tagline",
+        "buttons"
+      ],
+      "properties": {
+        "spelling": {
+          "const": "en-GB"
+        },
+        "voice": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "register"
+          ],
+          "properties": {
+            "register": {
+              "type": "string",
+              "enum": [
+                "plain",
+                "warm",
+                "precise",
+                "dry-wit",
+                "editorial"
+              ]
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        },
+        "heroH1": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 70
+        },
+        "heroHighlight": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "tagline": {
+          "type": "string",
+          "maxLength": 90
+        },
+        "howItWorksMetaphor": {
+          "type": "string"
+        },
+        "buttons": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "spin",
+            "deal",
+            "claim"
+          ],
+          "properties": {
+            "spin": {
+              "type": "string"
+            },
+            "deal": {
+              "type": "string"
+            },
+            "claim": {
+              "type": "string"
+            }
+          },
+          "description": "Buttons say what will happen, with the amount: 'Spin for 24 Ticks'."
+        },
+        "sample": {
+          "type": "string",
+          "maxLength": 800
+        }
+      }
+    },
+    "socialCasinoOptions": {
+      "type": "object",
+      "required": [
+        "currency",
+        "games",
+        "purchases",
+        "ageVerification"
+      ],
+      "properties": {
+        "currency": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "singular",
+            "plural",
+            "abbr",
+            "startingBalance",
+            "topUpAmount",
+            "topUpBelow"
+          ],
+          "properties": {
+            "singular": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 16
+            },
+            "plural": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 18
+            },
+            "abbr": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4
+            },
+            "startingBalance": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 100000
+            },
+            "topUpAmount": {
+              "type": "integer",
+              "minimum": 50,
+              "maximum": 100000
+            },
+            "topUpBelow": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000
+            },
+            "origin": {
+              "type": "string",
+              "description": "Why this unit belongs to the world."
+            }
+          }
+        },
+        "games": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "house",
+            "pragmatic"
+          ],
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": [
+                "house",
+                "pragmatic"
+              ],
+              "description": "house: only our own games, the only build that can be certified for Google Ads. pragmatic: Pragmatic Play demos plus at least two house tables; needs written consent."
+            },
+            "house": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/houseGame"
+              },
+              "minItems": 3
+            },
+            "pragmatic": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "enabled"
+              ],
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "writtenConsent": {
+                  "oneOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "reference",
+                        "from",
+                        "date"
+                      ],
+                      "properties": {
+                        "reference": {
+                          "type": "string",
+                          "minLength": 3
+                        },
+                        "from": {
+                          "type": "string"
+                        },
+                        "date": {
+                          "$ref": "#/$defs/date"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "featured": {
+                  "$ref": "#/$defs/slug"
+                },
+                "demos": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "maxItems": 11,
+                  "items": {
+                    "$ref": "#/$defs/slug"
+                  },
+                  "description": "Slugs from src/data/pragmatic-games.json; appeal must be low or medium there."
+                },
+                "params": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "lang",
+                    "cur",
+                    "jurisdiction",
+                    "websiteUrl"
+                  ],
+                  "properties": {
+                    "lang": {
+                      "const": "en"
+                    },
+                    "cur": {
+                      "const": "FUN"
+                    },
+                    "jurisdiction": {
+                      "const": "UK"
+                    },
+                    "websiteUrl": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  }
+                },
+                "demoUrl": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "frameHosts": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              }
+            }
+          },
+          "description": "Amendment 6: mode transitions pragmatic -> house are legal at any status."
+        },
+        "purchases": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "enabled"
+          ],
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "priceGbp",
+                  "whatYouGet"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "priceGbp": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "whatYouGet": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "disclosure": {
+              "type": "string",
+              "description": "Shown on the landing page and beside every game when enabled."
+            }
+          }
+        },
+        "ageVerification": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "method"
+          ],
+          "properties": {
+            "method": {
+              "type": "string",
+              "enum": [
+                "self-declaration",
+                "third-party"
+              ]
+            },
+            "provider": {
+              "type": "string"
+            },
+            "decidedBy": {
+              "type": "string"
+            },
+            "decidedOn": {
+              "$ref": "#/$defs/date"
+            }
+          }
+        },
+        "sweepstakes": {
+          "const": false,
+          "description": "Redeemable coins move the order out of the type (ST 1.1); intake rejects true."
+        },
+        "realMoneyLinks": {
+          "const": false,
+          "description": "Any link to real-money gambling is out of scope (ST 1.4)."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "games": {
+                "properties": {
+                  "mode": {
+                    "const": "house"
+                  }
+                },
+                "required": [
+                  "mode"
+                ]
+              }
+            },
+            "required": [
+              "games"
+            ]
+          },
+          "then": {
+            "properties": {
+              "games": {
+                "properties": {
+                  "pragmatic": {
+                    "properties": {
+                      "enabled": {
+                        "const": false
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "games": {
+                "properties": {
+                  "mode": {
+                    "const": "pragmatic"
+                  }
+                },
+                "required": [
+                  "mode"
+                ]
+              }
+            },
+            "required": [
+              "games"
+            ]
+          },
+          "then": {
+            "properties": {
+              "games": {
+                "properties": {
+                  "pragmatic": {
+                    "required": [
+                      "enabled",
+                      "demos",
+                      "params",
+                      "demoUrl",
+                      "frameHosts",
+                      "featured"
+                    ],
+                    "properties": {
+                      "enabled": {
+                        "const": true
+                      },
+                      "demos": {
+                        "minItems": 3
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "purchases": {
+                "properties": {
+                  "enabled": {
+                    "const": true
+                  }
+                },
+                "required": [
+                  "enabled"
+                ]
+              }
+            },
+            "required": [
+              "purchases"
+            ]
+          },
+          "then": {
+            "properties": {
+              "purchases": {
+                "required": [
+                  "enabled",
+                  "items",
+                  "disclosure"
+                ],
+                "properties": {
+                  "items": {
+                    "minItems": 1
+                  },
+                  "disclosure": {
+                    "type": "string",
+                    "minLength": 20
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "onlineGamesOptions": {
+      "type": "object",
+      "description": "Phase 1 stub; types/online-games/schema/order-options.schema.json refines it (ST 6.2).",
+      "properties": {
+        "providers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "key"
+            ],
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "adapter": {
+                "type": "string"
+              },
+              "publisherId": {
+                "type": "string"
+              },
+              "paidSearchPermitted": {
+                "type": "object",
+                "properties": {
+                  "permitted": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  "clauseRef": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "ownGames": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "licensedGames": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "curationPolicy": {
+          "type": "string"
+        },
+        "adsInside": {
+          "type": "boolean"
+        },
+        "childDirected": {
+          "type": "boolean"
+        },
+        "socialFeatures": {
+          "type": "boolean"
+        },
+        "audienceSelf": {
+          "type": "string",
+          "enum": [
+            "general-adult",
+            "mixed",
+            "child-likely"
+          ]
+        },
+        "scraped": {
+          "const": false,
+          "description": "Portals built by scraping Poki/CrazyGames iframes are rejected (ST 1.4)."
+        }
+      }
+    },
+    "hotelCasinoOptions": {
+      "type": "object",
+      "description": "Phase 1 stub; types/hotel-casino/schema/order-options.schema.json refines it (ST 6.2).",
+      "properties": {
+        "booking": {
+          "type": "object",
+          "properties": {
+            "provider": {
+              "type": "string"
+            },
+            "engineUrlTemplate": {
+              "type": "string"
+            },
+            "hosts": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "affiliateId": {
+              "type": "string"
+            },
+            "campaignLabel": {
+              "type": "string"
+            },
+            "affiliatePaidSearch": {
+              "type": "object",
+              "properties": {
+                "permitted": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "clauseRef": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "amenityWhitelist": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "venues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "casinoLinked"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "casinoLinked": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "casino": {
+          "type": "object",
+          "properties": {
+            "entryAge": {
+              "type": "integer"
+            },
+            "regulator": {
+              "type": "string"
+            },
+            "licenceNumber": {
+              "type": "string"
+            },
+            "operatorLegalName": {
+              "type": "string"
+            }
+          }
+        },
+        "modeB": {
+          "type": "object",
+          "properties": {
+            "googleConfirmation": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "reference": {
+                  "type": "string"
+                },
+                "date": {
+                  "$ref": "#/$defs/date"
+                }
+              }
+            },
+            "gamblingActOpinion": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "reference": {
+                  "type": "string"
+                },
+                "date": {
+                  "$ref": "#/$defs/date"
+                }
+              }
+            }
+          }
+        },
+        "reviews": {
+          "type": "object",
+          "properties": {
+            "shown": {
+              "type": "boolean"
+            }
+          }
+        },
+        "hotelFacts": {
+          "type": "object"
+        }
+      }
+    },
+    "approvals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "item",
+          "status"
+        ],
+        "properties": {
+          "item": {
+            "type": "string",
+            "enum": [
+              "concept",
+              "palette",
+              "typography",
+              "structure",
+              "copy",
+              "operator",
+              "legal",
+              "launch",
+              "currency",
+              "games",
+              "catalogue",
+              "curationPolicy",
+              "audience",
+              "facts",
+              "offers",
+              "media",
+              "booking"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected",
+              "changes-requested"
+            ]
+          },
+          "by": {
+            "type": "string"
+          },
+          "on": {
+            "$ref": "#/$defs/date"
+          },
+          "note": {
+            "type": "string"
+          },
+          "via": {
+            "type": "string",
+            "enum": [
+              "board",
+              "proposal",
+              "evidence"
+            ]
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "A",
+              "B",
+              "C"
+            ]
+          }
+        }
+      }
+    },
+    "uniqueness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "comparedAgainst",
+        "passed"
+      ],
+      "properties": {
+        "comparedAgainst": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{2,39}$"
+          }
+        },
+        "checkedOn": {
+          "$ref": "#/$defs/date"
+        },
+        "results": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "copyJaccardMax": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "paletteMinDistance": {
+              "type": "number",
+              "minimum": 0
+            },
+            "fontPairUnique": {
+              "type": "boolean"
+            },
+            "nameCollisions": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "structureTupleUnique": {
+              "type": "boolean"
+            },
+            "conceptFamilyUnique": {
+              "type": "boolean"
+            },
+            "familyRule": {
+              "type": "string",
+              "pattern": "^(unique|shared:[a-z][a-z0-9-]*)$"
+            },
+            "inFlightCompared": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "report": {
+          "type": "string"
+        }
+      }
+    },
+    "launch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "checklist"
+      ],
+      "properties": {
+        "checklist": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "orderValidated": {
+              "$ref": "#/$defs/tick"
+            },
+            "operatorDetails": {
+              "$ref": "#/$defs/tick"
+            },
+            "mailboxWorks": {
+              "$ref": "#/$defs/tick"
+            },
+            "pragmaticDecision": {
+              "$ref": "#/$defs/tick"
+            },
+            "demosChecked": {
+              "$ref": "#/$defs/tick"
+            },
+            "datesHonest": {
+              "$ref": "#/$defs/tick"
+            },
+            "legalReview": {
+              "$ref": "#/$defs/tick"
+            },
+            "strictBuild": {
+              "$ref": "#/$defs/tick"
+            },
+            "e2eChecks": {
+              "$ref": "#/$defs/tick"
+            },
+            "lighthouse": {
+              "$ref": "#/$defs/tick"
+            },
+            "imagesRegenerated": {
+              "$ref": "#/$defs/tick"
+            },
+            "fontsCovered": {
+              "$ref": "#/$defs/tick"
+            },
+            "uniquenessGate": {
+              "$ref": "#/$defs/tick"
+            },
+            "registryUpdated": {
+              "$ref": "#/$defs/tick"
+            },
+            "ciGreen": {
+              "$ref": "#/$defs/tick"
+            },
+            "hostingProject": {
+              "$ref": "#/$defs/tick"
+            },
+            "dns": {
+              "$ref": "#/$defs/tick"
+            },
+            "headersLive": {
+              "$ref": "#/$defs/tick"
+            },
+            "richResults": {
+              "$ref": "#/$defs/tick"
+            },
+            "searchConsole": {
+              "$ref": "#/$defs/tick"
+            },
+            "sitemapSubmitted": {
+              "$ref": "#/$defs/tick"
+            },
+            "adsCertification": {
+              "$ref": "#/$defs/tick"
+            },
+            "analyticsConsent": {
+              "$ref": "#/$defs/tick"
+            },
+            "contactTested": {
+              "$ref": "#/$defs/tick"
+            },
+            "monitoring": {
+              "$ref": "#/$defs/tick"
+            },
+            "handover": {
+              "$ref": "#/$defs/tick"
+            },
+            "policyUrlsVerified": {
+              "$ref": "#/$defs/tick"
+            },
+            "audienceAssessmentSigned": {
+              "$ref": "#/$defs/tick"
+            },
+            "affiliatePaidSearchChecked": {
+              "$ref": "#/$defs/tick"
+            },
+            "providerPaidSearchChecked": {
+              "$ref": "#/$defs/tick"
+            },
+            "trademark": {
+              "$ref": "#/$defs/tick"
+            },
+            "evidence": {
+              "$ref": "#/$defs/tick"
+            },
+            "bookingClause": {
+              "$ref": "#/$defs/tick"
+            },
+            "modeConfirmation": {
+              "$ref": "#/$defs/tick"
+            },
+            "hotelFacts": {
+              "$ref": "#/$defs/tick"
+            },
+            "modelAges": {
+              "$ref": "#/$defs/tick"
+            },
+            "distributorTerms": {
+              "$ref": "#/$defs/tick"
+            },
+            "licenceScope": {
+              "$ref": "#/$defs/tick"
+            },
+            "ppcKit": {
+              "$ref": "#/$defs/tick"
+            }
+          }
+        },
+        "evidenceUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "ppc": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "primaryConversion"
+      ],
+      "properties": {
+        "primaryConversion": {
+          "type": "string",
+          "description": "Owner placeholder: empty until the owner picks (Q11); --level launch refuses empty (D-42)."
+        },
+        "accountId": {
+          "type": "string",
+          "pattern": "^(\\d{3}-\\d{3}-\\d{4})?$"
+        },
+        "certification": {
+          "type": "string",
+          "enum": [
+            "social-casino",
+            "offline-gambling",
+            "none"
+          ]
+        },
+        "kitVersion": {
+          "type": "string"
+        },
+        "advertiserOfRecord": {
+          "type": "string"
+        },
+        "paymentProfileOwner": {
+          "type": "string",
+          "enum": [
+            "client",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "audienceAssessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "result": {
+          "type": "string",
+          "enum": [
+            "general-adult",
+            "mixed",
+            "child-likely"
+          ]
+        },
+        "signedBy": {
+          "type": "string"
+        },
+        "signedOn": {
+          "$ref": "#/$defs/date"
+        }
+      }
+    },
+    "buildStages": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "stages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "stage",
+              "at"
+            ],
+            "properties": {
+              "stage": {
+                "type": "string"
+              },
+              "headSha": {
+                "type": "string"
+              },
+              "at": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

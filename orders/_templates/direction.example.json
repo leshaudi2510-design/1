@@ -1,0 +1,427 @@
+{
+  "id": "B",
+  "type": "social-casino",
+  "variant": "own-games",
+  "orderId": "meridian-signal-rooms",
+  "seed": "meridian-signal-rooms:B:1",
+  "title": "The Signal Rooms",
+  "concept": {
+    "title": "The Signal Rooms",
+    "family": "science-instrument",
+    "era": "1880s",
+    "place": "Greenwich observatory",
+    "craft": "chronometry",
+    "world": "An 1880s observatory time-signal station: brass chronometers, transit circles, star charts on cream paper, verdigris domes and the red time ball that drops at one o'clock. Every result is a reading taken from an instrument, logged in a ledger.",
+    "boldMove": "The whole site is a ledger page: a hairline grid of ruled lines, with the live slot drawn as a transit-circle readout in the first screen.",
+    "vocabulary": [
+      {
+        "term": "Tick",
+        "meaning": "One beat of the chronometer; the virtual unit",
+        "usedFor": [
+          "currency",
+          "copy"
+        ]
+      },
+      {
+        "term": "Transit",
+        "meaning": "A star crossing the meridian wire; a spin",
+        "usedFor": [
+          "game-name",
+          "ui-state"
+        ]
+      },
+      {
+        "term": "Reading",
+        "meaning": "A result taken from an instrument",
+        "usedFor": [
+          "copy",
+          "ui-state"
+        ]
+      },
+      {
+        "term": "Ledger",
+        "meaning": "The observer's log; the lobby and history",
+        "usedFor": [
+          "nav",
+          "copy"
+        ]
+      },
+      {
+        "term": "Time ball",
+        "meaning": "The red ball dropped at 1 pm; the reality-check reminder",
+        "usedFor": [
+          "copy",
+          "ui-state",
+          "sound"
+        ]
+      },
+      {
+        "term": "Verdigris",
+        "meaning": "Green patina on brass domes",
+        "usedFor": [
+          "palette-name"
+        ]
+      },
+      {
+        "term": "Chart paper",
+        "meaning": "Cream star-chart stock",
+        "usedFor": [
+          "palette-name"
+        ]
+      }
+    ],
+    "artwork": {
+      "rule": "objects-and-places-only",
+      "subjects": [
+        "transit circle",
+        "marine chronometer",
+        "sextant",
+        "star chart",
+        "observatory dome",
+        "time ball on its mast",
+        "telegraph key"
+      ],
+      "avoid": [
+        "astronomer figures",
+        "constellation creatures",
+        "zodiac characters",
+        "cartoon planets with faces"
+      ]
+    },
+    "mood": [
+      "precise",
+      "quiet",
+      "brass and paper",
+      "measured"
+    ],
+    "antiReferences": [
+      "Opal Quest Lounge (pop-art, CMYK, halftone)",
+      "Pixel Crown Club (pixel art, velvet night, gold)",
+      "purple-neon casino gradients",
+      "gold-on-black coins"
+    ]
+  },
+  "palette": {
+    "model": "oklch",
+    "colours": [
+      {
+        "role": "ink",
+        "name": "Night ink",
+        "oklch": {
+          "l": 0.22,
+          "c": 0.045,
+          "h": 265
+        },
+        "hex": "#101A2F"
+      },
+      {
+        "role": "paper",
+        "name": "Chart paper",
+        "oklch": {
+          "l": 0.965,
+          "c": 0.02,
+          "h": 85
+        },
+        "hex": "#FAF3E5"
+      },
+      {
+        "role": "primary",
+        "name": "Brass",
+        "oklch": {
+          "l": 0.76,
+          "c": 0.13,
+          "h": 80
+        },
+        "hex": "#DCA744"
+      },
+      {
+        "role": "secondary",
+        "name": "Verdigris",
+        "oklch": {
+          "l": 0.7,
+          "c": 0.1,
+          "h": 175
+        },
+        "hex": "#50B39B"
+      },
+      {
+        "role": "accent",
+        "name": "Time-ball red",
+        "oklch": {
+          "l": 0.6,
+          "c": 0.2,
+          "h": 25
+        },
+        "hex": "#DE3B3D"
+      },
+      {
+        "role": "signal",
+        "name": "Chalk",
+        "oklch": {
+          "l": 0.93,
+          "c": 0.025,
+          "h": 230
+        },
+        "hex": "#D8EBF6"
+      }
+    ],
+    "themes": {
+      "light": {
+        "background": "#FEFAF1",
+        "surface": "#FAF3E5",
+        "text": "#101A2F",
+        "themeColor": "#FAF3E5"
+      },
+      "dark": {
+        "background": "#080F1F",
+        "surface": "#101A2F",
+        "text": "#D8EBF6",
+        "themeColor": "#080F1F"
+      }
+    },
+    "contrastChecked": true
+  },
+  "typography": {
+    "display": {
+      "family": "Fraunces",
+      "licence": "OFL",
+      "axes": [
+        "wght",
+        "opsz",
+        "SOFT",
+        "WONK"
+      ],
+      "weightRange": [
+        500,
+        900
+      ],
+      "selfHosted": true
+    },
+    "body": {
+      "family": "Public Sans",
+      "licence": "OFL",
+      "axes": [
+        "wght"
+      ],
+      "weightRange": [
+        400,
+        700
+      ],
+      "selfHosted": true
+    },
+    "numeric": {
+      "family": "Azeret Mono",
+      "licence": "OFL",
+      "axes": [
+        "wght"
+      ],
+      "weightRange": [
+        400,
+        600
+      ],
+      "selfHosted": true
+    },
+    "rationale": "A soft Victorian serif for headings against a plain civic sans for reading; a mono face for readings and balances, like a logbook."
+  },
+  "currency": {
+    "singular": "Tick",
+    "plural": "Ticks",
+    "abbr": "tk",
+    "startingBalance": 1440,
+    "topUpAmount": 720,
+    "topUpBelow": 60,
+    "origin": "1,440 minutes in a day; the chronometer gives you a day of Ticks to start."
+  },
+  "games": {
+    "house": [
+      {
+        "slug": "transit-reels",
+        "name": "Transit Reels",
+        "engine": "reel-slot",
+        "spec": {
+          "reels": 3,
+          "lines": 3,
+          "symbols": [
+            {
+              "code": "M",
+              "name": "Meridian wire",
+              "wild": true
+            },
+            {
+              "code": "C",
+              "name": "Chronometer"
+            },
+            {
+              "code": "S",
+              "name": "Sextant"
+            },
+            {
+              "code": "T",
+              "name": "Transit circle"
+            },
+            {
+              "code": "D",
+              "name": "Dome"
+            },
+            {
+              "code": "K",
+              "name": "Telegraph key"
+            },
+            {
+              "code": "P",
+              "name": "Star chart"
+            }
+          ],
+          "stakes": [
+            12,
+            24,
+            60,
+            120
+          ],
+          "targetRtp": 0.955
+        },
+        "coverMotif": "A brass transit circle on a stone pier under a half-open dome, drawn in hairline ink on chart paper.",
+        "tileFacts": [
+          "3 reels",
+          "3 lines"
+        ],
+        "tags": [],
+        "rtpNote": "Exact: every reel-stop combination enumerated by the build (as Seven Systems does).",
+        "status": "approved"
+      },
+      {
+        "slug": "equatorial-wheel",
+        "name": "Equatorial Wheel",
+        "engine": "european-roulette",
+        "spec": {
+          "chips": [
+            2,
+            10,
+            50,
+            200
+          ],
+          "tableLimit": 1000,
+          "pocketNames": {
+            "red": "Sunrise",
+            "black": "Midnight",
+            "zero": "Meridian"
+          }
+        },
+        "coverMotif": "A single-zero wheel drawn as a brass setting circle with engraved degree marks.",
+        "tileFacts": [
+          "Roulette",
+          "Single zero"
+        ],
+        "tags": [
+          "table"
+        ],
+        "rtpNote": "Exact: 36 ÷ 37 for every bet on the table.",
+        "status": "approved"
+      },
+      {
+        "slug": "chronometer-twenty-one",
+        "name": "Chronometer Twenty-One",
+        "engine": "blackjack",
+        "spec": {
+          "decks": 8,
+          "dealer": "S17",
+          "naturalName": "Chronometer",
+          "naturalPays": "3:2",
+          "hint": true,
+          "stakes": [
+            12,
+            30,
+            60,
+            120
+          ]
+        },
+        "coverMotif": "An open marine chronometer in its gimballed box beside two face-down cards.",
+        "tileFacts": [
+          "Blackjack",
+          "8 decks"
+        ],
+        "tags": [
+          "table"
+        ],
+        "rtpNote": "Measured: 20 million simulated hands of basic strategy for 8 decks, S17 (tools/simulate-21.mjs with the order's spec).",
+        "status": "approved"
+      }
+    ]
+  },
+  "structure": {
+    "heroGame": "transit-reels",
+    "heroStyle": "first-spin",
+    "homeSections": [
+      "hero",
+      "world",
+      "lobby",
+      "how",
+      "safer",
+      "faq"
+    ],
+    "lobbyLayout": "ledger",
+    "gamePageLayout": "rules-first",
+    "faq": [
+      "faq-what-are-ticks",
+      "faq-can-i-buy",
+      "faq-how-results-decided",
+      "faq-why-adults-only",
+      "faq-rtp-meaning",
+      "faq-time-limits",
+      "faq-offline"
+    ],
+    "navLabels": {
+      "games": "Reels",
+      "tables": "Tables",
+      "safer": "Safer play",
+      "about": "The rooms"
+    },
+    "extraPages": [
+      "glossary"
+    ]
+  },
+  "copy": {
+    "register": "precise",
+    "heroH1": "Take a reading from the transit circle.",
+    "heroHighlight": "Played for Ticks.",
+    "tagline": "Free-to-play reels and tables from an 1880s signal station.",
+    "buttons": {
+      "spin": "Spin for 24 Ticks",
+      "deal": "Deal for 30 Ticks",
+      "claim": "Wind on 720 Ticks"
+    }
+  },
+  "forcing": {
+    "family": "science-instrument",
+    "era": "1880s",
+    "place": "Greenwich observatory",
+    "craft": "chronometry",
+    "displayFont": "Fraunces",
+    "bodyFont": "Public Sans",
+    "structureTuple": {
+      "heroStyle": "first-spin",
+      "lobbyLayout": "ledger",
+      "gamePageLayout": "rules-first",
+      "homeSections": [
+        "hero",
+        "world",
+        "lobby",
+        "how",
+        "safer",
+        "faq"
+      ],
+      "extraPages": [
+        "glossary"
+      ]
+    },
+    "register": "precise",
+    "mustAddEngine": false,
+    "requiresSignoff": false,
+    "reason": "family unused by any reserved, approved, review or live entry; display font and (display, body) pair unused; structure tuple unused"
+  },
+  "scores": {
+    "compliance": 0.92,
+    "uniqueness": 0.9
+  },
+  "pre": null
+}
