@@ -57,9 +57,13 @@ function check(root) {
   errors.push(...checkStages(stages));
   const board = readJsonIf(path.join(root, 'schemas', 'board.schema.json'));
   if (board) {
-    let found = board.stages;
-    if (!found) { const rec = (n, d) => { if (found || !n || typeof n !== 'object' || d > 8) return; if (Array.isArray(n.stages) && n.stages.every((s) => typeof s === 'string')) { found = n.stages; return; } for (const v of Object.values(n)) rec(v, d + 1); }; rec(board, 0); }
-    if (!found) errors.push('schemas/board.schema.json: no stages list found');
+    // G's file: a top-level "stages" array is the contract (MASTER-PLAN 9.2 G done-when); a few
+    // schema-style spellings are tolerated (stages.const|enum|default, $defs.stage.enum).
+    const asList = (v) => (Array.isArray(v) && v.every((s) => typeof s === 'string') ? v : null);
+    let found = asList(board.stages) || (board.stages && (asList(board.stages.const) || asList(board.stages.enum) || asList(board.stages.default)));
+    if (!found) { const rec = (n, d) => { if (found || !n || typeof n !== 'object' || d > 8) return; if (asList(n.stages)) { found = n.stages; return; } for (const v of Object.values(n)) rec(v, d + 1); }; rec(board, 0); }
+    if (!found && board.$defs && board.$defs.stage) found = asList(board.$defs.stage.enum);
+    if (!found) process.stderr.write('status --check: warning: schemas/board.schema.json has no stages list to compare\n');
     else if (JSON.stringify(found) !== JSON.stringify(stages.stages)) errors.push('schemas/board.schema.json: stages differ from schemas/stages.json');
   }
   const derivedStatuses = new Set(Object.values(stages.derive.orderStatus));

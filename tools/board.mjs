@@ -65,15 +65,15 @@ function builtin(stages) {
       },
     },
     sites: {
-      type: 'object', required: ['slug', 'brand', 'type', 'stage', 'updatedAt'],
+      type: 'object', required: ['slug', 'brand', 'type', 'stage', 'reports'],
       properties: {
         slug: { type: 'string', pattern: SLUG }, brand: { type: 'string', minLength: 1 }, domain: { type: ['string', 'null'] },
         type: { type: 'string', enum: ['social-casino', 'online-games', 'hotel-casino'] }, variant: { type: ['string', 'null'] },
         locales: { type: 'array', items: { type: 'string' } }, status: { type: ['string', 'null'] }, stage,
-        engine: { type: 'string', enum: ['factory', 'none'] }, cfProject: { type: ['string', 'null'] },
+        cfProject: { type: ['string', 'null'] }, lhBaseline: { type: ['object', 'null'] }, lh: { type: ['object', 'null'] }, monitoring: { type: 'object' },
         deployed: { type: ['object', 'null'] }, ci: { type: ['object', 'null'] },
         reports: { type: 'object' }, health: { type: ['object', 'null'] }, nearestSibling: { type: ['string', 'null'] },
-        incidents: { type: 'integer', minimum: 0 }, updatedAt: { type: 'string', pattern: ISO },
+        incidents: { type: 'integer', minimum: 0 },
       },
     },
     events: {
@@ -178,11 +178,11 @@ export async function buildRow(collection, id, root = repoRoot()) {
       slug: id, brand: cfg.brand || (r.registry && r.registry.brand) || fp.brand || id, domain: cfg.domain || (r.registry && r.registry.domain) || null,
       type: r.type || cfg.type || 'social-casino', variant: cfg.variant || (r.registry && r.registry.variant) || fp.variant || null,
       locales: (cfg.locales || []).map((l) => l.code).filter(Boolean).length ? cfg.locales.map((l) => l.code) : ['en-GB'],
-      status: stages.derive.registryStatus[stage] ?? null, stage, engine: r.engine || 'factory',
+      status: stages.derive.registryStatus[stage] ?? null, stage,
       cfProject: (cfg.deploy && cfg.deploy.project) || (r.registry && r.registry.cfProject) || null,
-      deployed: null, ci: null, reports, health: null,
+      deployed: null, ci: null, reports: { ...reports, at: reports.at || now }, health: null, lhBaseline: null, lh: null,
       nearestSibling: reports.uniqueness && reports.uniqueness.nearest.length ? reports.uniqueness.nearest[0] : null,
-      incidents: 0, updatedAt: now,
+      incidents: 0, monitoring: { routines: [] },
     };
   }
   throw new UsageError(`row supports the collections orders and sites (got ${collection})`);

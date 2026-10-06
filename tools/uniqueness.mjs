@@ -322,7 +322,8 @@ export function post(siteDir, { root = repoRoot(), sitesDir, dist = null, agains
         if (diff < th.faqMinDiff) fail({ dimension: 'faq', sibling: s.slug, value: diff, threshold: th.faqMinDiff });
         if (sameAnswers) fail({ dimension: 'faq:answers', sibling: s.slug, value: sameAnswers, threshold: 0 });
       }
-      if (s.routeSetHash && subj.routeSetHash === s.routeSetHash) fail({ dimension: 'structure:routes', sibling: s.slug, value: 'identical route set', threshold: 'differs' });
+      // route sets are distinctive for social casino (game slugs); hotel and games sites share page sets by design
+      if (s.routeSetHash && subj.routeSetHash === s.routeSetHash) (subj.type === 'social-casino' ? fail : warn)({ dimension: 'structure:routes', sibling: s.slug, value: 'identical route set', threshold: 'differs' });
       if (subj.structure && s.structure) {
         const sameSections = subj.structure.homeSections.length > 0 && JSON.stringify(subj.structure.homeSections) === JSON.stringify(s.structure.homeSections);
         const sameNav = subj.structure.navLabels.length > 0 && JSON.stringify(subj.structure.navLabels.map(norm)) === JSON.stringify(s.structure.navLabels.map(norm));
