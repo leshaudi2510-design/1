@@ -1,0 +1,53 @@
+{
+  "brand": "Gilded Lantern Lounge",
+  "shortName": "Gilded Lantern",
+  "domain": "gildedlanternlounge.com",
+  "concept": "Moonlit Lanterns: a night-market lounge where a smiling moon mascot hands out lucky lanterns. Calibration fixture: the copy breaks the wording rules on purpose.",
+  "currency": {
+    "singular": "Lantern",
+    "plural": "Lanterns",
+    "abbr": "ln",
+    "startingBalance": 1000,
+    "topUpAmount": 1000,
+    "topUpBelow": 100
+  },
+  "operator": {
+    "companyName": "[Operator company name] Ltd",
+    "companyNumber": "[Companies House number]",
+    "registeredIn": "England and Wales",
+    "address": "[Registered office address], United Kingdom",
+    "email": "hello@gildedlanternlounge.com"
+  },
+  "purchases": false,
+  "analytics": {
+    "ga4": "",
+    "adsConversionId": ""
+  },
+  "contactEndpoint": "",
+  "lastUpdated": "2026-10-06",
+  "legalUpdated": {
+    "terms": "2026-10-06",
+    "privacy": "2026-10-06",
+    "cookies": "2026-10-06"
+  },
+  "themeColor": {
+    "light": "#221400",
+    "dark": "#110900"
+  },
+  "pragmatic": {
+    "enabled": true,
+    "writtenConsent": "",
+    "demoUrl": "https://demogamesfree.pragmaticplay.net/gs2c/openGame.do",
+    "params": {
+      "lang": "en",
+      "cur": "FUN",
+      "jurisdiction": "UK",
+      "websiteUrl": "https://demogamesfree.pragmaticplay.net"
+    },
+    "frameHosts": [
+      "https://demogamesfree.pragmaticplay.net"
+    ]
+  },
+  "type": "social-casino",
+  "storagePrefix": "glb"
+}

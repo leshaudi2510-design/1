@@ -1,0 +1,29 @@
+{
+  "$comment": "Seed fingerprints for sites that predate concept.json/order.json (SPEC 15.2 'Seed in Phase 1'). tools/uniqueness.mjs and tools/order-to-config.mjs use an entry only for the concept-level fields (family, era, place, craft, vocabulary, fonts, games) a site does not carry in orders/<slug>/order.json or sites/<slug>/concept.json. Retired once tools/registry.mjs owns the registry branch (Phase 2).",
+  "entries": [
+    {
+      "slug": "opalquestlounge", "type": "social-casino", "variant": "demo-lobby", "stage": "live", "engine": "factory", "hosting": "studio-cf",
+      "brand": "Opal Quest Lounge", "domain": "opalquestlounge.com",
+      "family": "print-typography", "era": "contemporary", "place": "print studio", "craft": "typesetting",
+      "keywords": ["pop-art", "ben-day dots", "halftone", "cmyk", "starburst", "gems"],
+      "vocabulary": ["Carat", "Lounge", "Lapidary", "Brilliant", "Systems"],
+      "paletteNames": ["process ink", "process yellow", "process cyan", "process magenta", "warm red"],
+      "fonts": { "display": "Archivo", "body": "Radio Canada" },
+      "games": [ { "name": "Seven Systems", "slug": "seven-systems", "engine": "reel-slot" }, { "name": "Lapidary Wheel", "slug": "lapidary-wheel", "engine": "roulette" }, { "name": "Brilliant Twenty-One", "slug": "brilliant-twenty-one", "engine": "blackjack" } ],
+      "currency": { "singular": "Carat", "plural": "Carats" },
+      "homeSummary": "Pop-art print lobby of Pragmatic Play demos and three gem-cut house tables, played for Carats."
+    },
+    {
+      "slug": "pixelcrownclub", "type": "social-casino", "variant": "own-games", "stage": "live", "engine": "none", "hosting": "studio-cf",
+      "brand": "Pixel Crown Club",
+      "family": "era-style", "era": "1990s", "place": "arcade", "craft": "pixel art",
+      "keywords": ["pixel-art", "velvet", "gold", "crown", "trophy"],
+      "vocabulary": ["Crown", "Club", "Trophy", "Purse"],
+      "paletteNames": ["velvet night", "gold"],
+      "fonts": { "display": "Pixelify Sans", "body": "Instrument Sans", "numeric": "Silkscreen" },
+      "games": [],
+      "currency": { "singular": "Crown", "plural": "Crowns" },
+      "homeSummary": "Pixel-art velvet-and-gold club with three classic tables, five tiers and free Crowns every eight hours."
+    }
+  ]
+}

@@ -135,6 +135,11 @@ export function getPath(obj, p) {
   return cur;
 }
 
+/** True when the module at metaUrl is the entry script (so tools can be imported by tests). */
+export function isMain(metaUrl) {
+  try { return fs.realpathSync(path.resolve(process.argv[1] || '')) === fs.realpathSync(fileURLToPath(metaUrl)); } catch { return false; }
+}
+
 /** The scratch directory for temporary build output. */
 export function scratchDir() {
   return process.env.CLAUDE_SCRATCHPAD || process.env.RUNNER_TEMP || process.env.TMPDIR || '/tmp';
