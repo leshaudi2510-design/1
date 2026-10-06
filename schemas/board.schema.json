@@ -1,0 +1,1208 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://studio.local/factory/schemas/board.schema.json",
+  "title": "Site Factory Board documents",
+  "$comment": "Owner: partition G (MASTER-PLAN 4.6, D-38, D-43; SPEC 13). The root validates one ArtifactData write envelope { collection, id, data }: `id` must match the collection's idPattern and `data` its document schema. `collections.<name>` is each collection's document schema ($ref into $defs) plus its db rule and first phase; tools/board.mjs reads `collections.<name>` to validate one bare document. Non-validation keywords at the root (`version`, `stages`, `thresholds`, `collections`, `artifact`) are data for the tools: Ajv compiles this file with `strict: false`, or in strict mode with `allowUnionTypes: true` after `ajv.addVocabulary([\"version\",\"stages\",\"thresholds\",\"collections\",\"artifact\"])` (and, inside `collections`, the keys are never compiled). `stages` must equal schemas/stages.json `stages` (G done-when); `thresholds.lighthouse` (launch gate G5: >= 95 in every category, LCP < 2.0 s, CLS < 0.05, mobile and desktop; keys match the lighthouse summary.json rows, D-55) is read by engine/tools/lighthouse.mjs and the sites-ci Lighthouse gate (D-14); `thresholds.uniqueness[type]` is read by tools/uniqueness.mjs (D-20); `thresholds.health` holds the numbers tools/probe.mjs and site-sentinel use. Every write is by Claude via ArtifactData (D-38) except approvals (Board/proposal/evidence buttons) and inbox (the intake form, Phase 2).",
+  "version": "1.0",
+  "stages": [
+    "intake",
+    "questions-sent",
+    "proposal",
+    "approved",
+    "building",
+    "review",
+    "fix",
+    "ready-for-launch",
+    "ready",
+    "live-pending",
+    "live",
+    "maintenance",
+    "blocked",
+    "paused",
+    "retired"
+  ],
+  "thresholds": {
+    "lighthouse": { "perf": 95, "a11y": 95, "bp": 95, "seo": 95, "lcpMs": 2000, "cls": 0.05 },
+    "uniqueness": {
+      "social-casino": {
+        "copyPage": 0.25,
+        "copyPageSameFamily": 0.2,
+        "copySite": 0.15,
+        "headings": 0.2,
+        "faqMinDiff": 2,
+        "paletteMin": 0.12,
+        "paletteMinSameFamily": 0.16,
+        "hueMin": 40,
+        "vocabularyOverlapMax": 1,
+        "crossTypeSite": 0.15,
+        "bodyFontMaxUses": 2,
+        "pragmaticJaccard": 0.5
+      },
+      "online-games": {
+        "copyPage": 0.25,
+        "copyPageSameFamily": 0.2,
+        "copySite": 0.15,
+        "headings": 0.2,
+        "faqMinDiff": 2,
+        "paletteMin": 0.12,
+        "paletteMinSameFamily": 0.16,
+        "hueMin": 40,
+        "vocabularyOverlapMax": 1,
+        "crossTypeSite": 0.15,
+        "bodyFontMaxUses": 2
+      },
+      "hotel-casino": {
+        "copyPage": 0.25,
+        "copyPageSameFamily": 0.2,
+        "copySite": 0.15,
+        "headings": 0.2,
+        "faqMinDiff": 2,
+        "paletteMin": 0.12,
+        "paletteMinSameFamily": 0.16,
+        "hueMin": 40,
+        "vocabularyOverlapMax": 1,
+        "crossTypeSite": 0.15,
+        "bodyFontMaxUses": 2
+      }
+    },
+    "health": { "certAmberDays": 30, "certRedDays": 14, "domainAmberDays": 60, "domainRedDays": 21 },
+    "stopGate": { "attempts": 2, "timeoutSec": 300 },
+    "policyHealth": { "disapprovedMax": 0, "limitedWarn": 1 }
+  },
+  "artifact": {
+    "path": "artifacts/board/index.html",
+    "capabilities": {
+      "db": {
+        "rules": [
+          { "path": "", "read": "view", "write": "admin" },
+          { "path": "orders", "read": "view", "write": "admin" },
+          { "path": "proposals", "read": "view", "write": "admin" },
+          { "path": "approvals", "read": "view", "write": "interact" },
+          { "path": "inbox", "read": "admin", "write": "admin" },
+          { "path": "sites", "read": "view", "write": "admin" },
+          { "path": "shepherd", "read": "view", "write": "admin" },
+          { "path": "runs", "read": "view", "write": "admin" },
+          { "path": "health", "read": "view", "write": "admin" },
+          { "path": "lighthouse", "read": "view", "write": "admin" },
+          { "path": "reviews", "read": "view", "write": "admin" },
+          { "path": "sessions", "read": "view", "write": "admin" },
+          { "path": "events", "read": "view", "write": "admin" },
+          { "path": "portfolio", "read": "view", "write": "admin" },
+          { "path": "ppc", "read": "view", "write": "admin" },
+          { "path": "policyhealth", "read": "view", "write": "admin" },
+          { "path": "certifications", "read": "view", "write": "admin" },
+          { "path": "config", "read": "view", "write": "admin" }
+        ]
+      },
+      "user": {}
+    },
+    "$comment": "what the hub passes as `capabilities` when it publishes the Board (D-38). The page itself never writes; approvals write `interact` only for the Phase 3 approval buttons. A rule's write level is never below its read level, so inbox (read admin) is write admin here; the intake form is its own artifact with its own rules (SPEC 13.4)."
+  },
+  "collections": {
+    "orders": {
+      "$ref": "#/$defs/order",
+      "docPath": "orders/<orderId>",
+      "idPattern": "^[a-z][a-z0-9-]{2,39}$",
+      "rule": { "read": "view", "write": "admin" },
+      "firstPhase": 2
+    },
+    "proposals": {
+      "$ref": "#/$defs/proposal",
+      "docPath": "proposals/<orderId>",
+      "idPattern": "^[a-z][a-z0-9-]{2,39}$",
+      "rule": { "read": "view", "write": "admin" },
+      "firstPhase": 3
+    },
+    "approvals": {
+      "$ref": "#/$defs/approval",
+      "docPath": "approvals/<orderId>:<item>",
+      "idPattern": "^[a-z][a-z0-9-]{2,39}:[A-Za-z]+$",
+      "rule": { "read": "view", "write": "interact" },
+      "firstPhase": 3
+    },
+    "inbox": {
+      "$ref": "#/$defs/inbox",
+      "docPath": "inbox/<id>",
+      "idPattern": "^[A-Za-z0-9_.~:@+-]{1,64}$",
+      "rule": { "read": "admin", "write": "admin" },
+      "firstPhase": 2
+    },
+    "sites": {
+      "$ref": "#/$defs/site",
+      "docPath": "sites/<slug>",
+      "idPattern": "^[a-z][a-z0-9-]{2,39}$",
+      "rule": { "read": "view", "write": "admin" },
+      "firstPhase": 1
+    },
+    "shepherd": {
+      "$ref": "#/$defs/shepherd",
+      "docPath": "shepherd/<slug>:<sha>",
+      "idPattern": "^[a-z][a-z0-9-]{2,39}:[0-9a-f]{7,40}$",
+      "rule": { "read": "view", "write": "admin" },
+      "firstPhase": 3
+    },
+    "runs": {
+      "$ref": "#/$defs/run",
+      "docPath": "runs/<slug>:<sha>",
+      "idPattern": "^[a-z][a-z0-9-]{2,39}:[0-9a-f]{7,40}$",
+      "rule": { "read": "view", "write": "admin" },
+      "firstPhase": 1
+    },
+    "health": {
+      "$ref": "#/$defs/health",
+      "docPath": "health/<slug>:<YYYY-MM-DDTHH> | <slug>:<YYYY-MM-DD>",
+      "idPattern": "^[a-z][a-z0-9-]{2,39}:\\d{4}-\\d{2}-\\d{2}(T\\d{2})?$",
+      "rule": { "read": "view", "write": "admin" },
+      "firstPhase": 4
+    },
+    "lighthouse": {
+      "$ref": "#/$defs/lighthouse",
+      "docPath": "lighthouse/<slug>:<YYYY-MM-DD>",
+      "idPattern": "^[a-z][a-z0-9-]{2,39}:\\d{4}-\\d{2}-\\d{2}$",
+      "rule": { "read": "view", "write": "admin" },
+      "firstPhase": 4
+    },
+    "reviews": {
+      "$ref": "#/$defs/review",
+      "docPath": "reviews/<slug>:<round>",
+      "idPattern": "^[a-z][a-z0-9-]{2,39}:[1-9][0-9]*$",
+      "rule": { "read": "view", "write": "admin" },
+      "firstPhase": 2
+    },
+    "sessions": {
+      "$ref": "#/$defs/session",
+      "docPath": "sessions/<id>",
+      "idPattern": "^[A-Za-z0-9_.~:@+-]{1,100}$",
+      "rule": { "read": "view", "write": "admin" },
+      "firstPhase": 2
+    },
+    "events": {
+      "$ref": "#/$defs/event",
+      "docPath": "events/<ulid>",
+      "idPattern": "^[0-9A-Za-z]{8,32}$",
+      "rule": { "read": "view", "write": "admin" },
+      "firstPhase": 1
+    },
+    "portfolio": {
+      "$ref": "#/$defs/portfolio",
+      "docPath": "portfolio/registry | matrix | policy",
+      "idPattern": "^(registry|matrix|policy)$",
+      "rule": { "read": "view", "write": "admin" },
+      "firstPhase": 2
+    },
+    "ppc": {
+      "$ref": "#/$defs/ppc",
+      "docPath": "ppc/<slug>",
+      "idPattern": "^[a-z][a-z0-9-]{2,39}$",
+      "rule": { "read": "view", "write": "admin" },
+      "firstPhase": 5
+    },
+    "policyhealth": {
+      "$ref": "#/$defs/policyhealth",
+      "docPath": "policyhealth/<accountId>:<date>",
+      "idPattern": "^[0-9-]{6,20}:\\d{4}-\\d{2}-\\d{2}$",
+      "rule": { "read": "view", "write": "admin" },
+      "firstPhase": 5
+    },
+    "certifications": {
+      "$ref": "#/$defs/certification",
+      "docPath": "certifications/<accountId>:<country>:<category>",
+      "idPattern": "^[0-9-]{6,20}:[A-Z]{2}:(social-casino|offline-gambling)$",
+      "rule": { "read": "view", "write": "admin" },
+      "firstPhase": 5
+    },
+    "config": {
+      "$ref": "#/$defs/config",
+      "docPath": "config/factory",
+      "idPattern": "^factory$",
+      "rule": { "read": "view", "write": "admin" },
+      "firstPhase": 1
+    }
+  },
+  "type": "object",
+  "required": ["collection", "id", "data"],
+  "properties": {
+    "collection": {
+      "type": "string",
+      "enum": [
+        "orders",
+        "proposals",
+        "approvals",
+        "inbox",
+        "sites",
+        "shepherd",
+        "runs",
+        "health",
+        "lighthouse",
+        "reviews",
+        "sessions",
+        "events",
+        "portfolio",
+        "ppc",
+        "policyhealth",
+        "certifications",
+        "config"
+      ]
+    },
+    "id": { "type": "string", "minLength": 1, "maxLength": 200, "pattern": "^[A-Za-z0-9_.~:@+-]+$" },
+    "data": { "type": "object" }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": { "properties": { "collection": { "const": "orders" } }, "required": ["collection"] },
+      "then": {
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,39}$" },
+          "data": { "$ref": "#/$defs/order" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "collection": { "const": "proposals" } }, "required": ["collection"] },
+      "then": {
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,39}$" },
+          "data": { "$ref": "#/$defs/proposal" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "collection": { "const": "approvals" } }, "required": ["collection"] },
+      "then": {
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,39}:[A-Za-z]+$" },
+          "data": { "$ref": "#/$defs/approval" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "collection": { "const": "inbox" } }, "required": ["collection"] },
+      "then": {
+        "properties": {
+          "id": { "type": "string", "pattern": "^[A-Za-z0-9_.~:@+-]{1,64}$" },
+          "data": { "$ref": "#/$defs/inbox" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "collection": { "const": "sites" } }, "required": ["collection"] },
+      "then": {
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,39}$" },
+          "data": { "$ref": "#/$defs/site" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "collection": { "const": "shepherd" } }, "required": ["collection"] },
+      "then": {
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,39}:[0-9a-f]{7,40}$" },
+          "data": { "$ref": "#/$defs/shepherd" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "collection": { "const": "runs" } }, "required": ["collection"] },
+      "then": {
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,39}:[0-9a-f]{7,40}$" },
+          "data": { "$ref": "#/$defs/run" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "collection": { "const": "health" } }, "required": ["collection"] },
+      "then": {
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,39}:\\d{4}-\\d{2}-\\d{2}(T\\d{2})?$" },
+          "data": { "$ref": "#/$defs/health" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "collection": { "const": "lighthouse" } }, "required": ["collection"] },
+      "then": {
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,39}:\\d{4}-\\d{2}-\\d{2}$" },
+          "data": { "$ref": "#/$defs/lighthouse" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "collection": { "const": "reviews" } }, "required": ["collection"] },
+      "then": {
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,39}:[1-9][0-9]*$" },
+          "data": { "$ref": "#/$defs/review" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "collection": { "const": "sessions" } }, "required": ["collection"] },
+      "then": {
+        "properties": {
+          "id": { "type": "string", "pattern": "^[A-Za-z0-9_.~:@+-]{1,100}$" },
+          "data": { "$ref": "#/$defs/session" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "collection": { "const": "events" } }, "required": ["collection"] },
+      "then": {
+        "properties": { "id": { "type": "string", "pattern": "^[0-9A-Za-z]{8,32}$" }, "data": { "$ref": "#/$defs/event" } }
+      }
+    },
+    {
+      "if": { "properties": { "collection": { "const": "portfolio" } }, "required": ["collection"] },
+      "then": {
+        "properties": {
+          "id": { "type": "string", "pattern": "^(registry|matrix|policy)$" },
+          "data": { "$ref": "#/$defs/portfolio" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "collection": { "const": "ppc" } }, "required": ["collection"] },
+      "then": {
+        "properties": { "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,39}$" }, "data": { "$ref": "#/$defs/ppc" } }
+      }
+    },
+    {
+      "if": { "properties": { "collection": { "const": "policyhealth" } }, "required": ["collection"] },
+      "then": {
+        "properties": {
+          "id": { "type": "string", "pattern": "^[0-9-]{6,20}:\\d{4}-\\d{2}-\\d{2}$" },
+          "data": { "$ref": "#/$defs/policyhealth" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "collection": { "const": "certifications" } }, "required": ["collection"] },
+      "then": {
+        "properties": {
+          "id": { "type": "string", "pattern": "^[0-9-]{6,20}:[A-Z]{2}:(social-casino|offline-gambling)$" },
+          "data": { "$ref": "#/$defs/certification" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "collection": { "const": "config" } }, "required": ["collection"] },
+      "then": {
+        "properties": { "id": { "type": "string", "pattern": "^factory$" }, "data": { "$ref": "#/$defs/config" } }
+      }
+    }
+  ],
+  "$defs": {
+    "slug": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,39}$" },
+    "iso": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?(Z|[+-]\\d{2}:\\d{2})?)?$",
+      "$comment": "ISO 8601 date or date-time (date-only allowed for day-keyed docs)"
+    },
+    "sha": { "type": "string", "pattern": "^[0-9a-f]{7,40}$" },
+    "url": { "type": "string", "pattern": "^https?://" },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "intake",
+        "questions-sent",
+        "proposal",
+        "approved",
+        "building",
+        "review",
+        "fix",
+        "ready-for-launch",
+        "ready",
+        "live-pending",
+        "live",
+        "maintenance",
+        "blocked",
+        "paused",
+        "retired"
+      ],
+      "$comment": "identical to schemas/stages.json stages (and #/$defs/stage there); the top-level `stages` keyword of this file must equal it (G done-when)"
+    },
+    "type": { "type": "string", "enum": ["social-casino", "online-games", "hotel-casino"] },
+    "approvalStatus": { "type": "string", "enum": ["pending", "approved", "rejected", "changes-requested"] },
+    "approvalItem": {
+      "type": "string",
+      "enum": [
+        "concept",
+        "palette",
+        "typography",
+        "structure",
+        "copy",
+        "operator",
+        "legal",
+        "launch",
+        "currency",
+        "games",
+        "catalogue",
+        "curationPolicy",
+        "audience",
+        "facts",
+        "offers",
+        "media",
+        "booking"
+      ],
+      "$comment": "pack.approvalItems[]: common concept palette typography structure copy operator legal launch; social-casino + currency games; online-games + catalogue curationPolicy audience; hotel-casino + facts offers media booking (MASTER-PLAN 4.6)"
+    },
+    "severity": { "type": "string", "enum": ["info", "warn", "red", "green"] },
+    "probeState": { "type": "string", "enum": ["green", "amber", "red"] },
+    "pr": {
+      "anyOf": [
+        {
+          "type": "object",
+          "required": ["number"],
+          "properties": {
+            "number": { "type": "integer", "minimum": 1 },
+            "url": { "type": "string" },
+            "state": { "type": "string" },
+            "labels": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        { "type": "null" }
+      ]
+    },
+    "lhRow": {
+      "type": "object",
+      "properties": {
+        "url": { "type": "string" },
+        "preset": { "type": "string", "enum": ["mobile", "desktop"] },
+        "perf": { "type": "number" },
+        "a11y": { "type": "number" },
+        "bp": { "type": "number" },
+        "seo": { "type": "number" },
+        "lcp": { "type": "number" },
+        "lcpMs": { "type": "number" },
+        "cls": { "type": "number" },
+        "tbt": { "type": "number" }
+      }
+    },
+    "cost": {
+      "type": "object",
+      "properties": {
+        "inputTokens": { "type": "integer", "minimum": 0 },
+        "outputTokens": { "type": "integer", "minimum": 0 },
+        "cacheRead": { "type": "integer", "minimum": 0 },
+        "cacheWrite": { "type": "integer", "minimum": 0 },
+        "modelFamily": { "type": "string" },
+        "usdEstimate": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "toolCounts": {
+      "type": "object",
+      "properties": {
+        "tools": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } },
+        "skills": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } },
+        "agents": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } }
+      },
+      "additionalProperties": false
+    },
+    "order": {
+      "type": "object",
+      "required": ["orderId", "slug", "brand", "type", "stage", "approvals", "updatedAt"],
+      "properties": {
+        "orderId": { "$ref": "#/$defs/slug" },
+        "slug": { "$ref": "#/$defs/slug" },
+        "brand": { "type": "string", "minLength": 1 },
+        "domain": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "type": { "$ref": "#/$defs/type" },
+        "variant": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "casinoMode": { "type": "string", "enum": ["A", "A+", "B"] },
+        "audience": { "type": "string", "enum": ["general-adult", "mixed", "child-likely"] },
+        "markets": { "type": "array", "items": { "type": "string" } },
+        "client": {
+          "type": "object",
+          "properties": {
+            "name": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+            "language": { "anyOf": [{ "type": "string" }, { "type": "null" }] }
+          }
+        },
+        "stage": { "$ref": "#/$defs/stage" },
+        "launchTarget": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "sessionId": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "pr": { "$ref": "#/$defs/pr" },
+        "proposalUrl": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "evidenceUrl": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "approvals": {
+          "type": "object",
+          "propertyNames": { "$ref": "#/$defs/approvalItem" },
+          "additionalProperties": { "$ref": "#/$defs/approvalStatus" }
+        },
+        "questions": {
+          "type": "object",
+          "properties": {
+            "beforeBuild": { "type": "integer", "minimum": 0 },
+            "beforeLaunch": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "build": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": { "stage": { "type": "string" }, "headSha": { "type": "string" }, "at": { "type": "string" } }
+            },
+            { "type": "null" }
+          ]
+        },
+        "ppc": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "accountId": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+                "certification": { "anyOf": [{ "type": ["string", "object"] }, { "type": "null" }] },
+                "kitVersion": { "anyOf": [{ "type": "string" }, { "type": "null" }] }
+              }
+            },
+            { "type": "null" }
+          ]
+        },
+        "updatedAt": { "$ref": "#/$defs/iso" }
+      },
+      "additionalProperties": false,
+      "$comment": "orders/<orderId>; also the shape of reports/<slug>/board-row.json for an order"
+    },
+    "proposal": {
+      "type": "object",
+      "required": ["orderId", "directions"],
+      "properties": {
+        "orderId": { "$ref": "#/$defs/slug" },
+        "directions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "title"],
+            "properties": {
+              "id": { "type": "string", "enum": ["A", "B", "C"] },
+              "title": { "type": "string" },
+              "family": { "type": "string" },
+              "palette": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["role", "hex"],
+                  "properties": {
+                    "role": { "type": "string" },
+                    "name": { "type": "string" },
+                    "hex": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" }
+                  }
+                }
+              },
+              "fonts": { "type": ["object", "array"] },
+              "currency": { "anyOf": [{ "type": ["object", "string"] }, { "type": "null" }] },
+              "games": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["name"],
+                  "properties": { "name": { "type": "string" }, "engine": { "type": "string" } }
+                }
+              },
+              "structure": { "type": ["object", "string", "null"] },
+              "heroH1": { "type": "string" },
+              "tagline": { "type": "string" },
+              "scores": {
+                "type": "object",
+                "properties": {
+                  "compliance": { "anyOf": [{ "type": "number" }, { "type": "null" }] },
+                  "uniqueness": { "anyOf": [{ "type": "number" }, { "type": "null" }] }
+                }
+              },
+              "blocking": { "type": "array", "items": { "type": "string" } },
+              "typeFields": {
+                "type": "object",
+                "$comment": "type-specific direction fields from types/<type>/direction.schema.json (hotel: visual direction only; online-games: catalogue positioning)"
+              }
+            }
+          }
+        },
+        "publishedAt": { "anyOf": [{ "$ref": "#/$defs/iso" }, { "type": "null" }] }
+      },
+      "$comment": "proposals/<orderId> (SPEC 13.1 orders/<orderId>.proposal)"
+    },
+    "approval": {
+      "type": "object",
+      "required": ["orderId", "item", "status", "by", "at"],
+      "properties": {
+        "orderId": { "$ref": "#/$defs/slug" },
+        "item": { "$ref": "#/$defs/approvalItem" },
+        "status": { "$ref": "#/$defs/approvalStatus" },
+        "direction": { "type": "string", "enum": ["A", "B", "C"] },
+        "by": {
+          "type": "object",
+          "required": ["id"],
+          "properties": { "id": { "type": "string" }, "name": { "type": "string" } }
+        },
+        "at": { "$ref": "#/$defs/iso" },
+        "note": { "anyOf": [{ "type": "string", "maxLength": 2000 }, { "type": "null" }] },
+        "via": { "type": "string", "enum": ["board", "proposal", "evidence"] }
+      },
+      "additionalProperties": false,
+      "$comment": "approvals/<orderId>:<item>; written by Board/proposal/evidence buttons only"
+    },
+    "inbox": {
+      "type": "object",
+      "required": ["brand", "status", "submittedAt"],
+      "properties": {
+        "brand": { "type": "string", "minLength": 1 },
+        "shortName": { "type": "string" },
+        "domain": { "type": "string" },
+        "type": { "$ref": "#/$defs/type" },
+        "variant": { "type": "string" },
+        "client": {
+          "type": "object",
+          "properties": { "name": { "type": "string" }, "contact": { "type": "string" }, "language": { "type": "string" } }
+        },
+        "conceptHints": { "type": "string" },
+        "purchases": { "type": "boolean" },
+        "demos": { "type": "boolean" },
+        "analytics": { "type": "object", "properties": { "ga4": { "type": "string" }, "ads": { "type": "string" } } },
+        "contactEndpoint": { "type": "string" },
+        "operator": { "type": "object" },
+        "launchTarget": { "type": "string" },
+        "hosting": { "type": "string", "enum": ["studio-cf", "client-repo", "bundle"] },
+        "brief": { "type": "string", "maxLength": 20000 },
+        "typeBlock": {
+          "type": "object",
+          "$comment": "per-type intake block (social-casino currency/games; online-games providers/audience; hotel-casino venue/booking/casino mode)"
+        },
+        "status": { "type": "string", "enum": ["submitted", "taken"] },
+        "submittedAt": { "$ref": "#/$defs/iso" },
+        "submittedBy": { "type": "string" },
+        "orderId": { "$ref": "#/$defs/slug" }
+      },
+      "$comment": "inbox/<id>; written by the intake form (Phase 2), read by admins only"
+    },
+    "site": {
+      "type": "object",
+      "required": ["slug", "brand", "type", "stage", "reports"],
+      "properties": {
+        "slug": { "$ref": "#/$defs/slug" },
+        "brand": { "type": "string", "minLength": 1 },
+        "domain": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "type": { "$ref": "#/$defs/type" },
+        "variant": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "locales": { "type": "array", "items": { "type": "string" } },
+        "status": {
+          "anyOf": [
+            { "type": "string", "enum": ["reserved", "approved", "review", "live", "released"] },
+            { "type": "null" }
+          ]
+        },
+        "stage": { "$ref": "#/$defs/stage" },
+        "cfProject": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "deployed": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": { "version": { "type": "string" }, "at": { "type": "string" }, "sha": { "type": "string" } }
+            },
+            { "type": "null" }
+          ]
+        },
+        "ci": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "sha": { "type": "string" },
+                "result": { "type": "string" },
+                "at": { "type": "string" },
+                "runUrl": { "type": "string" }
+              }
+            },
+            { "type": "null" }
+          ]
+        },
+        "reports": {
+          "type": "object",
+          "properties": {
+            "at": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+            "buildVersion": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+            "lint": {
+              "type": "object",
+              "properties": {
+                "problems": { "type": "integer", "minimum": 0 },
+                "warnings": { "type": "integer", "minimum": 0 }
+              }
+            },
+            "check": {
+              "type": "object",
+              "properties": {
+                "passed": { "anyOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }] },
+                "failed": { "anyOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }] },
+                "sections": { "type": ["integer", "array"] }
+              }
+            },
+            "axe": { "type": ["integer", "array", "object", "null"] },
+            "lighthouse": {
+              "type": "object",
+              "properties": {
+                "mobile": { "anyOf": [{ "$ref": "#/$defs/lhRow" }, { "type": "null" }] },
+                "desktop": { "anyOf": [{ "$ref": "#/$defs/lhRow" }, { "type": "null" }] }
+              }
+            },
+            "uniqueness": {
+              "type": "object",
+              "properties": {
+                "nearest": { "type": ["array", "string", "null"] },
+                "max": { "anyOf": [{ "type": "number" }, { "type": "null" }] },
+                "passed": { "type": "boolean" }
+              }
+            },
+            "policy": {
+              "type": "object",
+              "properties": { "unverified": { "type": ["integer", "array"] }, "promoted": { "type": ["integer", "array"] } }
+            }
+          }
+        },
+        "health": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "at": { "type": "string" },
+                "ok": { "type": "boolean" },
+                "failing": { "type": "array", "items": { "type": "string" } },
+                "cert": { "anyOf": [{ "type": "number" }, { "type": "null" }] }
+              }
+            },
+            { "type": "null" }
+          ]
+        },
+        "lhBaseline": { "anyOf": [{ "type": "object" }, { "type": "null" }] },
+        "lh": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": { "last": { "type": ["object", "null"] }, "drift": { "type": ["object", "array", "null"] } }
+            },
+            { "type": "null" }
+          ]
+        },
+        "nearestSibling": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "incidents": { "type": "integer", "minimum": 0 },
+        "monitoring": { "type": "object", "properties": { "routines": { "type": "array", "items": { "type": "string" } } } }
+      },
+      "additionalProperties": false,
+      "$comment": "sites/<slug>; check sections include pack ids"
+    },
+    "shepherd": {
+      "type": "object",
+      "required": ["slug", "pr", "sha", "startedAt", "by"],
+      "properties": {
+        "slug": { "$ref": "#/$defs/slug" },
+        "pr": { "type": "integer" },
+        "sha": { "$ref": "#/$defs/sha" },
+        "startedAt": { "$ref": "#/$defs/iso" },
+        "finishedAt": { "$ref": "#/$defs/iso" },
+        "result": { "type": "string", "enum": ["live", "stopped", "incident"] },
+        "by": { "type": "string", "enum": ["github-trigger", "ci-reporter"] }
+      },
+      "additionalProperties": false,
+      "$comment": "shepherd/<slug>:<sha>; idempotency row for pr-shepherd"
+    },
+    "run": {
+      "type": "object",
+      "required": ["slug", "sha", "result", "at"],
+      "properties": {
+        "slug": { "$ref": "#/$defs/slug" },
+        "pr": { "anyOf": [{ "type": "integer" }, { "type": "null" }] },
+        "sha": { "type": "string" },
+        "result": { "type": "string" },
+        "runUrl": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "reportUrl": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "lh": { "anyOf": [{ "type": ["object", "array"] }, { "type": "null" }] },
+        "at": { "$ref": "#/$defs/iso" },
+        "workflow": { "type": "string" }
+      },
+      "additionalProperties": false,
+      "$comment": "runs/<slug>:<sha>"
+    },
+    "health": {
+      "type": "object",
+      "required": ["slug", "at", "ok", "probes"],
+      "properties": {
+        "slug": { "$ref": "#/$defs/slug" },
+        "at": { "$ref": "#/$defs/iso" },
+        "ok": { "type": "boolean" },
+        "probes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "state"],
+            "properties": {
+              "name": { "type": "string" },
+              "state": { "$ref": "#/$defs/probeState" },
+              "detail": { "type": "string" }
+            }
+          }
+        },
+        "deployedVersion": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "ciOnMain": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "openPrs": { "anyOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }] },
+        "cert": { "anyOf": [{ "type": "number" }, { "type": "null" }] },
+        "domainExpiry": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "rollup": {
+          "type": "object",
+          "properties": { "runs": { "type": "integer", "minimum": 0 }, "worst": { "$ref": "#/$defs/probeState" } }
+        }
+      },
+      "$comment": "health/<slug>:<YYYY-MM-DDTHH> and the daily roll-up health/<slug>:<YYYY-MM-DD>; probes may carry pack probe ids"
+    },
+    "lighthouse": {
+      "type": "object",
+      "required": ["slug", "at", "urls", "state"],
+      "properties": {
+        "slug": { "$ref": "#/$defs/slug" },
+        "at": { "$ref": "#/$defs/iso" },
+        "urls": { "type": "array", "items": { "$ref": "#/$defs/lhRow" } },
+        "drift": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": { "category": { "type": "string" }, "delta": { "type": "number" } }
+          }
+        },
+        "state": { "type": "string", "enum": ["ok", "warn"] }
+      },
+      "$comment": "lighthouse/<slug>:<YYYY-MM-DD>"
+    },
+    "review": {
+      "type": "object",
+      "required": ["slug", "round", "verdict", "items", "at"],
+      "properties": {
+        "slug": { "$ref": "#/$defs/slug" },
+        "pr": { "type": "integer" },
+        "sha": { "type": "string" },
+        "round": { "type": "integer", "minimum": 1 },
+        "rubricVersions": {
+          "type": "object",
+          "properties": { "typeRubric": { "type": "string" } },
+          "additionalProperties": { "type": "string" }
+        },
+        "verdict": { "type": "string" },
+        "uniqueness": {
+          "type": "object",
+          "properties": { "votes": { "type": ["integer", "array"] }, "pass": { "type": "boolean" } }
+        },
+        "compliance": {
+          "type": "object",
+          "properties": { "pass": { "type": "boolean" }, "blocking": { "type": "integer", "minimum": 0 } }
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["judge", "severity"],
+            "properties": {
+              "judge": { "type": "string" },
+              "page": { "type": "string" },
+              "quote": { "type": "string" },
+              "rule": { "type": "string" },
+              "why": { "type": "string" },
+              "fix": { "type": "string" },
+              "fixedBy": { "type": "string" },
+              "severity": { "type": "string", "enum": ["blocking", "advisory"] },
+              "proof": {
+                "type": "object",
+                "properties": {
+                  "quote": { "type": "string" },
+                  "selector": { "type": "string" },
+                  "policyId": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "integrationIssues": { "type": "array", "items": { "type": ["string", "object"] } },
+        "missingItems": { "type": "array", "items": { "type": ["string", "object"] } },
+        "at": { "$ref": "#/$defs/iso" }
+      },
+      "$comment": "reviews/<slug>:<round>"
+    },
+    "session": {
+      "type": "object",
+      "required": ["id", "status"],
+      "properties": {
+        "id": { "type": "string" },
+        "slug": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "title": { "type": "string" },
+        "status": { "type": "string" },
+        "statusBucket": { "type": "string" },
+        "startedAt": { "anyOf": [{ "$ref": "#/$defs/iso" }, { "type": "null" }] },
+        "lastCheck": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "url": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "cost": { "$ref": "#/$defs/cost" },
+        "toolCounts": { "$ref": "#/$defs/toolCounts" }
+      },
+      "additionalProperties": false,
+      "$comment": "sessions/<id>; cost from the transcript (D-26), never ccusage"
+    },
+    "event": {
+      "type": "object",
+      "required": ["at", "kind", "severity", "text"],
+      "properties": {
+        "at": { "$ref": "#/$defs/iso" },
+        "slug": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "session",
+            "ci",
+            "review",
+            "health",
+            "lighthouse",
+            "uniqueness",
+            "ship",
+            "deploy",
+            "incident",
+            "intake",
+            "ppc",
+            "policy"
+          ]
+        },
+        "severity": { "$ref": "#/$defs/severity" },
+        "text": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "ref": { "anyOf": [{ "type": "string" }, { "type": "null" }] }
+      },
+      "additionalProperties": false,
+      "$comment": "events/<ulid>"
+    },
+    "portfolioRegistry": {
+      "type": "object",
+      "required": ["entries"],
+      "properties": {
+        "at": { "$ref": "#/$defs/iso" },
+        "fromCommit": { "type": "string" },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["slug"],
+            "properties": {
+              "slug": { "$ref": "#/$defs/slug" },
+              "type": { "$ref": "#/$defs/type" },
+              "stage": { "$ref": "#/$defs/stage" }
+            }
+          }
+        }
+      },
+      "$comment": "portfolio/registry: snapshot of portfolio/registry.json entries (SPEC 4.4) with type, variant, locales, market, casinoMode"
+    },
+    "portfolioMatrix": {
+      "type": "object",
+      "required": ["at", "pairs"],
+      "properties": {
+        "at": { "$ref": "#/$defs/iso" },
+        "pairs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["a", "b"],
+            "properties": {
+              "a": { "type": "string" },
+              "b": { "type": "string" },
+              "copy": { "anyOf": [{ "type": "number" }, { "type": "null" }] },
+              "palette": { "anyOf": [{ "type": "number" }, { "type": "null" }] },
+              "fonts": { "anyOf": [{ "type": "number" }, { "type": "null" }] },
+              "roster": { "anyOf": [{ "type": "number" }, { "type": "null" }] },
+              "structure": { "anyOf": [{ "type": "number" }, { "type": "null" }] },
+              "worst": { "anyOf": [{ "type": "number" }, { "type": "null" }] },
+              "sameType": { "type": "boolean" }
+            }
+          }
+        },
+        "thresholds": { "type": "object" }
+      },
+      "$comment": "portfolio/matrix; pairs gain sameType"
+    },
+    "portfolioPolicy": {
+      "type": "object",
+      "required": ["at", "types"],
+      "properties": {
+        "at": { "$ref": "#/$defs/iso" },
+        "types": {
+          "type": "object",
+          "propertyNames": { "$ref": "#/$defs/type" },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "total": { "type": "integer", "minimum": 0 },
+              "verified": { "type": "integer", "minimum": 0 },
+              "unverified": { "type": "array", "items": { "type": "string" } },
+              "lastRecheck": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+              "by": { "anyOf": [{ "type": "string" }, { "type": "null" }] }
+            }
+          }
+        }
+      },
+      "$comment": "portfolio/policy"
+    },
+    "portfolio": {
+      "type": "object",
+      "anyOf": [
+        { "$ref": "#/$defs/portfolioRegistry" },
+        { "$ref": "#/$defs/portfolioMatrix" },
+        { "$ref": "#/$defs/portfolioPolicy" }
+      ],
+      "$comment": "portfolio/registry | portfolio/matrix | portfolio/policy"
+    },
+    "ppc": {
+      "type": "object",
+      "required": ["slug", "type", "updatedAt"],
+      "properties": {
+        "slug": { "$ref": "#/$defs/slug" },
+        "type": { "$ref": "#/$defs/type" },
+        "variant": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "accountId": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "mcc": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "advertiserOfRecord": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "paymentProfileOwner": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "certification": {
+          "type": "object",
+          "properties": {
+            "status": { "type": "string" },
+            "country": { "type": "string" },
+            "granted": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+            "expires": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+            "licenceRefs": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "conversions": { "type": ["object", "array"] },
+        "primaryConversion": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "tagTemplate": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "consentMode": { "type": "string", "enum": ["basic", "advanced"] },
+        "personalisation": { "type": "boolean" },
+        "remarketing": { "type": "boolean" },
+        "crossDomain": { "type": "array", "items": { "type": "string" } },
+        "geo": {
+          "type": "object",
+          "properties": {
+            "targets": { "type": "array", "items": { "type": "string" } },
+            "exclusions": { "type": "array", "items": { "type": "string" } },
+            "verifiedOn": { "anyOf": [{ "type": "string" }, { "type": "null" }] }
+          }
+        },
+        "kit": {
+          "type": "object",
+          "properties": {
+            "version": { "type": "string" },
+            "generatedAt": { "type": "string" },
+            "path": { "type": "string" }
+          }
+        },
+        "policyHealth": {
+          "type": "object",
+          "properties": {
+            "at": { "type": "string" },
+            "disapproved": { "type": "integer", "minimum": 0 },
+            "limited": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "updatedAt": { "$ref": "#/$defs/iso" }
+      },
+      "$comment": "ppc/<slug> (partition P, Phase 5)"
+    },
+    "policyhealth": {
+      "type": "object",
+      "required": ["accountId", "at", "rows", "ok"],
+      "properties": {
+        "accountId": { "type": "string" },
+        "slug": { "$ref": "#/$defs/slug" },
+        "at": { "$ref": "#/$defs/iso" },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "campaign": { "type": "string" },
+              "adGroup": { "type": "string" },
+              "adId": { "type": "string" },
+              "topic": { "type": "string" },
+              "type": { "type": "string" },
+              "approvalStatus": { "type": "string" },
+              "reviewStatus": { "type": "string" },
+              "evidence": { "type": "string" }
+            }
+          }
+        },
+        "disapproved": { "type": "integer", "minimum": 0 },
+        "limited": { "type": "integer", "minimum": 0 },
+        "ok": { "type": "boolean" }
+      },
+      "$comment": "policyhealth/<accountId>:<date>"
+    },
+    "certification": {
+      "type": "object",
+      "required": ["accountId", "country", "category", "status"],
+      "properties": {
+        "accountId": { "type": "string" },
+        "slug": { "$ref": "#/$defs/slug" },
+        "country": { "type": "string", "pattern": "^[A-Z]{2}$" },
+        "category": { "type": "string", "enum": ["social-casino", "offline-gambling"] },
+        "status": { "type": "string" },
+        "granted": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "expires": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "licenceRefs": { "type": "array", "items": { "type": "string" } },
+        "confirmationRef": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "reminderAt": { "anyOf": [{ "type": "string" }, { "type": "null" }] }
+      },
+      "$comment": "certifications/<accountId>:<country>:<category>"
+    },
+    "config": {
+      "type": "object",
+      "required": ["boardVersion"],
+      "properties": {
+        "boardVersion": { "type": "string" },
+        "routines": { "type": "object" },
+        "coordinatorSession": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "routineBoardWrites": {
+          "anyOf": [{ "type": "string", "enum": ["direct", "via-github", "via-coordinator"] }, { "type": "null" }]
+        },
+        "routineGitWrites": { "anyOf": [{ "type": "boolean" }, { "type": "null" }] },
+        "lastCiPoll": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "thresholds": {
+          "type": "object",
+          "properties": {
+            "health": { "type": "object" },
+            "lighthouse": { "type": "object" },
+            "uniqueness": { "type": "object" },
+            "stopGate": { "type": "object", "properties": { "attempts": { "type": "integer", "minimum": 1 } } },
+            "policyHealth": { "type": "object" }
+          }
+        },
+        "stages": { "type": "array", "items": { "$ref": "#/$defs/stage" } },
+        "types": { "type": "array", "items": { "$ref": "#/$defs/type" } },
+        "environments": {
+          "type": "object",
+          "properties": {
+            "sites": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+            "ppc": { "anyOf": [{ "type": "string" }, { "type": "null" }] }
+          }
+        },
+        "limits": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": { "name": { "type": "string" }, "value": { "type": "number" }, "unit": { "type": "string" } }
+          }
+        },
+        "ciMinutesBudget": { "anyOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }] },
+        "capacity": {
+          "type": "object",
+          "properties": {
+            "maxInFlight": { "type": "integer", "minimum": 0 },
+            "waveSize": { "type": "integer", "minimum": 0 }
+          }
+        }
+      },
+      "$comment": "config/factory"
+    }
+  }
+}
