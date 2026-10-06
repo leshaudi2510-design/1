@@ -1,0 +1,216 @@
+# Engine, type packs, factory tools and the Claude layer (SPEC 11.2, MASTER-PLAN W27, D-15, D-56).
+# Owner: partition F.
+#
+# changes     -> did anything shared change (engine/, types/, tools/, schemas/, .claude/, .github/,
+#                sites/_fixtures/, ppc/, CLAUDE.md, .mcp.json, package*.json)? No workflow-level
+#                paths filter, so engine-ok always reports and can be a required check.
+# engine-lint -> tools/engine-lint.mjs (every check: engine, strings, agents, skills, context, packs,
+#                schemas), labels/labeler freshness, ci-lint of these workflows.
+# regression  -> rebuild every recorded site and compare with engine/dist-hashes.json; a changed hash
+#                passes only with "hash: <slug> intended: <reason>" in the PR body.
+# hook-tests  -> node --test .claude/hooks/tests + check-hooks-schema-keys.
+# claude-scan -> agentshield over .claude (tools/vet-skill.sh, pinned ecc-agentshield@1.6.0).
+# engine-ok   -> the one required check; skipped jobs count as success.
+# The calibrate job (judges-calibration status) arrives with the judges in Phase 2/3.
+name: engine
+
+on:
+  pull_request:
+  merge_group:
+  push:
+    branches: [main, 'tooling/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      engine: ${{ steps.diff.outputs.engine }}
+      claude: ${{ steps.diff.outputs.claude }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        name: Shared paths changed?
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          MQ_BASE: ${{ github.event.merge_group.base_sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          case "$EVENT" in
+            pull_request) BASE="$PR_BASE" ;;
+            merge_group) BASE="$MQ_BASE" ;;
+            push) BASE="$PUSH_BEFORE" ;;
+            *) BASE="" ;;
+          esac
+          if [ -z "$BASE" ] || [ "$BASE" = 0000000000000000000000000000000000000000 ] || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            echo "engine=true" >> "$GITHUB_OUTPUT"
+            echo "claude=true" >> "$GITHUB_OUTPUT"
+            echo "no usable base ($EVENT): everything runs"
+            exit 0
+          fi
+          git diff --name-only "$BASE"...HEAD > "$RUNNER_TEMP/changed.txt"
+          ENGINE=false
+          CLAUDE=false
+          if grep -qE '^(engine|types|tools|schemas|\.claude|\.github|ppc)/|^sites/_fixtures/|^(CLAUDE\.md|\.mcp\.json|package\.json|package-lock\.json)$' "$RUNNER_TEMP/changed.txt"; then ENGINE=true; fi
+          if grep -qE '^\.claude/|^(CLAUDE\.md|\.mcp\.json)$|^tools/vet-skill\.sh$|^\.github/workflows/engine-ci\.yml$' "$RUNNER_TEMP/changed.txt"; then CLAUDE=true; fi
+          echo "engine=$ENGINE" >> "$GITHUB_OUTPUT"
+          echo "claude=$CLAUDE" >> "$GITHUB_OUTPUT"
+          echo "engine=$ENGINE claude=$CLAUDE"
+
+  engine-lint:
+    needs: changes
+    if: needs.changes.outputs.engine == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Engine, packs, schemas, Claude layer (tools/engine-lint.mjs)
+        run: |
+          if [ ! -f tools/engine-lint.mjs ]; then
+            echo "::notice::tools/engine-lint.mjs is not on this branch yet (partition D); skipped"
+            exit 0
+          fi
+          node tools/engine-lint.mjs
+          if [ -f .claude/VENDORED.json ] && [ -f THIRD_PARTY_NOTICES.md ]; then
+            node tools/engine-lint.mjs --notices .claude/VENDORED.json THIRD_PARTY_NOTICES.md
+          fi
+      - name: Labels and labeler.yml are current
+        run: node tools/labels.mjs --check
+      - name: Workflows (tools/ci-lint.mjs)
+        run: |
+          node tools/ci-lint.mjs --self-test
+          node tools/ci-lint.mjs .github/workflows
+
+  regression:
+    needs: changes
+    if: needs.changes.outputs.engine == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Rebuild every recorded site and compare with engine/dist-hashes.json
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          printf '%s\n' "$PR_BODY" > "$RUNNER_TEMP/pr-body.txt"
+          mkdir -p "$RUNNER_TEMP/regression"
+          if [ -f tools/engine-hashes.mjs ]; then
+            node tools/engine-hashes.mjs --compare engine/dist-hashes.json --pr-body "$RUNNER_TEMP/pr-body.txt" --out "$RUNNER_TEMP/regression/regression.json"
+          else
+            echo "::notice::tools/engine-hashes.mjs is not on this branch yet (partition D); using the raw-hash fallback"
+            node .github/scripts/dist-hashes.mjs --compare engine/dist-hashes.json --work "$RUNNER_TEMP/regression" --pr-body "$RUNNER_TEMP/pr-body.txt"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: regression
+          path: ${{ runner.temp }}/regression/regression.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+  hook-tests:
+    needs: changes
+    if: needs.changes.outputs.engine == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Hook tests
+        run: |
+          if [ ! -d .claude/hooks/tests ]; then
+            echo "::notice::.claude/hooks/tests is not on this branch yet (partition E); skipped"
+            exit 0
+          fi
+          node --test .claude/hooks/tests
+      - name: Hook events and keys in .claude/settings.json
+        run: |
+          if [ ! -f .claude/hooks/tests/check-hooks-schema-keys.cjs ] || [ ! -f .claude/settings.json ]; then
+            echo "::notice::hook schema check or .claude/settings.json not on this branch yet; skipped"
+            exit 0
+          fi
+          node .claude/hooks/tests/check-hooks-schema-keys.cjs .claude/settings.json
+
+  claude-scan:
+    needs: changes
+    if: needs.changes.outputs.claude == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: agentshield over .claude (pinned ecc-agentshield@1.6.0)
+        run: |
+          if [ ! -d .claude ]; then
+            echo "::notice::no .claude directory; nothing to scan"
+            exit 0
+          fi
+          mkdir -p "$RUNNER_TEMP/scan"
+          BASELINE=""
+          if [ -f .agentshield-baseline.json ]; then BASELINE="--baseline .agentshield-baseline.json"; fi
+          if [ -f tools/vet-skill.sh ]; then
+            bash tools/vet-skill.sh .claude --scanners agentshield --min-severity high --out "$RUNNER_TEMP/scan" $BASELINE
+          else
+            echo "::notice::tools/vet-skill.sh is not on this branch yet (partition D); calling agentshield directly"
+            GATE=""
+            if [ -n "$BASELINE" ]; then GATE="$BASELINE --gate"; fi
+            npx -y ecc-agentshield@1.6.0 scan --path .claude --format json --min-severity high $GATE > "$RUNNER_TEMP/scan/agentshield.json"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: claude-scan
+          path: ${{ runner.temp }}/scan
+          if-no-files-found: ignore
+          retention-days: 14
+
+  engine-ok:
+    if: always()
+    needs: [changes, engine-lint, regression, hook-tests, claude-scan]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Every needed job succeeded or was skipped
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          echo "$RESULTS" | node -e '
+            const needs = JSON.parse(require("fs").readFileSync(0, "utf8"));
+            let bad = 0;
+            for (const [job, n] of Object.entries(needs)) {
+              const ok = n.result === "success" || n.result === "skipped";
+              console.log(`${ok ? "ok  " : "FAIL"} ${job}: ${n.result}`);
+              if (!ok) bad++;
+            }
+            process.exit(bad ? 1 : 0);
+          '
