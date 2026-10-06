@@ -1,12 +1,39 @@
-// Monte Carlo check of the Brilliant Twenty-One return to player, playing
-// the same basic strategy the game offers as a hint.
-//   node tools/simulate-21.mjs 2000000
+#!/usr/bin/env node
+// Monte Carlo check of the twenty-one return to player (the engine's
+// blackjack maths, engine/games/_legacy/brilliant-21.math.js), playing the
+// same basic strategy the game offers as a hint.
+//
+//   node engine/tools/simulate-21.mjs [<site-dir>] [hands]
+//   node engine/tools/simulate-21.mjs sites/opalquestlounge 20000000
+//
+// The site folder only names the play currency in the result line (its
+// site.config.json currency.singular); the maths are the engine's. Hands
+// default to 1,000,000. Phase 3 adds --spec for a game's own rule set.
 import { randomInt } from 'node:crypto';
+import { existsSync, readFileSync, statSync } from 'node:fs';
+import path from 'node:path';
 import {
   freshShoe, score, isBrilliant, canSplit, dealerShouldDraw, basicStrategy, settleHand, DECKS, CUT_AT,
 } from '../games/_legacy/brilliant-21.math.js';
 
-const N = Number(process.argv[2] || 1_000_000);
+const args = process.argv.slice(2);
+const isSite = (a) => existsSync(a) && statSync(a).isDirectory();
+const siteArg = args.find(isSite);
+const handsArg = args.find((a) => !isSite(a) && !a.startsWith('--'));
+const N = Number(handsArg || 1_000_000);
+if (!Number.isInteger(N) || N <= 0) {
+  console.error('usage: node engine/tools/simulate-21.mjs [<site-dir>] [hands]');
+  process.exit(2);
+}
+let unit = 'unit';
+if (siteArg) {
+  const cfgFile = path.join(siteArg, 'site.config.json');
+  if (!existsSync(cfgFile)) {
+    console.error(`error: ${siteArg} has no site.config.json`);
+    process.exit(2);
+  }
+  unit = JSON.parse(readFileSync(cfgFile, 'utf8')).currency?.singular || unit;
+}
 let shoe = [];
 const shuffle = () => {
   shoe = freshShoe();
@@ -57,4 +84,4 @@ for (let n = 0; n < N; n++) {
   for (const h of hands) returned += settleHand(h, dealer).back;
 }
 console.log(`${N.toLocaleString('en-GB')} hands`);
-console.log(`Return per Carat staked (doubles and splits included): ${(100 * returned / staked).toFixed(3)}%`);
+console.log(`Return per ${unit} staked (doubles and splits included): ${(100 * returned / staked).toFixed(3)}%`);

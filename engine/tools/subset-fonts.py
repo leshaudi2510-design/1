@@ -1,41 +1,48 @@
-"""Subset and trim the variable fonts used by the site.
+"""Subset and trim the variable fonts used by a site.
 
 Source files are the full variable TrueType fonts from the google/fonts
 repository (OFL licence), not the Latin woff2 files the Google Fonts CSS API
 serves: those stop at U+206F, so they leave out signs the site uses, such as
-U+2248 (≈).
+U+2248 (≈). The engine keeps the ones in use in engine/fonts/sources/:
 
-    ofl/archivo/Archivo[wdth,wght].ttf
-    ofl/radiocanada/RadioCanada[wdth,wght].ttf
+    Archivo[wdth,wght].ttf          (ofl/archivo/ in google/fonts)
+    RadioCanada[wdth,wght].ttf      (ofl/radiocanada/)
 
-from https://github.com/google/fonts. Run from the site folder:
+From the repository root:
 
     pip install fonttools brotli
-    python3 tools/subset-fonts.py path/to/folder-with-the-two-ttf-files
+    python3 engine/tools/subset-fonts.py <site-dir> [folder-with-the-two-ttf-files]
 
-Writes src/public/assets/fonts/archivo.woff2 and radio-canada.woff2, and
-src/data/font-coverage.json: the code points both files cover. build.mjs
-fails when a page or a script draws a character outside that list, and
-gives each font file a content-hashed name, so a regenerated font reaches
-returning visitors despite the year-long immutable caching.
+The source folder defaults to engine/fonts/sources. Writes
+<site-dir>/public/assets/fonts/archivo.woff2 and radio-canada.woff2, and
+<site-dir>/data/font-coverage.json: the code points both files cover.
+engine/build.mjs fails when a page or a script draws a character outside
+that list, and gives each font file a content-hashed name, so a regenerated
+font reaches returning visitors despite the year-long immutable caching.
 
 Stops with an error, and writes nothing, when a source font lacks one of
 the code points below: the fontTools subsetter would otherwise drop it
 without a word.
 
-Afterwards run `node tools/font-fallbacks.mjs --measure`, so the
-metric-matched fallback faces in src/styles/00-tokens.css still match the
-new files.
+Afterwards run `node engine/tools/font-fallbacks.mjs <site-dir> --measure`,
+so the metric-matched fallback faces in <site-dir>/theme/tokens.css still
+match the new files.
 """
 import json, pathlib, sys
 from fontTools.ttLib import TTFont
 from fontTools.varLib import instancer
 from fontTools import subset
 
-SRC = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else ".")
-SITE = pathlib.Path(__file__).resolve().parent.parent
-OUT = SITE / "src/public/assets/fonts"
-COVERAGE = SITE / "src/data/font-coverage.json"
+ENGINE = pathlib.Path(__file__).resolve().parent.parent
+USAGE = "usage: python3 engine/tools/subset-fonts.py <site-dir> [folder-with-the-two-ttf-files]"
+if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help"):
+    sys.exit(USAGE)
+SITE = pathlib.Path(sys.argv[1]).resolve()
+if not (SITE / "site.config.json").exists():
+    sys.exit(f"error: {SITE} has no site.config.json\n{USAGE}")
+SRC = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else ENGINE / "fonts/sources"
+OUT = SITE / "public/assets/fonts"
+COVERAGE = SITE / "data/font-coverage.json"
 
 UNICODES = sorted(
     list(range(0x20, 0x7F))
@@ -130,4 +137,4 @@ COVERAGE.write_text(
     + "\n"
 )
 print(COVERAGE.relative_to(SITE), len(covered), "code points")
-print("Now run: node tools/font-fallbacks.mjs --measure")
+print(f"Now run: node engine/tools/font-fallbacks.mjs {sys.argv[1]} --measure")
