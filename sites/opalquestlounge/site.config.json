@@ -1,4 +1,6 @@
 {
+  "type": "social-casino",
+  "storagePrefix": "oql",
   "brand": "Opal Quest Lounge",
   "shortName": "Opal Lounge",
   "domain": "opalquestlounge.com",

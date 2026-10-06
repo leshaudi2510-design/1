@@ -1,17 +1,17 @@
 // One page per Pragmatic Play demo (spec §8), written from
-// src/data/pragmatic-games.json in our own words. Facts listed in a game's
+// the site's data/pragmatic-games.json in our own words. Facts listed in a game's
 // "verify" array carry data-verify, so they are easy to find and check
 // against the demo's own information screen before launch.
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { html, esc, num } from '../lib/html.mjs';
 import { breadcrumbs } from '../lib/layout.mjs';
 import { pragmaticStage, gameList } from '../lib/games-ui.mjs';
 import { icon } from '../lib/icons.mjs';
 
-const PUBLIC = new URL('../public/', import.meta.url);
-// The researched data as written. ctx.games maps each game's tags to the lobby
+// The researched data as written (ctx.pragmaticData, the site's
+// data/pragmatic-games.json). ctx.games maps each game's tags to the lobby
 // filters (tumble, megaways, freespins); the page needs the full mechanic list.
-const DATA = new Map(JSON.parse(readFileSync(new URL('../data/pragmatic-games.json', import.meta.url), 'utf8')).games.map((d) => [d.slug, d]));
+const dataOf = (ctx) => new Map((ctx.pragmaticData.games || []).map((d) => [d.slug, d]));
 
 // ---------- copy helpers ----------
 
@@ -111,14 +111,14 @@ function volatilityNote(d) {
 // ---------- the page ----------
 
 export default function pragmaticGame(ctx, game) {
-  const g = { ...game, tags: DATA.get(game.slug)?.tags || [] };
+  const g = { ...game, tags: dataOf(ctx).get(game.slug)?.tags || [] };
   const name = esc(g.name);
   const verify = new Set(g.verify || []);
   const v = (field) => (verify.has(field) ? ' data-verify' : '');
   const pays = paysCell(g);
   const when = released(g);
   // Share image: the game's own card once tools/make-images.mjs draws one; the site card until then.
-  const hasOg = existsSync(new URL(`.${g.image}`, PUBLIC));
+  const hasOg = existsSync(ctx.site.path(`public${g.image}`));
   const ogImage = hasOg ? g.image : '/assets/img/og-home.png';
   const summary = plain(g.summary);
   const cards = featureCards(g);

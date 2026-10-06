@@ -176,7 +176,7 @@ function current(page, sec, key, path) {
 }
 
 function brand(ctx) {
-  // "Opal Quest Lounge" → "Opal Quest" in the wordmark, "Lounge" on the magenta tag.
+  // The brand's last word goes on the magenta tag ("Ruby Hall" → "Ruby" in the wordmark, "Hall" on the tag).
   const [name, tag] = ctx.brand.split(/ (?=\S+$)/);
   return html`<a class="brand" href="/" aria-label="${esc(ctx.brand)}, home">
       ${icon('opal', 'brand__opal')}
@@ -494,6 +494,125 @@ function resolveLd(ctx, ld) {
   return ld;
 }
 
+// ---------- basic chrome ----------
+// For type packs that set chrome: 'basic' (the Phase 1 stubs): the brand,
+// a three-link nav, the operator and legal footer, and the consent banner and
+// dialog when analytics is configured. No age notice, balance, session clock,
+// dock or game dialogs. The pages it links to (/, /about/, /contact/, /terms/,
+// /privacy/, /cookies/) are the pack's to provide.
+
+function basicMasthead(ctx, page) {
+  const [name, tag] = ctx.brand.split(/ (?=\S+$)/);
+  const here = (path) => (page.path === path ? ' aria-current="page"' : '');
+  return html`<header class="masthead">
+  <div class="wrap masthead__row">
+    <a class="brand" href="/" aria-label="${esc(ctx.brand)}, home">
+      <span class="brand__name" aria-hidden="true"><b>${esc(name)}</b>${tag ? `<span>${esc(tag)}</span>` : ''}</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <ul>
+        <li><a href="/"${here('/')}>Home</a></li>
+        <li><a href="/about/"${here('/about/')}>About</a></li>
+        <li><a href="/contact/"${here('/contact/')}>Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>`;
+}
+
+function basicFooter(ctx) {
+  const { op } = ctx;
+  return html`<footer class="colophon">
+  <div class="wrap">
+    <nav class="colophon__nav" aria-labelledby="f-legal">
+      <h2 id="f-legal">Legal</h2>
+      <ul>
+        <li><a href="/terms/">Terms of use</a></li>
+        <li><a href="/privacy/">Privacy notice</a></li>
+        <li><a href="/cookies/">Cookies and storage</a></li>
+        ${ctx.analyticsOn ? '<li><button type="button" class="linkish" data-open="consent" aria-haspopup="dialog">Cookie settings</button></li>' : ''}
+      </ul>
+    </nav>
+    <div class="colophon__slug">
+      <p>${esc(ctx.brand)} is operated by ${esc(op.companyName)}, company number <span class="num">${esc(op.companyNumber)}</span>, registered in ${esc(op.registeredIn)}. Registered office: ${esc(op.address)}. Contact: <a href="mailto:${esc(op.email)}">${esc(op.email)}</a></p>
+      <p>© ${ctx.year} ${esc(op.companyName)} · Page last updated <time datetime="${ctx.updatedIso}">${ctx.updated}</time></p>
+    </div>
+  </div>
+</footer>`;
+}
+
+function basicDialogs(ctx) {
+  const close = (label) => `<button type="submit" class="icon-btn dialog__close" value="close" aria-label="${label}">${icons.close}</button>`;
+  const status = '<p class="visually-hidden" role="status" data-dialog-status></p>';
+  const consent = ctx.analyticsOn
+    ? html`
+<dialog id="consent" class="sheet-dialog" aria-labelledby="consent-title">
+  <form method="dialog" class="consent-manage">
+    <header class="dialog__head">
+      <h2 id="consent-title">Cookie settings</h2>
+      ${close('Close cookie settings')}
+    </header>
+    <div class="dialog__body">
+      <p>We keep a little storage on your device so the site remembers your choices. That’s always on. Anything else is off until you switch it on.</p>
+      <div class="settings__switches">
+        <label class="switch is-locked"><input type="checkbox" role="switch" checked disabled><span>Strictly necessary</span><small>Your theme and this choice. Kept on your device.</small></label>
+        ${ctx.cfg.analytics?.ga4
+          ? '<label class="switch"><input type="checkbox" role="switch" name="analytics"><span>Analytics</span><small>Google Analytics 4 counts visits and which pages are read. Sets _ga cookies.</small></label>'
+          : '<p class="switch is-off"><span>Analytics</span><small>Not in use. We don’t run any analytics at the moment.</small></p>'}
+        ${ctx.cfg.analytics?.adsConversionId
+          ? '<label class="switch"><input type="checkbox" role="switch" name="ads"><span>Advertising measurement</span><small>Google Ads tells us whether an advert led to a visit. Sets Google Ads cookies.</small></label>'
+          : ''}
+      </div>
+      <div class="dialog__actions dialog__actions--equal consent__actions">
+        <button type="button" class="btn btn--secondary" data-consent="reject">Reject all</button>
+        <button type="button" class="btn btn--secondary" data-consent="save">Save choices</button>
+        <button type="button" class="btn btn--secondary" data-consent="accept">Accept all</button>
+      </div>
+      <p class="dialog__fine">Read the <a href="/cookies/">cookie policy</a>. You can change your mind at any time from the footer.</p>
+      ${status}
+    </div>
+  </form>
+</dialog>`
+    : '';
+  return html`
+<dialog id="confirm" class="sheet-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-body">
+  <form method="dialog">
+    <header class="dialog__head">
+      <h2 id="confirm-title"></h2>
+    </header>
+    <div class="dialog__body">
+      <p id="confirm-body"></p>
+      <div class="dialog__actions confirm__actions">
+        <button class="btn btn--primary" value="yes"></button>
+        <button class="btn btn--secondary" value="no" autofocus></button>
+      </div>
+      ${status}
+    </div>
+  </form>
+</dialog>
+${consent}
+<div class="toast" popover="manual" id="toast" role="status">${icons.info}<span class="toast__msg"></span></div>
+<p id="announcer" class="visually-hidden" aria-live="polite"></p>`;
+}
+
+function basicBody(ctx, page, top) {
+  return html`${top}
+<body class="${page.bodyClass || ''}">
+${SPRITE}
+<a class="skip" href="#main">Skip to main content</a>
+${consentBanner(ctx)}
+${basicMasthead(ctx, page)}
+<main id="main" tabindex="-1">
+${page.crumbsInBody || !page.breadcrumbs?.length ? '' : `<div class="wrap">${breadcrumbs(page.breadcrumbs)}</div>`}
+${page.body}
+</main>
+${basicFooter(ctx)}
+${basicDialogs(ctx)}
+</body>
+</html>
+`;
+}
+
 export function layout(ctx, page) {
   const v = ASSET_VERSION.value;
   const url = ctx.origin + page.path;
@@ -505,7 +624,7 @@ export function layout(ctx, page) {
   const robots = page.noindex ? '<meta name="robots" content="noindex">' : '';
   const sec = sectionOf(ctx, page);
 
-  return html`<!doctype html>
+  const top = html`<!doctype html>
 <html lang="en-GB" data-page="${page.id}">
 <head>
 <meta charset="utf-8">
@@ -546,7 +665,9 @@ ${modules.map((m) => `<link rel="modulepreload" href="${m}">`)}
 <meta name="twitter:image:alt" content="${esc(page.ogAlt || `${ctx.brand}: free-to-play games with virtual ${ctx.cur.plural}. 18+.`)}">
 ${ld.length ? ldScript(ld) : ''}
 <script type="speculationrules">${SPECULATION}</script>
-</head>
+</head>`;
+  if (ctx.pack?.chrome === 'basic') return basicBody(ctx, page, top);
+  return html`${top}
 <body class="${page.bodyClass || ''}">
 ${SPRITE}
 <a class="skip" href="#main">Skip to main content</a>

@@ -1,8 +1,9 @@
 import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { longDate, num, pct } from './html.mjs';
-import * as slot from '../public/assets/js/games/seven-systems.math.js';
-import * as wheel from '../public/assets/js/games/lapidary-wheel.math.js';
-import * as bj from '../public/assets/js/games/brilliant-21.math.js';
+import * as slot from '../games/_legacy/seven-systems.math.js';
+import * as wheel from '../games/_legacy/lapidary-wheel.math.js';
+import * as bj from '../games/_legacy/brilliant-21.math.js';
 
 export const DISCLAIMER =
   'Free-to-play social casino game. No real-money gambling and no prizes of real-world value. For adults 18+.';
@@ -10,9 +11,24 @@ export const DISCLAIMER =
 // Measured with tools/simulate-21.mjs over 20 million hands of basic strategy.
 export const TWENTY_ONE_RTP = 0.9957;
 
-const pragmaticData = JSON.parse(readFileSync(new URL('../data/pragmatic-games.json', import.meta.url), 'utf8'));
+/**
+ * The site folder as the page code sees it: its directory and reads relative
+ * to it. engine/build.mjs passes one for the site it builds; without one
+ * (tools that predate the site argument) it is SITE_DIR or the working
+ * directory.
+ */
+export function siteFolder(dir = process.env.SITE_DIR || process.cwd()) {
+  const abs = path.resolve(dir);
+  return {
+    dir: abs,
+    path: (rel) => path.join(abs, rel),
+    read: (rel) => readFileSync(path.join(abs, rel), 'utf8'),
+    readJson: (rel) => JSON.parse(readFileSync(path.join(abs, rel), 'utf8')),
+  };
+}
 
-export function makeContext(cfg) {
+export function makeContext(cfg, site = siteFolder()) {
+  const pragmaticData = site.readJson('data/pragmatic-games.json');
   const origin = `https://${cfg.domain}`;
   const cur = cfg.currency;
   const slotStats = slot.exactStats();
@@ -72,7 +88,7 @@ export function makeContext(cfg) {
     },
   ].map((g) => ({ ...g, provider: 'house', providerName: cfg.brand, table: g.tags.includes('table') }));
 
-  // Pragmatic Play demos (src/data/pragmatic-games.json), loaded in an iframe
+  // Pragmatic Play demos (data/pragmatic-games.json in the site folder), loaded in an iframe
   // only when the visitor presses "Play demo".
   const pragmaticOn = Boolean(cfg.pragmatic?.enabled);
   const TAGS = { 'free-spins': 'freespins', tumble: 'tumble', megaways: 'megaways' };
@@ -116,6 +132,8 @@ export function makeContext(cfg) {
 
   return {
     cfg,
+    site,
+    pragmaticData,
     origin,
     brand: cfg.brand,
     cur,
