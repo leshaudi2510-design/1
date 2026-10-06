@@ -48,6 +48,15 @@ done
 [ -n "$TARGET" ] || { echo "vet-skill: give a path to scan" >&2; usage >&2; exit 2; }
 [ -e "$TARGET" ] || { echo "vet-skill: $TARGET does not exist" >&2; exit 2; }
 [ -n "$SCANNERS" ] || { echo "vet-skill: --scanners needs a value" >&2; exit 2; }
+
+# Git worktrees under <path>/worktrees are other branches' copies of the repo, not
+# the configuration being vetted: scan a copy of <path> without them.
+if [ -d "$TARGET/worktrees" ]; then
+  CLEAN="$(mktemp -d)/$(basename "$TARGET")"
+  mkdir -p "$CLEAN"
+  (cd "$TARGET" && tar --exclude=./worktrees -cf - .) | (cd "$CLEAN" && tar -xf -)
+  TARGET="$CLEAN"
+fi
 OUT="${OUT:-${CLAUDE_SCRATCHPAD:-${TMPDIR:-/tmp}}/vet}"
 mkdir -p "$OUT" || { echo "vet-skill: cannot create $OUT" >&2; exit 2; }
 
