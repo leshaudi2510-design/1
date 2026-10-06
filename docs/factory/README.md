@@ -4,6 +4,7 @@ Written 2026-10-06 in a Claude Code cloud session. Start with MASTER-PLAN.md.
 
 | File | What it is |
 |---|---|
+| SUMMARY.ru.md | Краткое резюме для владельца на русском: архитектура, что берём у Мустафы, три типа сайтов, фаза 1, 15 вопросов с ответами по умолчанию. |
 | MASTER-PLAN.md | The reconciled plan: one repo tree, roster of skills/agents/workflows/hooks/routines, Phase 1 scope (34 items, partitions, verification), owner questions with defaults. Authoritative. |
 | SPEC.md | Factory operations spec v1.1 (social casino first): hub/spoke sessions, Board, Evidence Bundle, uniqueness gate, CI, deploy, routines. |
 | SITE-TYPES.md | The three order types (social casino, online games, hotel-casino), compliance matrix, PPC pack per type, type-pack engine contract, migration path. |
