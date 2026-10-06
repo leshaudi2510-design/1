@@ -1,11 +1,13 @@
-// Generates the site's icons and share cards, all from our own artwork:
+#!/usr/bin/env node
+// Generates a site's icons and share cards, all from its own artwork:
 //
-//   src/public/favicon.svg             the opal mark (#opal in src/lib/art.mjs), simplified for 16px
-//   src/public/favicon.ico             16, 32 and 48 px
-//   src/public/assets/icons/           apple-touch-icon.png (180), icon-192.png, icon-512.png and
-//                                      icon-maskable-512.png: the opal on process yellow, in an ink ring
-//   src/public/assets/img/og-*.png     1200 × 630 share cards: og-home.png, and og-<slug>.png for every
-//                                      game in ctx.games with the Pragmatic Play demos on and off
+//   <site>/public/favicon.svg           the opal mark (#opal in engine/lib/art.mjs until the site's
+//                                       art/ takes it, Phase 2), simplified for 16px
+//   <site>/public/favicon.ico           16, 32 and 48 px
+//   <site>/public/assets/icons/         apple-touch-icon.png (180), icon-192.png, icon-512.png and
+//                                       icon-maskable-512.png: the opal on process yellow, in an ink ring
+//   <site>/public/assets/img/og-*.png   1200 × 630 share cards: og-home.png, og-home-house.png, and
+//                                       og-<slug>.png for every game in ctx.games with the demos on and off
 //
 // The share cards are rendered by Chromium from the BUILT site, so the fonts,
 // the stylesheet and the cover colours are the real ones. The script serves
@@ -16,13 +18,17 @@
 // blocked, so nothing is fetched from anywhere else, least of all Pragmatic
 // Play: the cards show only our own cover art.
 //
-//   npm run build && npm run images && npm run build
-//   node tools/make-images.mjs [build-dir] [--only icons|cards]
+//   node engine/tools/make-images.mjs --site <site-dir> [--only icons|cards] [--dry] [--dist DIR]
 //
-// build-dir defaults to $OUT_DIR, then dist/. If it holds no build, or one
-// older than the styles, fonts or artwork, the site is built into it first.
+//   --only icons|cards  one of the two sets (default both)
+//   --dry               write nothing: say for each file whether it would change
+//   --dist DIR          the build to render the cards from (default $OUT_DIR, then
+//                       <site>/dist). If it holds no build, or one older than the
+//                       styles, fonts or artwork, the site is built into it first.
+//
 // Run the build again afterwards: the game pages point og:image at their own
-// card only once the file exists.
+// card only once the file exists. The home cards fan out the games named in the
+// site's checks.json "images" (homeFan, houseFan), else its first three games.
 //
 // Needs sharp and Playwright's Chromium (both dev dependencies).
 import fs from 'node:fs/promises';
@@ -34,24 +40,50 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 
 import { SPRITE } from '../lib/art.mjs';
-import { makeContext } from '../lib/context.mjs';
+import { makeContext, siteFolder } from '../lib/context.mjs';
 import { cover } from '../lib/ui/tiles.mjs';
 import { esc } from '../lib/html.mjs';
 import { csp } from '../lib/layout.mjs';
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PUB = path.join(ROOT, 'src/public');
-const IMG = path.join(PUB, 'assets/img');
-const ICONS = path.join(PUB, 'assets/icons');
+const ENGINE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const USAGE = 'usage: node engine/tools/make-images.mjs --site <site-dir> [--only icons|cards] [--dry] [--dist DIR]';
 
 const args = process.argv.slice(2);
-const onlyAt = args.indexOf('--only');
-const only = onlyAt >= 0 ? args[onlyAt + 1] : '';
-if (only && !['icons', 'cards'].includes(only)) throw new Error(`--only takes "icons" or "cards", not "${only}"`);
-const dirArg = args.find((a, i) => !a.startsWith('--') && args[i - 1] !== '--only');
-const DIST = path.resolve(ROOT, dirArg || process.env.OUT_DIR || 'dist');
+const opt = (name) => {
+  const i = args.findIndex((a) => a === `--${name}` || a.startsWith(`--${name}=`));
+  if (i < 0) return undefined;
+  return args[i].includes('=') ? args[i].split('=').slice(1).join('=') : args[i + 1];
+};
+const fail = (msg) => {
+  console.error(`error: ${msg}\n${USAGE}`);
+  process.exit(2);
+};
+const siteArg = opt('site') ?? (existsSync('site.config.json') ? '.' : undefined);
+if (!siteArg) fail('--site is required');
+const SITE = path.resolve(siteArg);
+if (!existsSync(path.join(SITE, 'site.config.json'))) fail(`${SITE} has no site.config.json`);
+const only = opt('only') || '';
+if (only && !['icons', 'cards'].includes(only)) fail(`--only takes "icons" or "cards", not "${only}"`);
+const DRY = args.includes('--dry');
+const PUB = path.join(SITE, 'public');
+const IMG = path.join(PUB, 'assets/img');
+const ICONS = path.join(PUB, 'assets/icons');
+const DIST = path.resolve(SITE, opt('dist') || process.env.OUT_DIR || 'dist');
 
-const cfg = JSON.parse(await fs.readFile(path.resolve(ROOT, process.env.SITE_CONFIG || 'site.config.json'), 'utf8'));
+const cfg = JSON.parse(await fs.readFile(path.resolve(SITE, process.env.SITE_CONFIG || 'site.config.json'), 'utf8'));
+const checks = existsSync(path.join(SITE, 'checks.json')) ? JSON.parse(readFileSync(path.join(SITE, 'checks.json'), 'utf8')) : {};
+
+/** Write a file, or with --dry say whether it would change. */
+const changed = [];
+async function put(file, data) {
+  const rel = path.relative(process.cwd(), file);
+  const before = await fs.readFile(file).catch(() => null);
+  const same = before !== null && Buffer.compare(before, Buffer.from(data)) === 0;
+  if (!same) changed.push(rel);
+  if (DRY) return console.log(`${same ? 'same   ' : before === null ? 'new    ' : 'changed'} ${rel}`);
+  await fs.mkdir(path.dirname(file), { recursive: true });
+  await fs.writeFile(file, data);
+}
 
 const INK = '#18122B';
 const YELLOW = '#FFE11A';
@@ -158,7 +190,7 @@ const png = (input) => sharp(Buffer.from(input)).png({ compressionLevel: 9, adap
 
 async function makeIcons() {
   const fav = faviconSvg();
-  await fs.writeFile(path.join(PUB, 'favicon.svg'), fav);
+  await put(path.join(PUB, 'favicon.svg'), fav);
 
   // favicon.ico: PNG entries at 16, 32 and 48 px, each rasterised straight
   // from the SVG at its own size (crisper than scaling one bitmap down)
@@ -184,13 +216,12 @@ async function makeIcons() {
     offset += entries[i].length;
   });
   const ico = Buffer.concat([header, ...entries]);
-  await fs.writeFile(path.join(PUB, 'favicon.ico'), ico);
+  await put(path.join(PUB, 'favicon.ico'), ico);
   console.log(`favicon.svg ${kb(Buffer.byteLength(fav))}, favicon.ico ${kb(ico.length)} (16, 32, 48)`);
 
-  await fs.mkdir(ICONS, { recursive: true });
   for (const spec of ICON_SPECS) {
     const buf = await png(iconSvg(spec.size, spec));
-    await fs.writeFile(path.join(ICONS, spec.file), buf);
+    await put(path.join(ICONS, spec.file), buf);
     console.log(`${spec.file} ${spec.size}×${spec.size} ${kb(buf.length)}`);
   }
 }
@@ -220,10 +251,10 @@ function ensureBuild() {
     }
     return t;
   };
-  const sources = Math.max(newest(path.join(ROOT, 'src/styles')), newest(path.join(PUB, 'assets/fonts')), statSync(path.join(ROOT, 'src/lib/art.mjs')).mtimeMs);
+  const sources = Math.max(newest(path.join(ENGINE, 'styles')), newest(path.join(SITE, 'theme')), newest(path.join(PUB, 'assets/fonts')), statSync(path.join(ENGINE, 'lib/art.mjs')).mtimeMs);
   if (existsSync(css) && statSync(css).mtimeMs >= sources) return;
   console.log(`building the site into ${path.relative(process.cwd(), DIST) || '.'}/ first`);
-  const r = spawnSync(process.execPath, [path.join(ROOT, 'build.mjs')], { cwd: ROOT, env: { ...process.env, OUT_DIR: DIST }, stdio: 'inherit' });
+  const r = spawnSync(process.execPath, [path.join(ENGINE, 'build.mjs'), SITE, '--out', DIST], { env: { ...process.env, OUT_DIR: '' }, stdio: 'inherit' });
   if (r.status !== 0) throw new Error('the build failed');
 }
 
@@ -252,8 +283,9 @@ async function serve(dir) {
 
 // Every game the site can list: the Pragmatic Play demos (on) and our own slot (off).
 function allGames() {
-  const on = makeContext({ ...cfg, pragmatic: { ...cfg.pragmatic, enabled: true } });
-  const off = makeContext({ ...cfg, pragmatic: { ...cfg.pragmatic, enabled: false } });
+  const site = siteFolder(SITE);
+  const on = makeContext({ ...cfg, pragmatic: { ...cfg.pragmatic, enabled: true } }, site);
+  const off = makeContext({ ...cfg, pragmatic: { ...cfg.pragmatic, enabled: false } }, site);
   const seen = new Map();
   for (const g of [...on.games, ...off.games]) if (!seen.has(g.slug)) seen.set(g.slug, g);
   return { ctx: on, games: [...seen.values()] };
@@ -304,11 +336,10 @@ function gameCard(ctx, g) {
 // The home cards: the hero line and a fan of three covers. og-home.png is for
 // the site with the Pragmatic demos (two slots, one table); og-home-house.png is
 // for the site on our own three games (site.config.json "pragmatic.enabled": false).
-const HOME_FAN = ['big-bass-bonanza', 'lapidary-wheel', 'gates-of-olympus'];
-const HOUSE_FAN = ['seven-systems', 'lapidary-wheel', 'brilliant-twenty-one'];
-
 function homeCard(ctx, games, { house = false } = {}) {
-  const fan = (house ? HOUSE_FAN : HOME_FAN).map((slug) => games.find((g) => g.slug === slug)).filter(Boolean);
+  const named = (house ? checks.images?.houseFan : checks.images?.homeFan) || [];
+  const pool = house ? games.filter((g) => g.provider !== 'pragmatic') : games;
+  const fan = named.length ? named.map((slug) => games.find((g) => g.slug === slug)).filter(Boolean) : pool.slice(0, 3);
   const [lead, ...rest] = ctx.disclaimer.split(/(?<=\.) /);
   return `<section class="og og--home" id="${house ? 'og-home-house' : 'og-home'}">
   ${cmyk}
@@ -474,8 +505,7 @@ async function makeCards() {
     if (fonts.length < 2 || fonts.some((f) => !f.endsWith('loaded'))) throw new Error(`the site fonts didn't load (${fonts.join(', ')})`);
     if (errors.length) throw new Error(errors.join('\n'));
 
-    await fs.mkdir(IMG, { recursive: true });
-    await page.evaluate(fitTitles);
+      await page.evaluate(fitTitles);
     // Then one card at a time, alone at the top left of a 1200 × 630 viewport.
     for (const c of cards) {
       const box = await page.evaluate((id) => {
@@ -489,7 +519,7 @@ async function makeCards() {
       }
       const shot = await page.screenshot({ clip: box, animations: 'disabled' });
       const out = await squeeze(shot);
-      await fs.writeFile(path.join(IMG, c.file), out);
+      await put(path.join(IMG, c.file), out);
       console.log(`${c.file} ${kb(out.length)}`);
     }
   } finally {
@@ -502,3 +532,4 @@ async function makeCards() {
 
 if (only !== 'cards') await makeIcons();
 if (only !== 'icons') await makeCards();
+if (DRY) console.log(changed.length ? `--dry: ${changed.length} file(s) would change` : '--dry: nothing would change');

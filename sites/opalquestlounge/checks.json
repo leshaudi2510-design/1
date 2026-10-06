@@ -1,0 +1,41 @@
+{
+  "$schema": "../../engine/tools/checks.schema.json",
+  "checksVersion": 1,
+  "storagePrefix": "oql.",
+  "currency": { "singular": "Carat", "plural": "Carats", "abbr": "ct" },
+  "embedHost": "(^|\\.)pragmaticplay\\.net$",
+  "embedLabel": "*.pragmaticplay.net",
+  "stageSelector": "figure.stage[data-game=\"pragmatic\"]",
+  "demoPages": ["/", "/games/gates-of-olympus/", "/games/big-bass-bonanza/", "/games/wolf-gold/"],
+  "pages": {
+    "demo": "/games/gates-of-olympus/",
+    "demoAfterReject": "/games/wolf-gold/",
+    "demoBar": "/games/zeus-vs-hades-gods-of-war/",
+    "safer": "/responsible-gaming/",
+    "offlineLanding": "/about/",
+    "offlineUnvisited": "/games/wolf-gold/",
+    "offlineUnvisitedNoDemos": "/contact/"
+  },
+  "games": {
+    "roulette": {
+      "slug": "lapidary-wheel",
+      "result": "The ball lands on \\d+ (Garnet|Jet|Malachite)",
+      "settled": "The ball lands on",
+      "colourBet": "garnet"
+    },
+    "blackjack": { "slug": "brilliant-twenty-one" },
+    "slot": { "slug": "seven-systems" }
+  },
+  "lobby": {
+    "page": "/games/",
+    "groups": [
+      { "id": "slots", "nav": "Slots", "dock": "Slots" },
+      { "id": "tables", "nav": "Table games", "dock": "Tables" }
+    ]
+  },
+  "images": {
+    "homeFan": ["big-bass-bonanza", "lapidary-wheel", "gates-of-olympus"],
+    "houseFan": ["seven-systems", "lapidary-wheel", "brilliant-twenty-one"]
+  },
+  "extraPages": []
+}
