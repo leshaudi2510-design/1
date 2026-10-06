@@ -1,0 +1,33 @@
+{
+  "boardUrl": "",
+  "boardId": "",
+  "intakeUrl": "",
+  "routines": {
+    "site-health": "",
+    "lighthouse-nightly": "",
+    "ci-reporter": "",
+    "ci-reporter-api": "",
+    "pr-shepherd": "",
+    "ci-failed": "",
+    "orders-inbox": "",
+    "factory-monthly": "",
+    "factory-weekly-audit": "",
+    "coordinator-poke": "",
+    "policy-watch": "",
+    "ppc-daily-report": "",
+    "ppc-alert-triage": ""
+  },
+  "routineGitWrites": "unknown",
+  "routineBoardWrites": "unknown",
+  "coordinatorSession": "",
+  "coordinatorPermissionMode": "acceptEdits",
+  "ownerLogins": ["leshaudi2510"],
+  "maxInFlight": 4,
+  "waves": { "size": 5, "everyMinutes": 10 },
+  "spokeCpus": 4,
+  "autoFixOnCi": false,
+  "ciMinutesBudget": 2000,
+  "environments": { "sites": "", "ppc": "" },
+  "models": { "hub": "opus", "spoke": "sonnet" },
+  "types": ["social-casino", "online-games", "hotel-casino"]
+}
