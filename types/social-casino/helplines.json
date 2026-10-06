@@ -1,0 +1,40 @@
+{
+  "_about": "Helplines the social-casino chrome and responsible-gaming page signpost, keyed by target market (SITE-TYPES 5.2 shape, with the policy-urls verified fields). GambleAware closed on 31 March 2026 and is banned by lint sc.helplines. In Phase 1 the pages still carry these numbers in engine code (engine/lib/layout.mjs, engine/pages/responsible-gaming.mjs); Phase 2 reads them from here. 'verified' stays null until a person has called or opened each entry from a UK connection.",
+  "schemaVersion": 1,
+  "banned": ["gambleaware.org", "begambleaware.org"],
+  "markets": {
+    "GB": [
+      {
+        "id": "gamcare",
+        "name": "GamCare",
+        "tel": "0808 8020 133",
+        "telHref": "tel:+448088020133",
+        "url": "https://www.gamcare.org.uk/",
+        "what": "Free, confidential support for anyone worried about gambling, including someone else’s",
+        "verified": null,
+        "pageUpdated": null,
+        "checkedBy": null
+      },
+      {
+        "id": "nhs-gambling",
+        "name": "NHS gambling support",
+        "tel": null,
+        "url": "https://www.nhs.uk/live-well/addiction-support/gambling-addiction/",
+        "what": "NHS advice and the NHS gambling clinics",
+        "verified": null,
+        "pageUpdated": null,
+        "checkedBy": null
+      },
+      {
+        "id": "gamcare-self-assessment",
+        "name": "GamCare self-assessment",
+        "tel": null,
+        "url": "https://www.gamcare.org.uk/understanding-your-gambling/self-assessment-tool/",
+        "what": "A short questionnaire about gambling habits",
+        "verified": null,
+        "pageUpdated": null,
+        "checkedBy": null
+      }
+    ]
+  }
+}

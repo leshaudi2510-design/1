@@ -1,0 +1,258 @@
+{
+  "_about": "Facts only (SPEC 3.2 item 9, D-10): the Pragmatic Play demo games a social-casino site may list, with the facts researched on 26 September 2026 for sites/opalquestlounge (Pragmatic press releases, captured game configs and third-party reviews; pragmaticplay.com could not be reached). No prose: each site writes its own summary, howItPlays, bonus, features and faq in its data/pragmatic-games.json, and lint sc.pragmatic-prose-copied (Phase 2) fails a site whose prose equals another site's. Facts named in verify are unconfirmed until someone compares them with the game's own information screen. appeal is low or medium only: games likely to appeal to under-18s are left out (CAP 16.3.12).",
+  "schemaVersion": 1,
+  "researched": "2026-09-26",
+  "checked": null,
+  "games": [
+    {
+      "slug": "gates-of-olympus",
+      "name": "Gates of Olympus",
+      "symbol": "vs20olympgate",
+      "released": 2021,
+      "grid": "6×5",
+      "pays": "Anywhere on the grid: 8 or more of the same symbol",
+      "tags": [
+        "tumble",
+        "multipliers",
+        "free-spins",
+        "pay-anywhere"
+      ],
+      "volatility": "High",
+      "topPayout": 5000,
+      "rtp": 96.5,
+      "appeal": "low",
+      "verify": [
+        "rtp",
+        "topPayout"
+      ]
+    },
+    {
+      "slug": "gates-of-olympus-1000",
+      "name": "Gates of Olympus 1000",
+      "symbol": "vs20olympx",
+      "released": 2023,
+      "grid": "6×5",
+      "pays": "Anywhere on the grid: 8 or more of the same symbol",
+      "tags": [
+        "tumble",
+        "multipliers",
+        "free-spins",
+        "pay-anywhere"
+      ],
+      "volatility": "High",
+      "topPayout": 15000,
+      "rtp": 96.5,
+      "appeal": "low",
+      "verify": [
+        "rtp",
+        "volatility"
+      ]
+    },
+    {
+      "slug": "zeus-vs-hades-gods-of-war",
+      "name": "Zeus vs Hades – Gods of War",
+      "symbol": "vs15godsofwar",
+      "released": null,
+      "grid": "5×5",
+      "pays": "15 paylines",
+      "tags": [
+        "free-spins",
+        "multipliers",
+        "paylines"
+      ],
+      "volatility": "High (Olympus) or very high (Hades)",
+      "topPayout": 15000,
+      "rtp": 96.07,
+      "appeal": "low",
+      "verify": [
+        "rtp",
+        "released"
+      ]
+    },
+    {
+      "slug": "fruit-party",
+      "name": "Fruit Party",
+      "symbol": "vs20fruitparty",
+      "released": 2020,
+      "grid": "7×7",
+      "pays": "Clusters: 5 or more matching symbols touching up, down or sideways",
+      "tags": [
+        "tumble",
+        "multipliers",
+        "free-spins",
+        "cluster"
+      ],
+      "volatility": "High",
+      "topPayout": 5000,
+      "rtp": 96.47,
+      "appeal": "medium",
+      "appealNote": "Fruit with no characters or faces.",
+      "verify": [
+        "rtp",
+        "topPayout"
+      ]
+    },
+    {
+      "slug": "big-bass-bonanza",
+      "name": "Big Bass Bonanza",
+      "symbol": "vs10bbbonanza",
+      "released": 2020,
+      "grid": "5×3",
+      "pays": "10 fixed paylines",
+      "tags": [
+        "free-spins",
+        "multipliers",
+        "paylines"
+      ],
+      "volatility": "High",
+      "topPayout": 2100,
+      "rtp": 96.71,
+      "appeal": "medium",
+      "appealNote": "Life-like angler. The ASA found Big Bass Bonanza's promotion acceptable in its 2026 Videoslots ruling.",
+      "verify": [
+        "rtp",
+        "topPayout",
+        "volatility"
+      ]
+    },
+    {
+      "slug": "big-bass-splash",
+      "name": "Big Bass Splash",
+      "symbol": "vs10txbigbass",
+      "released": null,
+      "grid": "5×3",
+      "pays": "Paylines",
+      "tags": [
+        "free-spins",
+        "paylines"
+      ],
+      "volatility": "High",
+      "topPayout": 5000,
+      "rtp": 96.71,
+      "appeal": "medium",
+      "appealNote": "Same art style as Big Bass Bonanza.",
+      "verify": [
+        "rtp",
+        "topPayout",
+        "volatility",
+        "pays",
+        "released"
+      ]
+    },
+    {
+      "slug": "wolf-gold",
+      "name": "Wolf Gold",
+      "symbol": "vs25wolfgold",
+      "released": 2017,
+      "grid": "5×3",
+      "pays": "25 fixed paylines",
+      "tags": [
+        "free-spins",
+        "respins",
+        "paylines"
+      ],
+      "volatility": "Medium",
+      "topPayout": null,
+      "rtp": 96.01,
+      "appeal": "low",
+      "verify": [
+        "rtp",
+        "volatility"
+      ]
+    },
+    {
+      "slug": "great-rhino-megaways",
+      "name": "Great Rhino Megaways",
+      "symbol": "vswaysrhino",
+      "released": 2020,
+      "grid": "6 reels, 2 to 7 rows",
+      "pays": "Up to 200,704 ways",
+      "tags": [
+        "megaways",
+        "tumble",
+        "free-spins",
+        "multipliers"
+      ],
+      "volatility": "High",
+      "topPayout": 20000,
+      "rtp": 96.58,
+      "appeal": "low",
+      "verify": [
+        "rtp",
+        "grid",
+        "bonus"
+      ]
+    },
+    {
+      "slug": "buffalo-king-megaways",
+      "name": "Buffalo King Megaways",
+      "symbol": "vswaysbufking",
+      "released": 2021,
+      "grid": "6 reels, variable rows",
+      "pays": "Up to 200,704 ways",
+      "tags": [
+        "megaways",
+        "tumble",
+        "free-spins",
+        "multipliers"
+      ],
+      "volatility": "High",
+      "topPayout": 5000,
+      "rtp": 96.52,
+      "appeal": "low",
+      "verify": [
+        "released",
+        "grid",
+        "topPayout",
+        "volatility",
+        "bonus"
+      ]
+    },
+    {
+      "slug": "madame-destiny-megaways",
+      "name": "Madame Destiny Megaways",
+      "symbol": "vswaysmadame",
+      "released": 2021,
+      "grid": "6 reels, 2 to 7 rows",
+      "pays": "Up to 200,704 ways",
+      "tags": [
+        "megaways",
+        "tumble",
+        "free-spins",
+        "multipliers"
+      ],
+      "volatility": "High",
+      "topPayout": 5000,
+      "rtp": 96.56,
+      "appeal": "low",
+      "verify": [
+        "rtp",
+        "topPayout"
+      ]
+    },
+    {
+      "slug": "wild-west-gold",
+      "name": "Wild West Gold",
+      "symbol": "vs40wildwest",
+      "released": null,
+      "grid": "5×4",
+      "pays": "40 paylines",
+      "tags": [
+        "free-spins",
+        "multipliers",
+        "paylines",
+        "sticky-wilds"
+      ],
+      "volatility": null,
+      "topPayout": 10000,
+      "rtp": 96.51,
+      "appeal": "low",
+      "verify": [
+        "rtp",
+        "volatility",
+        "released",
+        "bonus"
+      ]
+    }
+  ]
+}
