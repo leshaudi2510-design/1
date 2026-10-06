@@ -278,7 +278,8 @@ const LIMIT_MIN = Number(process.env.CHECK_TIMEOUT_MIN || 30);
 const stop = (why) => {
   console.log(`\n${why} ${failures.length} check(s) had failed by then.`);
   writeReport(true);
-  if (REPORT) console.log(`Partial report: ${path.relative(process.cwd(), REPORT)}`);
+  if (REPORT) console.log(`Partial report: ${REPORT}`);
+  if (!KEEP) harness.cleanTempSync();
   process.exit(1);
 };
 setTimeout(() => stop(`Stopped after ${LIMIT_MIN} minutes (CHECK_TIMEOUT_MIN).`), LIMIT_MIN * 60000).unref();
@@ -367,7 +368,7 @@ const { passes } = summary();
 console.log(`\n${passes} passed, ${failures.length} failed in ${((Date.now() - t0) / 1000).toFixed(0)} s.`);
 console.log(failures.length ? `${failures.length} check(s) failed.` : 'All checks passed.');
 writeReport(false);
-if (REPORT) console.log(`Report: ${path.relative(process.cwd(), REPORT)}`);
+if (REPORT) console.log(`Report: ${REPORT}`);
 process.exit(failures.length || oracleFailed ? 1 : 0);
 
 /**

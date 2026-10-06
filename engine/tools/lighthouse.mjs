@@ -229,6 +229,6 @@ try {
   server.stop();
 }
 await fs.writeFile(path.join(OUT, 'summary.json'), `${JSON.stringify(summary, null, 2)}\n`);
-console.log(`Lighthouse ${LH.version}, ${path.relative(process.cwd(), CHROME)}; thresholds ${LIMITS.from}: categories >= ${LIMITS.perf}/${LIMITS.a11y}/${LIMITS.bp}/${LIMITS.seo}, LCP < ${LIMITS.lcpMs} ms, CLS < ${LIMITS.cls}`);
+console.log(`Lighthouse ${LH.version}, ${CHROME}; thresholds ${LIMITS.from}: categories >= ${LIMITS.perf}/${LIMITS.a11y}/${LIMITS.bp}/${LIMITS.seo}, LCP < ${LIMITS.lcpMs} ms, CLS < ${LIMITS.cls}`);
 console.log(`${summary.length - failed} of ${summary.length} audits within the thresholds. Summary: ${path.relative(process.cwd(), path.join(OUT, 'summary.json'))}`);
 process.exit(failed ? 1 : 0);

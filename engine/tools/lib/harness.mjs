@@ -6,7 +6,7 @@
 // site folder being checked (sites/<slug>, a template site, a fixture). Both
 // are set once by check.mjs through setRoots() before anything else runs.
 import fs from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import http from 'node:http';
@@ -96,6 +96,10 @@ export async function tempDir() {
 }
 export async function cleanTemp() {
   if (tmpRoot) await fs.rm(tmpRoot, { recursive: true, force: true });
+}
+/** The same, for an exit path that cannot wait. */
+export function cleanTempSync() {
+  if (tmpRoot) rmSync(tmpRoot, { recursive: true, force: true });
 }
 
 /**
