@@ -97,7 +97,10 @@ export function makeContext(cfg, site = siteFolder()) {
 
   // Pragmatic Play demos (data/pragmatic-games.json in the site folder), loaded in an iframe
   // only when the visitor presses "Play demo".
-  const pragmaticOn = Boolean(cfg.pragmatic?.enabled);
+  // Demos are on only when the config asks for them AND the site has demo data;
+  // an empty list is reported by the pack's lint (sc.pragmatic-empty), not a crash.
+  const pragmaticRequested = Boolean(cfg.pragmatic?.enabled);
+  const pragmaticOn = pragmaticRequested && Array.isArray(pragmaticData?.games) && pragmaticData.games.length > 0;
   const TAGS = { 'free-spins': 'freespins', tumble: 'tumble', megaways: 'megaways' };
   const shortGrid = (grid) => (/^\d+×\d+$/.test(grid) ? grid : grid.replace(/,.*$/, ''));
   const mechanicTag = (d) =>
@@ -155,9 +158,10 @@ export function makeContext(cfg, site = siteFolder()) {
     games,
     game: (slug) => games.find((g) => g.slug === slug),
     pragmaticOn,
+    pragmaticRequested,
     pragmaticGames: pragmatic,
     houseGames: games.filter((g) => g.provider === 'house'),
-    featured: pragmaticOn ? games.find((g) => g.slug === (cfg.pragmatic.featured || 'gates-of-olympus')) : null,
+    featured: pragmaticOn ? games.find((g) => g.slug === (cfg.pragmatic.featured || 'gates-of-olympus')) || games.find((g) => g.provider === 'pragmatic') : null,
     slot,
     slotStats,
     wheel,

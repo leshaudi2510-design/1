@@ -4,22 +4,58 @@
   "sites": {
     "opalquestlounge": {
       "allow": [
-        { "rule": "placeholder", "reason": "operator company name, number and address are still placeholders (owner question)", "until": "launch" },
-        { "rule": "sc.written-consent", "reason": "Pragmatic Play written consent not yet recorded (pragmatic.writtenConsent)", "until": "launch" },
-        { "rule": "sc.pragmatic-checked", "reason": "demo facts not yet confirmed from a UK browser (data/pragmatic-games.json checked dates)", "until": "launch" }
+        {
+          "rule": "placeholder",
+          "reason": "operator company name, number and address are still placeholders (owner question)",
+          "until": "launch"
+        },
+        {
+          "rule": "sc.written-consent",
+          "reason": "Pragmatic Play written consent not yet recorded (pragmatic.writtenConsent)",
+          "until": "launch"
+        },
+        {
+          "rule": "sc.pragmatic-checked",
+          "reason": "demo facts not yet confirmed from a UK browser (data/pragmatic-games.json checked dates)",
+          "until": "launch"
+        }
       ]
     }
   },
   "templates": {
     "social-casino": {
-      "expect": ["placeholder"],
+      "expect": [
+        "placeholder"
+      ],
       "allow": [],
       "skipVariants": [
-        { "name": "pragmatic", "reason": "the template ships with demos off and an empty demo list; forcing pragmatic.enabled=true crashes engine/lib/ui/stage.mjs (pragmaticStage reads .slug of undefined) instead of reporting a lint problem", "owner": "A", "until": "the pack edit or the engine handles an empty demo list" },
-        { "name": "ga", "reason": "same crash: the ga variant also forces pragmatic.enabled=true", "owner": "A", "until": "the pack edit or the engine handles an empty demo list" }
+        {
+          "name": "pragmatic",
+          "reason": "the template ships with demos off and an empty demo list; with pragmatic.enabled forced on, the build now reports sc.pragmatic-empty (an error by design) instead of crashing. The pragmatic variant applies to sites that have demo data.",
+          "owner": "A",
+          "until": "permanent for the template (it never carries demo data)"
+        },
+        {
+          "name": "ga",
+          "reason": "the template ships with demos off and an empty demo list; with pragmatic.enabled forced on, the build now reports sc.pragmatic-empty (an error by design) instead of crashing. The ga variant applies to sites that have demo data.",
+          "owner": "A",
+          "until": "permanent for the template (it never carries demo data)"
+        }
       ]
     },
-    "online-games": { "expect": ["type-stub", "placeholder"], "allow": [] },
-    "hotel-casino": { "expect": ["type-stub", "placeholder"], "allow": [] }
+    "online-games": {
+      "expect": [
+        "type-stub",
+        "placeholder"
+      ],
+      "allow": []
+    },
+    "hotel-casino": {
+      "expect": [
+        "type-stub",
+        "placeholder"
+      ],
+      "allow": []
+    }
   }
 }

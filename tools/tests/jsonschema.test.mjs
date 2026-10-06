@@ -51,6 +51,9 @@ test('the factory schemas use only supported keywords and compile', () => {
   for (const f of fs.readdirSync(path.join(REPO, 'schemas')).filter((x) => x.endsWith('.json'))) {
     const s = JSON.parse(fs.readFileSync(path.join(REPO, 'schemas', f), 'utf8'));
     if (f === 'stages.json') continue;
+    // board.schema.json also carries data members (stage list, thresholds, artifact, collection registry
+    // capabilities, version) that tools read; lint only its schema members.
+    if (f === 'board.schema.json') for (const k of ['version', 'stages', 'thresholds', 'artifact', 'collections']) delete s[k];
     assert.deepEqual(unknownKeywords(s), [], f);
     assert.deepEqual(lintSchema(s), [], f);
   }

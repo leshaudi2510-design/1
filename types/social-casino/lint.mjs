@@ -269,6 +269,17 @@ export const rules = [
   // ---------- config (after the engine's placeholder check) ----------
   // The Pragmatic Play demos: open decisions (docs/COMPLIANCE.md, section 0, "Режим Pragmatic").
   {
+    // Demos switched on with no demo data: the build falls back to the house games.
+    id: 'sc.pragmatic-empty',
+    phase: 'config',
+    level: 'error',
+    run({ ctx }, r) {
+      if (ctx.pragmaticRequested && !ctx.pragmaticOn) {
+        r.error(`site.config.json: pragmatic.enabled is true but ${PRAGMATIC_DATA} lists no games. Add the demos (the pragmatic lane) or set pragmatic.enabled to false`);
+      }
+    },
+  },
+  {
     // Pragmatic's terms allow its games only with its express written consent.
     id: 'sc.written-consent',
     phase: 'config',
