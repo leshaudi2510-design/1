@@ -646,7 +646,7 @@ test -z "$(git ls-files reports | grep -v '^reports/_phase1/')"
 # A: byte-identical dist, three configurations, strict expectations, templates and stubs, no site/type name in engine code
 rm -rf "$X/after"; node engine/build.mjs sites/opalquestlounge --json --out "$X/after" | json_ok 'r.problems.length===0'
 diff -r "$X/before" "$X/after"
-node engine/build.mjs sites/opalquestlounge --strict --json --out "$X/strict" | json_ok "r.problems.length>0&&r.problems.every(p=>['operator-placeholder','pragmatic-consent','pragmatic-unchecked'].includes(p.rule))"
+node engine/build.mjs sites/opalquestlounge --strict --json --out "$X/strict" | json_ok "r.problems.length>0&&r.problems.every(p=>['placeholder','sc.written-consent','sc.pragmatic-checked'].includes(p.rule))"
 node engine/build.mjs sites/opalquestlounge --no-pragmatic --json --out "$X/off" | json_ok 'r.problems.length===0'
 node -e "const fs=require('fs');const c=JSON.parse(fs.readFileSync('sites/opalquestlounge/site.config.json'));c.pragmatic={...c.pragmatic,enabled:false};c.analytics={ga4:'G-TEST000000',adsConversionId:''};fs.writeFileSync('$X/ga.json',JSON.stringify(c))"
 SITE_CONFIG="$X/ga.json" node engine/build.mjs sites/opalquestlounge --json --out "$X/ga" | json_ok 'r.problems.length===0'
@@ -654,7 +654,7 @@ node engine/build.mjs types/social-casino/template-site --json --out "$X/tpl-sc"
 node engine/build.mjs types/social-casino/template-site --strict --json --out "$X/tpl-sc-strict" | json_ok 'r.problems.length>0'
 for t in online-games hotel-casino; do node engine/build.mjs types/$t/template-site --json --out "$X/tpl-$t" | json_ok "r.problems.length===0&&r.warnings.some(w=>w.rule==='type-stub')"; done
 node -e "const c=require('./sites/opalquestlounge/site.config.json');process.exit(c.schemaVersion===1&&c.type==='social-casino'&&c.storagePrefix==='oql'?0:1)"
-node -e "const p=require('./engine/fonts/approved-pairings.json');process.exit(['archivo','radio-canada'].every(f=>p.families.some(x=>x.id===f))?0:1)"
+node -e "const p=require('./engine/fonts/approved-pairings.json');process.exit(['archivo','radio-canada'].every(f=>p.families.some(x=>x.slug===f))?0:1)"
 grep -rEn "opalquestlounge|Opal Quest|social-casino" engine/lib engine/pages engine/client engine/styles engine/build.mjs | grep -v '/_legacy/' | grep -v 'pack-resolver-default' | wc -l | grep -qx 0
 node tools/engine-hashes.mjs --compare engine/dist-hashes.json
 # C: 277-check oracle parity (run in the background, never two at once), partial run, id validation, Lighthouse, images, serve
