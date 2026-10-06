@@ -73,7 +73,13 @@ export default [
           'a daily limit reached before midnight lifts at midnight in an open tab, with no reload', JSON.stringify({ before: before.state, midnight: midnight.state, said }));
         await pressOn(page, `${STAGE} .stage__over [data-action="load"]`);
         await page.clock.runFor(2000);
-        const ready = (await stageInfo(page)).state;
+        // The stubbed frame's load event arrives in real time, not on the fake clock: give it up to 10 s on a busy machine.
+        let ready = (await stageInfo(page)).state;
+        for (let i = 0; ready === 'loading' && i < 50; i++) {
+          await new Promise((r) => setTimeout(r, 200));
+          await page.clock.runFor(200);
+          ready = (await stageInfo(page)).state;
+        }
         await page.clock.runFor(31 * 60 * 1000);
         const next = await stageInfo(page);
         expect(ready === 'ready' && next.state === 'blocked' && next.framesOnPage === 0,
