@@ -1,0 +1,19 @@
+# Code owners for SHARED paths only (SPEC 10.3, MASTER-PLAN section 2).
+# There is deliberately no "*" line: a PR that touches only sites/<slug>/** and
+# orders/<slug>/** needs no Code Owners review and can auto-merge once sites-ok is green.
+# portfolio/ lives on the registry branch and is deliberately absent.
+
+/engine/                    @leshaudi2510-design
+/types/                     @leshaudi2510-design
+/tools/                     @leshaudi2510-design
+/schemas/                   @leshaudi2510-design
+/ppc/                       @leshaudi2510-design
+/.github/                   @leshaudi2510-design
+/.claude/                   @leshaudi2510-design
+/.mcp.json                  @leshaudi2510-design
+/artifacts/                 @leshaudi2510-design
+/docs/                      @leshaudi2510-design
+/sites/registry.json        @leshaudi2510-design
+/engine/dist-hashes.json    @leshaudi2510-design
+/package.json               @leshaudi2510-design
+/package-lock.json          @leshaudi2510-design

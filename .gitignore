@@ -1,7 +1,31 @@
-node_modules/
+# Dependencies (hoisted to the repository root, D-50). No trailing slash: worktrees
+# link node_modules to the hub's tree, and git does not treat a symlink as a directory.
+node_modules
+
+# Build output: any dist folder, per site and per type template (engine/build.mjs --out)
 dist/
 dist-*/
+sites/*/dist*/
+types/*/template-site/dist*/
+sites/*/site.config.check.json
+
+# Browser-check output
 check-shots/
-reports/
+sites/*/check-shots/
+
+# Reports are hub-owned and local; only the Phase 1 acceptance record is committed
+reports/*
+!reports/_phase1/
+
+# Claude Code local state (the rest of .claude/ is tracked)
 .claude/worktrees/
+.claude/settings.local.json
+.claude/.slug
+
+# Scanner caches
+.skillspector/
+
+# Misc
 *.log
+*.zip
+.DS_Store
