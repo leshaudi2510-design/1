@@ -160,7 +160,9 @@ async function main(argv) {
     if (errs.length) return 1;
   }
   if (a['all-paths-covered']) {
-    const files = (git(['ls-files'], { cwd: root }) || '').split('\n').filter(Boolean);
+    const listed = git(['ls-files'], { cwd: root });
+    if (listed === null) { process.stderr.write(`partition-scope: git ls-files failed in ${root} (not a git checkout?)\n`); return 2; }
+    const files = listed.split('\n').filter(Boolean);
     const errs = [];
     for (const f of files) {
       const o = ownerOf(P, f, phase);
