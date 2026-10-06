@@ -4,7 +4,7 @@
 import { randomInt } from 'node:crypto';
 import {
   freshShoe, score, isBrilliant, canSplit, dealerShouldDraw, basicStrategy, settleHand, DECKS, CUT_AT,
-} from '../src/public/assets/js/games/brilliant-21.math.js';
+} from '../games/_legacy/brilliant-21.math.js';
 
 const N = Number(process.argv[2] || 1_000_000);
 let shoe = [];

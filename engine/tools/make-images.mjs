@@ -33,11 +33,11 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 
-import { SPRITE } from '../src/lib/art.mjs';
-import { makeContext } from '../src/lib/context.mjs';
-import { cover } from '../src/lib/ui/tiles.mjs';
-import { esc } from '../src/lib/html.mjs';
-import { csp } from '../src/lib/layout.mjs';
+import { SPRITE } from '../lib/art.mjs';
+import { makeContext } from '../lib/context.mjs';
+import { cover } from '../lib/ui/tiles.mjs';
+import { esc } from '../lib/html.mjs';
+import { csp } from '../lib/layout.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PUB = path.join(ROOT, 'src/public');
