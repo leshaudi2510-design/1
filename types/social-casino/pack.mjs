@@ -12,6 +12,7 @@ import sevenSystems from '../../engine/pages/seven-systems.mjs';
 import lapidaryWheel from '../../engine/pages/lapidary-wheel.mjs';
 import brilliant21 from '../../engine/pages/brilliant-twenty-one.mjs';
 import responsibleGaming from '../../engine/pages/responsible-gaming.mjs';
+import { coverCss } from '../../engine/lib/art.mjs';
 import { rules, MANDATORY } from './lint.mjs';
 
 // Our own games' page modules, by slug (until engine/games/<id>/ plugins, Phase 3).
@@ -51,6 +52,8 @@ export default {
       '10-base.css', '20-chrome.css', '25-prose.css', '30-controls.css', '40-dialogs.css', '50-home.css',
       '55-pages.css', '60-lobby.css', '70-stage.css', '75-game-page.css', '80-tables.css', '95-prefs.css',
     ],
+    /** Per-game cover colours (engine/lib/art.mjs until the site's art/ takes them, Phase 2). */
+    extraCss: () => coverCss(),
   },
 
   lint: { rules },

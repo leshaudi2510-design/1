@@ -1,0 +1,4 @@
+{
+  "_about": "This site's Pragmatic Play demos, in its own words (summary, howItPlays, features, faq) over the facts in types/social-casino/data/pragmatic-catalog.json. Empty while pragmatic.enabled is false; the pragmatic lane fills it.",
+  "games": []
+}

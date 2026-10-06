@@ -49,7 +49,6 @@ import { fileURLToPath } from 'node:url';
 import { makeContext, siteFolder } from './lib/context.mjs';
 import { longDate } from './lib/html.mjs';
 import { layout, setAssetVersion, csp } from './lib/layout.mjs';
-import { coverCss } from './lib/art.mjs';
 import { loadPack, typeOf } from './lib/pack.mjs';
 import { createReport, printableWarnings } from './lint/report.mjs';
 import { visibleText, tagsOf, cspOf } from './lint/markup.mjs';
@@ -135,7 +134,7 @@ async function main() {
   if (defaulted) report.warn('type-missing', `site.config.json: no "type"; building as "${type}" (Phase 1 default). Add "type" to the config.`);
   const pack = await loadPack(TYPES, type);
   if (pack.status === 'stub') {
-    report.strict('type-stub', `types/${type}: this type pack is a stub (contract v0: generic pages, the engine's default chrome and legal pages). Sites of this type can't launch until the pack is complete.`);
+    report.strict('type-stub', `types/${type}: this type pack is a stub (contract v0: placeholder content-only pages, no type rules). Sites of this type can't launch until the pack is complete.`);
   }
   const schema = await validateConfig(cfg, { REPO });
   for (const e of schema.errors) {
@@ -279,8 +278,9 @@ async function main() {
   if (!conceptAdded) styleFiles.push(conceptFile);
   if (styleFiles.length) {
     const parts = await Promise.all(styleFiles.map(async (f) => `${(await fs.readFile(f, 'utf8')).trim()}\n`));
-    // Per-game cover colours, generated as rules because the CSP blocks inline styles.
-    parts.push(`${coverCss()}\n`);
+    // Generated rules the pack adds last (social casino: per-game cover colours; the CSP blocks inline styles).
+    const extra = typeof pack.styles.extraCss === 'function' ? pack.styles.extraCss(ctx) : '';
+    if (extra) parts.push(`${extra}\n`);
     // @font-face URLs name the fonts' content-hashed files.
     const css = minifyCss(parts.join('\n')).replace(/\/assets\/fonts\/[\w.-]+\.woff2/g, (u) => fontUrls.get(u) || u);
     await write('assets/css/site.css', `/* ${cfg.brand}. Built from src/styles/*.css by build.mjs */\n${css}`);

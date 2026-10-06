@@ -1,0 +1,53 @@
+{
+  "type": "social-casino",
+  "storagePrefix": "tpl",
+  "brand": "[Brand Name]",
+  "shortName": "[Brand]",
+  "domain": "example.com",
+  "concept": "[One-paragraph concept from concept.json: world, era, place, craft. Artwork shows objects and places only.]",
+  "currency": {
+    "singular": "Credit",
+    "plural": "Credits",
+    "abbr": "cr",
+    "startingBalance": 1000,
+    "topUpAmount": 1000,
+    "topUpBelow": 100
+  },
+  "operator": {
+    "companyName": "[Operator company name] Ltd",
+    "companyNumber": "[Companies House number]",
+    "registeredIn": "[England and Wales]",
+    "address": "[Registered office address], United Kingdom",
+    "email": "[hello]@example.com"
+  },
+  "purchases": false,
+  "analytics": {
+    "ga4": "",
+    "adsConversionId": ""
+  },
+  "contactEndpoint": "",
+  "lastUpdated": "2026-10-06",
+  "legalUpdated": {
+    "terms": "2026-10-06",
+    "privacy": "2026-10-06",
+    "cookies": "2026-10-06"
+  },
+  "themeColor": {
+    "light": "#3A3A3A",
+    "dark": "#1C1C1C"
+  },
+  "pragmatic": {
+    "enabled": false,
+    "writtenConsent": "",
+    "demoUrl": "https://demogamesfree.pragmaticplay.net/gs2c/openGame.do",
+    "params": {
+      "lang": "en",
+      "cur": "FUN",
+      "jurisdiction": "UK",
+      "websiteUrl": "https://demogamesfree.pragmaticplay.net"
+    },
+    "frameHosts": [
+      "https://demogamesfree.pragmaticplay.net"
+    ]
+  }
+}

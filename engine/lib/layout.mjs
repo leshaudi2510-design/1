@@ -501,6 +501,15 @@ function resolveLd(ctx, ld) {
 // dock or game dialogs. The pages it links to (/, /about/, /contact/, /terms/,
 // /privacy/, /cookies/) are the pack's to provide.
 
+// Only the generic line icons the basic chrome draws, taken from the sprite
+// (no brand mark, no artwork colours).
+const BASIC_ICONS = ['i-close', 'i-info', 'i-ext', 'i-arrow', 'i-chev'];
+const BASIC_SPRITE = `<svg class="sprite" width="0" height="0" aria-hidden="true" focusable="false">
+  <defs>
+${BASIC_ICONS.map((id) => SPRITE.match(new RegExp(`\\s*<symbol id="${id}"[\\s\\S]*?</symbol>`))?.[0].replace(/^\s*/, '    ') || '').filter(Boolean).join('\n')}
+  </defs>
+</svg>`;
+
 function basicMasthead(ctx, page) {
   const [name, tag] = ctx.brand.split(/ (?=\S+$)/);
   const here = (path) => (page.path === path ? ' aria-current="page"' : '');
@@ -598,7 +607,7 @@ ${consent}
 function basicBody(ctx, page, top) {
   return html`${top}
 <body class="${page.bodyClass || ''}">
-${SPRITE}
+${BASIC_SPRITE}
 <a class="skip" href="#main">Skip to main content</a>
 ${consentBanner(ctx)}
 ${basicMasthead(ctx, page)}

@@ -10,11 +10,15 @@
 //     lintPrefix: 'sc',                   // every lint.rules[].id starts with '<prefix>.'
 //     pages(ctx, common) -> page[],       // the ordered page list; common = the engine's
 //                                         //   { about, terms, privacy, cookies, contact, notFound, offline }
-//     styles: { partials: ['10-base.css', …] },   // engine/styles partials in order
+//     styles: { partials: ['10-base.css', …],     // engine/styles partials in order (the site's
+//               extraCss?(ctx) -> string },        //   theme/tokens.css goes first); generated CSS appended last
 //     mandatory: { pageLints: ['<prefix>.<id>', …] }, // ids of lint.rules a site can never switch off
-//     lint: { rules: [{ id, phase, level, factory?, run(input, report) }] },  // see engine/build.mjs PHASES
+//     lint: { rules: [{ id, phase, level, factory?, run(input, report) }] },  // phases: PHASES below
 //     checks: { builds: { <name>: { edit(cfg) -> cfg, sections: [ids] } } },
 //     templateSite: 'template-site',      // directory, relative to the pack
+//     chrome?: 'full' | 'basic',          // Phase 1: which engine/lib/layout.mjs chrome wraps the pages
+//                                         //   (default 'full'); pack.chrome objects arrive in Phase 2
+//     manifest?(ctx, manifest) -> manifest,  // adjust the web app manifest
 //   }
 //
 // engine/schema/pack.schema.json describes the same surface for tools.
@@ -45,6 +49,9 @@ export function packProblems(pack, type) {
   if (!Array.isArray(pack.styles?.partials) || !pack.styles.partials.every((p) => typeof p === 'string' && p.endsWith('.css'))) {
     out.push(`${at}: styles.partials must be a list of engine/styles/*.css names`);
   }
+  if (pack.styles?.extraCss !== undefined && typeof pack.styles.extraCss !== 'function') out.push(`${at}: styles.extraCss must be a function`);
+  if (pack.chrome !== undefined && !['full', 'basic'].includes(pack.chrome)) out.push(`${at}: chrome must be "full" or "basic"`);
+  if (pack.manifest !== undefined && typeof pack.manifest !== 'function') out.push(`${at}: manifest must be a function`);
   const rules = pack.lint?.rules ?? [];
   if (!Array.isArray(rules)) out.push(`${at}: lint.rules must be a list`);
   const ids = new Set();
