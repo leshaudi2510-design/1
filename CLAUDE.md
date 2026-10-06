@@ -40,9 +40,9 @@ Operator surface: `/order`, `/batch`, `/status`, `/ship`, `/fix`; helpers `/buil
 - `/ship <slug>` (Phase 3) - the only door to production; the operator types `ship <slug>`.
 - The operator's day: `docs/SOP-operator.md`.
 
-Direct commands: `node engine/build.mjs sites/<slug> --strict --json`, `node engine/tools/check.mjs --site sites/<slug> --only=pages`, `node tools/run.mjs <slug> qa` (Phase 2), `node tools/status.mjs --table`, `node tools/validate-order.mjs orders/<id> --level draft|build|launch`, `node --test .claude/hooks/tests`.
+Direct commands: `node engine/build.mjs sites/<slug> --strict --json`, `node engine/tools/check.mjs --site sites/<slug> --only=pages`, `node tools/status.mjs --table`, `node tools/validate-order.mjs orders/<id> --level draft|build|launch`, `node --test .claude/hooks/tests`.
 
-When you touch these files, read these craft docs first: `sites/**/content/**` -> `.claude/craft/copy.md`, `seo.md`; `sites/**/theme/**` -> `design-direction.md`, `motion.md`, `interfaces.md`; `engine/client/**` -> `interaction-audit.md`, `accessibility.md`; `engine/**`, `types/**`, `tools/**`, `.claude/**` -> tooling work only (section 5).
+Read the craft docs before editing: `sites/**/content/**` -> `.claude/craft/copy.md`, `seo.md`; `sites/**/theme/**` -> `design-direction.md`, `motion.md`, `interfaces.md`; `engine/client/**` -> `interaction-audit.md`, `accessibility.md`; `engine/**`, `types/**`, `tools/**`, `.claude/**` -> tooling work only (section 5).
 
 ## 5. Branches and roles
 
