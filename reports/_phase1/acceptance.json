@@ -1,0 +1,35 @@
+{
+  "at": "2026-10-06T12:03:08Z",
+  "commit": "09290fd2df023a8cfefd997cb80c1c405f739763",
+  "script": "docs/factory/MASTER-PLAN.md section 9.3, each command line run on its own with .git/factory-env",
+  "passed": false,
+  "summary": { "lines": 73, "pass": 68, "fail": 1, "skipped": 4 },
+  "blocks": {
+    "git": "pass (4/4)",
+    "A": "pass (13/13): dist byte-identical to the pre-factory build in default, --no-pragmatic and test-GA4 configurations; strict fails only on operator placeholders, Pragmatic written consent and unchecked demos; templates and stubs build; no site or type name in engine lib/pages/client/styles; engine-hashes --compare",
+    "C": "pass (7/7): check.mjs 277/277 with oracle parity and 0 axe violations (first run 276/277, timing race fixed in 335880a, full re-run green); partial run; unknown id exits 2; Lighthouse mobile and desktop within thresholds; icons byte-identical; serve.mjs --port=0",
+    "D": "pass (15/15): validate-order, new-site + build per type, uniqueness fixtures (reskin fails, reference passes), bad-copy strict, status --check, stages derive, partition-scope, engine-lint, vet-skill",
+    "E": "19/20: hooks tests (164), guard must-block and must-pass cases, output caps, context budget; one fail (settings permission rule forms, see open)",
+    "F": "4/5, 1 skipped (wf_* worktree check, see open)", "hub": "3 skipped (wf_* worktree removal, see open)",
+    "G": "pass (3/3) plus tool steps: Board published, rows written, list sites/events verified",
+    "H": "pass (3/3)"
+  },
+  "fixedDuringAcceptance": [
+    "d207d17: plan assertions aligned with shipped names (placeholder, sc.written-consent, sc.pragmatic-checked; font families keyed by slug); schemaVersion 1 in the site config (dist unchanged)",
+    "335880a: chrome.mjs midnight daily-limit check waits for the stubbed frame in real time",
+    "8e1c32c: plan uses sc.forbidden-terms",
+    "09290fd: CLAUDE.md under 12,288 bytes"
+  ],
+  "open": [
+    {
+      "item": ".claude/settings.json permission rule forms",
+      "detail": "Allow list has mcp__ga4__* and mcp__gsc__*, deny list has Bash(* :mutate*); MASTER-PLAN R-08 and 5.4 want mcp__ga4, mcp__gsc and three concrete PPC mutate prefixes. The session's auto-mode classifier refused editing the permission file (self-modification), so this is the owner's change.",
+      "owner": true
+    },
+    {
+      "item": "Stale wf_* worktrees and worktree-wf_* branches",
+      "detail": "Removal refused by the session's auto-mode classifier; the owner runs the W2 housekeeping commands.",
+      "owner": true
+    }
+  ]
+}
