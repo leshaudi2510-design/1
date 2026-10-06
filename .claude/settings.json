@@ -1,0 +1,49 @@
+{
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Read", "Glob", "Grep",
+      "Bash(npm ci)", "Bash(npm run *)", "Bash(npx wrangler pages deploy *)",
+      "Bash(mkdir -p *)", "Bash(cp *)", "Bash(ls *)", "Bash(cat *)", "Bash(test *)", "Bash(date *)",
+      "Bash(git status*)", "Bash(git diff*)", "Bash(git log*)", "Bash(git show *)", "Bash(git fetch *)", "Bash(git rev-parse *)", "Bash(git worktree list*)",
+      "Bash(gh api repos/*/pulls*)", "Bash(gh api repos/*/issues*)", "Bash(gh api repos/*/actions*)", "Bash(gh api repos/*/check-runs*)", "Bash(gh api repos/*/commits*)", "Bash(gh api repos/*/labels*)", "Bash(gh api -X POST repos/*)", "Bash(gh api -X PATCH repos/*)", "Bash(gh api graphql *)",
+      "Edit(sites/**)", "Edit(orders/**)", "Edit(reports/**)", "Edit(.claude/factory.json)",
+      "ArtifactData", "Artifact", "Workflow", "Agent",
+      "mcp__ga4__*", "mcp__gsc__*"
+    ],
+    "deny": [
+      "Bash(git push --force*)", "Bash(git push -f *)", "Bash(git branch -D *)",
+      "Bash(rm -rf /)", "Bash(rm -rf / *)", "Bash(rm -rf ~)", "Bash(rm -rf ~/*)", "Bash(rm -rf .)", "Bash(rm -rf ..)",
+      "Bash(curl * --insecure*)", "Bash(curl * -k *)",
+      "Edit(engine/data/pragmatic-catalog.json)", "Edit(portfolio/**)", "Edit(reports/*/ship.lock)", "Edit(reports/_engine/ship.lock)",
+      "Edit(types/social-casino/data/pragmatic-catalog.json)",
+      "Read(~/.ssh/**)", "Read(~/.aws/**)", "Read(**/.env*)", "Bash(ssh *)", "Bash(scp *)", "Bash(nc *)", "Bash(npm publish*)",
+      "Bash(node tools/ppc/ads-mutate*)", "Bash(* :mutate*)",
+      "Bash(sudo *)", "Bash(chmod 777 *)", "Bash(* > /dev/sd*)",
+      "mcp__github__merge_pull_request", "mcp__github__enable_pr_auto_merge"
+    ]
+  },
+  "env": {
+    "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "2",
+    "PLAYWRIGHT_BROWSERS_PATH": "/opt/pw-browsers",
+    "CHECK_TIMEOUT_MIN": "15",
+    "FACTORY_ROOT": ".",
+    "FACTORY_HOOKS": "on"
+  },
+  "hooks": {
+    "SessionStart": [{ "matcher": "startup|resume|compact", "hooks": [{ "type": "command", "command": "bash .claude/hooks/session-start.sh", "timeout": 600 }] }],
+    "UserPromptSubmit": [{ "hooks": [{ "type": "command", "command": "node .claude/hooks/context-line.mjs", "timeout": 10 }] }],
+    "PreToolUse": [
+      { "matcher": "Edit|Write|MultiEdit|NotebookEdit", "hooks": [{ "type": "command", "command": "node .claude/hooks/guard-scope.mjs", "timeout": 10 }] },
+      { "matcher": "Bash", "hooks": [{ "type": "command", "command": "node .claude/hooks/guard-ship.mjs", "timeout": 30 }] },
+      { "matcher": "mcp__google-ads__.*|mcp__gtm__.*|mcp__ga4__.*", "hooks": [{ "type": "command", "command": "node .claude/hooks/guard-ppc.mjs", "timeout": 15 }] }
+    ],
+    "PostToolUse": [
+      { "matcher": "Edit|Write|MultiEdit", "hooks": [{ "type": "command", "command": "node .claude/hooks/lint-touched-site.mjs", "timeout": 60 }] },
+      { "matcher": "mcp__google-ads__.*|mcp__gtm__.*|mcp__ga4__.*", "hooks": [{ "type": "command", "command": "node .claude/hooks/guard-ppc.mjs --post", "timeout": 10 }] }
+    ],
+    "PreCompact": [{ "matcher": "manual|auto", "hooks": [{ "type": "command", "command": "node .claude/hooks/flush-events.mjs --precompact", "timeout": 10 }] }],
+    "Stop": [{ "hooks": [{ "type": "command", "command": "node .claude/hooks/flush-events.mjs", "timeout": 300 }] }],
+    "StopFailure": [{ "hooks": [{ "type": "command", "command": "node .claude/hooks/log-event.mjs", "timeout": 10, "async": true }] }]
+  }
+}

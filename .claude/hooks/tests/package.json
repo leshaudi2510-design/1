@@ -1,0 +1,7 @@
+{
+  "name": "factory-hook-tests",
+  "private": true,
+  "type": "commonjs",
+  "main": "index.js",
+  "description": "Pins index.js to CommonJS whatever the root package.json says, so `node --test .claude/hooks/tests` (a directory argument) resolves and runs every *.test.mjs here."
+}
