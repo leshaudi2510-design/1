@@ -1,7 +1,7 @@
 {
-  "$comment": "Every custom property the engine's partials, lib, pages and client code read with var(); each site's theme/tokens.css must define all of them (lint 'token-contract'). Generated once from sites/opalquestlounge/theme/tokens.css (the old src/styles/00-tokens.css) by partition A in Phase 1; a theme may define more. Variables the engine sets on elements itself (--cb-clear, --ct-size, --rib, --tf) are not part of the contract.",
+  "$comment": "Every custom property the engine's partials, lib, pages and client code read with var(); each site's theme/tokens.css must define all of them (lint 'token-contract'). Generated once from site #1's theme/tokens.css (the old src/styles/00-tokens.css) by partition A in Phase 1; a theme may define more. Variables the engine sets on elements itself (--cb-clear, --ct-size, --rib, --tf) are not part of the contract.",
   "version": 1,
-  "source": "sites/opalquestlounge/theme/tokens.css",
+  "source": "site #1, theme/tokens.css (Phase 1)",
   "modes": {
     "light": ":root",
     "dark": "@media (prefers-color-scheme: dark) { :root:not([data-theme=\"light\"]) { ... } } and :root[data-theme=\"dark\"] { ... }"

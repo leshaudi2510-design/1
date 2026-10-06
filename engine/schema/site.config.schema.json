@@ -90,12 +90,20 @@
   },
   "allOf": [
     {
-      "if": { "properties": { "pragmatic": { "properties": { "enabled": { "const": true } } } }, "required": ["pragmatic"] },
-      "then": { "properties": { "pragmatic": { "required": ["enabled", "demoUrl", "params", "frameHosts"] } } }
+      "if": { "properties": { "pragmatic": { "type": "object", "required": ["enabled"], "properties": { "enabled": { "const": true } } } }, "required": ["pragmatic"] },
+      "then": {
+        "properties": {
+          "pragmatic": {
+            "type": "object",
+            "required": ["enabled", "demoUrl", "params", "frameHosts"],
+            "properties": { "enabled": { "type": "boolean" }, "demoUrl": { "type": "string" }, "params": { "type": "object" }, "frameHosts": { "type": "array" } }
+          }
+        }
+      }
     },
     {
       "if": { "properties": { "type": { "not": { "const": "social-casino" } } }, "required": ["type"] },
-      "then": { "properties": { "pragmatic": { "properties": { "enabled": { "const": false } } } } }
+      "then": { "properties": { "pragmatic": { "type": "object", "properties": { "enabled": { "const": false } } } } }
     }
   ]
 }

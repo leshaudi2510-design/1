@@ -29,7 +29,7 @@ export function siteFolder(dir = process.env.SITE_DIR || process.cwd()) {
 
 export function makeContext(cfg, site = siteFolder()) {
   // A site without the file (a type with no demos) reads as {}; the
-  // social-casino lint (sc.pragmatic-data) reports a missing list.
+  // type pack's own lint reports a missing list where the type needs one.
   let pragmaticData = {};
   try {
     pragmaticData = site.readJson('data/pragmatic-games.json');

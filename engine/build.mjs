@@ -127,6 +127,7 @@ async function main() {
   const site = siteFolder(SITE);
 
   const cfg = JSON.parse(await fs.readFile(configFile, 'utf8'));
+  if (cfg.engine === 'none') throw new UsageError(`${path.relative(process.cwd(), SITE) || '.'} is not built by the engine (site.config.json "engine": "none")`);
   const report = createReport({ strict });
 
   // ---------- 0. type pack and config schema ----------

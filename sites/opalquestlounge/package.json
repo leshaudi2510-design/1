@@ -1,0 +1,6 @@
+{
+  "name": "opalquestlounge",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "node ../../engine/build.mjs .", "build:strict": "node ../../engine/build.mjs . --strict", "build:off": "node ../../engine/build.mjs . --no-pragmatic", "serve": "node ../../engine/tools/serve.mjs dist 8080", "check": "node ../../engine/tools/check.mjs --site ." }
+}

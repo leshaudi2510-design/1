@@ -1,0 +1,10 @@
+{
+  "name": "@factory/engine",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The site factory's static-site engine: node engine/build.mjs <site-dir>. Zero runtime dependencies; dev tools use the repository's hoisted devDependencies. The version is engineVersion (site.config.json v2, tag engine-vX.Y.Z).",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  }
+}

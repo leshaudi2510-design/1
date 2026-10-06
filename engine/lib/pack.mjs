@@ -72,6 +72,17 @@ export function packProblems(pack, type) {
 }
 
 /**
+ * A pack as JSON, for engine/schema/pack.schema.json: every function becomes
+ * the string "function" (tools/engine-lint.mjs --packs validates this).
+ */
+export function projectPack(value) {
+  if (typeof value === 'function') return 'function';
+  if (Array.isArray(value)) return value.map(projectPack);
+  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).filter(([k]) => k !== 'dir').map(([k, v]) => [k, projectPack(v)]));
+  return value;
+}
+
+/**
  * Load types/<type>/pack.mjs from the TYPES root. Throws with a readable
  * message when the type has no pack or the pack breaks the v0 contract.
  */
